@@ -575,8 +575,8 @@
       "validation": "कृपया त्रुटिहरूको लागि फर्म जाँच गर्नुहोस्",
       "rateLimit": "धेरै पेशहरू",
       "rateLimitMessage": "धेरै पेशहरू। कृपया फेरि प्रयास गर्नु अघि {{time}} प्रतीक्षा गर्नुहोस्।",
-      "rateLimitWaitTime": "{{minutes}} मिनेट{{seconds, select, 0 {} other { र {{seconds}} सेकेन्ड}}}",
-      "rateLimitWaitTimeSeconds": "{{seconds}} सेकेन्ड",
+      "rateLimitWaitTime": "{{value}}",
+      "rateLimitWaitTimeSeconds": "{{value}}",
       "rateLimitCountdown": "बाँकी समय: {{time}}",
       "server": "सर्भर त्रुटि। कृपया पछि फेरि प्रयास गर्नुहोस्।",
       "network": "नेटवर्क त्रुटि। कृपया आफ्नो जडान जाँच गर्नुहोस् र फेरि प्रयास गर्नुहोस्।"

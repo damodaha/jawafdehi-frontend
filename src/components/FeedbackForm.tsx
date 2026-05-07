@@ -187,16 +187,14 @@ export function FeedbackForm({
                     
                     const minutes = Math.floor(error.retryAfter / 60);
                     const seconds = error.retryAfter % 60;
-                    const timeString = minutes > 0 
-                        ? t("feedback.error.rateLimitWaitTime", { 
-                            minutes, 
-                            seconds,
-                            defaultValue: `${minutes} minute${minutes > 1 ? 's' : ''} ${seconds > 0 ? `and ${seconds} second${seconds > 1 ? 's' : ''}` : ''}`
-                          })
-                        : t("feedback.error.rateLimitWaitTimeSeconds", { 
-                            seconds,
-                            defaultValue: `${seconds} second${seconds > 1 ? 's' : ''}`
-                          });
+                    const minuteStr = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+                    const secondStr = `${seconds} second${seconds !== 1 ? 's' : ''}`;
+                    const builtTime = minutes > 0
+                        ? `${minuteStr}${seconds > 0 ? ` and ${secondStr}` : ''}`
+                        : secondStr;
+                    const timeString = minutes > 0
+                        ? t("feedback.error.rateLimitWaitTime", { value: builtTime, defaultValue: builtTime })
+                        : t("feedback.error.rateLimitWaitTimeSeconds", { value: builtTime, defaultValue: builtTime });
                     
                     setGeneralError(
                         t("feedback.error.rateLimitMessage", { 

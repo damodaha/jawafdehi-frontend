@@ -577,8 +577,8 @@
       "validation": "Please check the form for errors",
       "rateLimit": "Too Many Submissions",
       "rateLimitMessage": "Too many submissions. Please wait {{time}} before trying again.",
-      "rateLimitWaitTime": "{{minutes}} minute{{minutes, plural, one {} other {s}}}{{seconds, select, 0 {} other { and {{seconds}} second{{seconds, plural, one {} other {s}}}}}",
-      "rateLimitWaitTimeSeconds": "{{seconds}} second{{seconds, plural, one {} other {s}}}",
+      "rateLimitWaitTime": "{{value}}",
+      "rateLimitWaitTimeSeconds": "{{value}}",
       "rateLimitCountdown": "Time remaining: {{time}}",
       "server": "Server error. Please try again later.",
       "network": "Network error. Please check your connection and try again."
