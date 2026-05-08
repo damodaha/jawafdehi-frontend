@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { GuestCaseChatDrawer } from "@/components/guest/GuestCaseChatDrawer";
 import { DocumentSourceCard } from "@/components/DocumentSourceCard";
 import { ResponsiveTable } from "@/components/ResponsiveTable";
+import { CourtCaseCard } from "@/components/CourtCaseCard";
 import { FloatingShareSidebar } from "@/components/FloatingShareSidebar";
 import { CaseDetailBanner } from "@/components/CaseDetailBanner";
 import { CaseTimeline } from "@/components/CaseTimeline";
@@ -16,10 +17,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Calendar, FileText, AlertTriangle, ArrowLeft, ExternalLink, AlertCircle, Info, Mail, MapPin, MessageCircle, StickyNote, User, Banknote } from "lucide-react";
-import { getCaseById, getDocumentSourceById } from "@/services/jds-api";
+import { Banknote, Calendar, FileText, AlertTriangle, ArrowLeft, ExternalLink, AlertCircle, Info, Mail, MapPin, MessageCircle, Scale, StickyNote, User } from "lucide-react";
+import { getCaseById, getCourtCase, getDocumentSourceById } from "@/services/jds-api";
 import { getEntityById } from "@/services/api";
-import type { DocumentSource, JawafEntity } from "@/types/jds";
+import type { CourtCase, DocumentSource, JawafEntity } from "@/types/jds";
 import type { Entity } from "@/types/nes";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { formatCaseDateRange } from "@/utils/date";
@@ -174,6 +175,15 @@ const CaseDetail = () => {
     queries: uniqueNesIds.map((nesId) => ({
       queryKey: ['nes-entity', nesId],
       queryFn: () => getEntityById(nesId),
+      staleTime: 10 * 60 * 1000,
+      retry: false,
+    })),
+  });
+
+  const courtCaseQueries = useQueries({
+    queries: (caseData?.court_cases ?? []).map((courtCaseId) => ({
+      queryKey: ['court-case', courtCaseId],
+      queryFn: () => getCourtCase(courtCaseId),
       staleTime: 10 * 60 * 1000,
       retry: false,
     })),
@@ -542,48 +552,58 @@ const CaseDetail = () => {
                       </CardContent>
                     </Card>
 
-          {caseData.evidence.length > 0 && (
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <FileText className="mr-2 h-5 w-5" />
-                  {t("caseDetail.evidence")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {renderOrder.map((group) => {
-                    const evidenceInGroup = groupedEvidence[group];
-                    if (evidenceInGroup.length === 0) return null;
+                    {(caseData.court_cases ?? []).length > 0 && (
+                      <Card className="mb-8">
+                        <CardHeader>
+                          <CardTitle className="flex items-center">
+                            <Scale className="mr-2 h-5 w-5" />
+                            {t("caseDetail.courtCase", "Court Case")}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            {(caseData.court_cases ?? []).map((courtCaseId, index) => {
+                              const query = courtCaseQueries[index];
+                              return (
+                                <CourtCaseCard
+                                  key={courtCaseId}
+                                  courtCaseId={courtCaseId}
+                                  courtCase={query?.data as CourtCase | undefined}
+                                  isLoading={query?.isLoading ?? false}
+                                />
+                              );
+                            })}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
 
-                    return (
-                      <div key={group}>
-                        <SectionHeader 
-                          group={group} 
-                          count={evidenceInGroup.length} 
-                          t={t} 
-                        />
-                        <div>
-                          {evidenceInGroup.map((evidence, index) => {
-                            const source = resolvedSources[evidence.source_id] ?? null;
-                            return (
-                              <DocumentSourceCard
-                                key={`${evidence.source_id}-${index}`}
-                                source={source}
-                                sourceId={evidence.source_id}
-                                itemNumber={evidence.originalIndex + 1}
-                                evidenceDescription={evidence.description}
-                              />
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                    {caseData.evidence.length > 0 && (
+                      <Card className="mb-8">
+                        <CardHeader>
+                          <CardTitle className="flex items-center">
+                            <FileText className="mr-2 h-5 w-5" />
+                            {t("caseDetail.evidence")}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div>
+                            {caseData.evidence.map((evidence, index) => {
+                              const source = resolvedSources[evidence.source_id] ?? null;
+                              return (
+                                <DocumentSourceCard
+                                  key={`${evidence.source_id}-${index}`}
+                                  source={source}
+                                  sourceId={evidence.source_id}
+                                  itemNumber={index + 1}
+                                  evidenceDescription={evidence.description}
+                                />
+                              );
+                            })}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
 
                     {caseData.missing_details && (
                       <section className="mb-8 border-t border-border pt-5">
