@@ -14,7 +14,7 @@ export default {
     // (browsers always send Accept: text/html for navigation; non-navigation assets
     //  like JS/CSS are typically not GET-less, but we guard on method only to stay
     //  compatible with Cloudflare's asset serving behaviour)
-    if (request.method !== 'GET') return asset;
+    if (request.method !== 'GET' && request.method !== 'HEAD') return asset;
 
     // SPA fallback: serve index.html with 200
     const indexRequest = new Request(new URL('/', request.url).toString(), request);
