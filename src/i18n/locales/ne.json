@@ -151,6 +151,25 @@
     "askPopupTitle": "यस मुद्दाबारे जवाफदेहीलाई सोध्नुहोस्",
     "askPopupDescription": "छोटो सार, समयरेखा, वा स्रोतमा आधारित उत्तर पाउनुहोस्।",
     "inReviewBanner": "यो मुद्दा वर्तमानमा जवाफदेहीले समीक्षा गरिरहेको छ। जानकारी अधूरो वा संशोधनको अधीनमा हुन सक्छ।",
+    "courtCase": "अदालती मुद्दा",
+    "courtCaseNumber": "मुद्दा नं.",
+    "courtCaseType": "मुद्दाको प्रकार",
+    "courtCategory": "श्रेणी",
+    "courtDivision": "फाँट",
+    "courtRegistered": "दर्ता मिति",
+    "courtStatus": "स्थिति",
+    "courtPlaintiff": "वादी",
+    "courtDefendant": "प्रतिवादी",
+    "courtHearings": "सुनुवाइहरू",
+    "courtHearingDate": "सुनवाइ मिती",
+    "courtHearingStatus": "मुद्दाको स्थिती",
+    "courtHearingDecision": "आदेश / फैसलाको किसिम",
+    "courtHearingJudges": "न्यायधिसहरु",
+    "courtCaseUnavailable": "अदालती मुद्दाको विवरण उपलब्ध छैन।",
+    "embezzledAmount": "बिगो (हिनामिना रकम)",
+    "outcomes": "फैसला र परिणाम",
+    "verdict": "फैसला",
+    "sentence": "सजाय",
     "status": {
       "ongoing": "चलिरहेको",
       "resolved": "समाधान भएको",
@@ -161,6 +180,13 @@
       "loading": "टिप्पणीहरू लोड हुँदैछ...",
       "joinDiscussion": "यस मुद्दामा आफ्नो विचार साझा गर्न छलफलमा सामेल हुनुहोस्।",
       "loadComments": "टिप्पणीहरू लोड गर्नुहोस्"
+    },
+    "evidenceGroups": {
+      "primary": "प्राथमिक स्रोत",
+      "legal": "कानूनी प्रमाण",
+      "secondary": "द्वितीयक स्रोतहरू",
+      "documentCount": "{{count}} प्रमाण",
+      "documentCount_plural": "{{count}} प्रमाणहरू"
     }
   },
   "guestCommon": {
@@ -541,7 +567,9 @@
     "otherContactMethod": "अन्य",
     "otherPlaceholder": "सम्पर्क विवरण प्रविष्ट गर्नुहोस्",
     "submitFeedback": "प्रतिक्रिया पेश गर्नुहोस्",
+    "rateLimitedButton": "{{time}} प्रतीक्षा गर्नुहोस्",
     "submitting": "पेश गर्दै...",
+    "addContactMethod": "सम्पर्क थप्नुहोस्",
     "submitted": {
       "title": "प्रतिक्रिया पेश गरियो",
       "description": "तपाईंको प्रतिक्रियाको लागि धन्यवाद! हामी यसलाई समीक्षा गर्नेछौं र यदि आवश्यक छ भने तपाईंसँग फर्कनेछौं।"
@@ -550,6 +578,10 @@
       "title": "त्रुटि",
       "validation": "कृपया त्रुटिहरूको लागि फर्म जाँच गर्नुहोस्",
       "rateLimit": "धेरै पेशहरू",
+      "rateLimitMessage": "धेरै पेशहरू। कृपया फेरि प्रयास गर्नु अघि {{time}} प्रतीक्षा गर्नुहोस्।",
+      "rateLimitWaitTime": "{{value}}",
+      "rateLimitWaitTimeSeconds": "{{value}}",
+      "rateLimitCountdown": "बाँकी समय: {{time}}",
       "server": "सर्भर त्रुटि। कृपया पछि फेरि प्रयास गर्नुहोस्।",
       "network": "नेटवर्क त्रुटि। कृपया आफ्नो जडान जाँच गर्नुहोस् र फेरि प्रयास गर्नुहोस्।"
     },
@@ -744,5 +776,9 @@
     "shareOnReddit": "Reddit मा साझेदारी गर्नुहोस्",
     "shareOnMessenger": "Messenger मा साझेदारी गर्नुहोस्",
     "shareOnThreads": "Threads मा साझेदारी गर्नुहोस्"
+  },
+  "courts": {
+    "supreme": "सर्वोच्च अदालत",
+    "special": "विशेष अदालत"
   }
 }

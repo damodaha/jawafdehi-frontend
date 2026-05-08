@@ -15,6 +15,7 @@ import type {
   CaseDetail,
   CaseSearchParams,
   CaseStatistics,
+  CourtCase,
   DocumentSource,
   DocumentSourceSearchParams,
   PaginatedCaseList,
@@ -163,9 +164,9 @@ export async function getCases(params?: CaseSearchParams): Promise<PaginatedCase
  * Retrieve detailed information about a specific published case.
  * Includes complete case data and audit history.
  */
-export async function getCaseById(id: number): Promise<CaseDetail> {
+export async function getCaseById(id: string | number): Promise<CaseDetail> {
   try {
-    const response = await apiClient.get<CaseDetail>(`/cases/${id}/`);
+    const response = await apiClient.get<CaseDetail>(`/cases/${encodeURIComponent(String(id))}/`);
     return response.data;
   } catch (error) {
     handleApiError(error, `/cases/${id}/`);
@@ -229,6 +230,19 @@ export async function getDocumentSources(params?: DocumentSourceSearchParams): P
     return response.data;
   } catch (error) {
     handleApiError(error, '/sources/');
+  }
+}
+
+/**
+ * Retrieve court case details from the NGM endpoint.
+ */
+export async function getCourtCase(caseId: string): Promise<CourtCase> {
+  try {
+    const encoded = encodeURIComponent(caseId);
+    const response = await apiClient.get<CourtCase>(`/ngm/court_case/${encoded}`);
+    return response.data;
+  } catch (error) {
+    handleApiError(error, `/ngm/court_case/${caseId}`);
   }
 }
 

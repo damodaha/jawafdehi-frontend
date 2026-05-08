@@ -151,6 +151,26 @@
     "askPopupTitle": "Ask Jawafdehi about this case",
     "askPopupDescription": "Get a quick summary, timeline, or source-based answer.",
     "inReviewBanner": "This case is currently under review by Jawafdehi. Information may be incomplete or subject to revision.",
+    "embezzledAmount": "Embezzled / Irregular Amount",
+    "courtCases": "Related Court Cases",
+    "courtCase": "Court Case",
+    "courtCaseNumber": "Case No.",
+    "courtCaseType": "Case Type",
+    "courtCategory": "Category",
+    "courtDivision": "Division",
+    "courtRegistered": "Registered",
+    "courtStatus": "Status",
+    "courtPlaintiff": "Plaintiff",
+    "courtDefendant": "Defendant",
+    "courtHearings": "Hearings",
+    "courtHearingDate": "Hearing Date",
+    "courtHearingStatus": "Status",
+    "courtHearingDecision": "Decision",
+    "courtHearingJudges": "Judges",
+    "courtCaseUnavailable": "Court case details unavailable.",
+    "outcomes": "Verdict & Outcomes",
+    "verdict": "Verdict",
+    "sentence": "Sentence",
     "status": {
       "ongoing": "Ongoing",
       "resolved": "Resolved",
@@ -161,6 +181,13 @@
       "loading": "Loading comments...",
       "joinDiscussion": "Join the discussion and share your thoughts on this case.",
       "loadComments": "Load Comments"
+    },
+    "evidenceGroups": {
+      "primary": "Primary Evidence",
+      "legal": "Legal Documents",
+      "secondary": "Secondary Sources",
+      "documentCount": "{{count}} document",
+      "documentCount_plural": "{{count}} documents"
     }
   },
   "guestCommon": {
@@ -542,6 +569,7 @@
     "otherContactMethod": "Other",
     "otherPlaceholder": "Enter contact details",
     "submitFeedback": "Submit Feedback",
+    "rateLimitedButton": "Wait {{time}}",
     "submitting": "Submitting...",
     "submitted": {
       "title": "Feedback Submitted",
@@ -551,6 +579,10 @@
       "title": "Error",
       "validation": "Please check the form for errors",
       "rateLimit": "Too Many Submissions",
+      "rateLimitMessage": "Too many submissions. Please wait {{time}} before trying again.",
+      "rateLimitWaitTime": "{{value}}",
+      "rateLimitWaitTimeSeconds": "{{value}}",
+      "rateLimitCountdown": "Time remaining: {{time}}",
       "server": "Server error. Please try again later.",
       "network": "Network error. Please check your connection and try again."
     },
@@ -746,5 +778,9 @@
     "shareOnReddit": "Share on Reddit",
     "shareOnMessenger": "Share on Messenger",
     "shareOnThreads": "Share on Threads"
+  },
+  "courts": {
+    "supreme": "Supreme Court",
+    "special": "Special Court"
   }
 }

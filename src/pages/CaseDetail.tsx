@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { GuestCaseChatDrawer } from "@/components/guest/GuestCaseChatDrawer";
 import { DocumentSourceCard } from "@/components/DocumentSourceCard";
 import { ResponsiveTable } from "@/components/ResponsiveTable";
+import { CourtCaseCard } from "@/components/CourtCaseCard";
 import { CaseShareBar } from "@/components/CaseShareBar";
 import { CaseDetailBanner } from "@/components/CaseDetailBanner";
 import { CaseTimeline } from "@/components/CaseTimeline";
@@ -16,10 +17,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Calendar, FileText, AlertTriangle, ArrowLeft, ExternalLink, AlertCircle, Info, Mail, MapPin, MessageCircle, StickyNote, User } from "lucide-react";
-import { getCaseById, getDocumentSourceById } from "@/services/jds-api";
+import { Banknote, Calendar, FileText, AlertTriangle, ArrowLeft, ExternalLink, AlertCircle, Info, Mail, MapPin, MessageCircle, Scale, StickyNote, User } from "lucide-react";
+import { getCaseById, getCourtCase, getDocumentSourceById } from "@/services/jds-api";
 import { getEntityById } from "@/services/api";
-import type { DocumentSource, JawafEntity } from "@/types/jds";
+import type { CourtCase, DocumentSource, JawafEntity } from "@/types/jds";
 import type { Entity } from "@/types/nes";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { formatCaseDateRange } from "@/utils/date";
@@ -29,6 +30,7 @@ import { JAWAFDEHI_WHATSAPP_NUMBER, JAWAFDEHI_EMAIL } from "@/config/constants";
 import { translateDynamicText } from "@/lib/translate-dynamic-content";
 import { trackEvent } from "@/utils/analytics";
 import { cn } from "@/lib/utils";
+import { formatNPR, formatBigo } from "@/utils/number";
 import "@/styles/print.css";
 
 const RELATION_PRIORITY: Record<string, number> = {
@@ -56,11 +58,93 @@ function getGroupedEntities(entities: JawafEntity[]) {
   }, {} as Record<string, JawafEntity[]>);
 }
 
+// Evidence tier grouping types and constants
+type EvidenceGroup = 'primary' | 'legal' | 'secondary';
+
+const PRIMARY_TYPES: readonly string[] = [
+  'OFFICIAL_GOVERNMENT',
+  'FINANCIAL_FORENSIC',
+  'INTERNAL_CORPORATE',
+  'INVESTIGATIVE_REPORT'
+] as const;
+
+const LEGAL_TYPES: readonly string[] = [
+  'LEGAL_COURT_ORDER',
+  'LEGAL_PROCEDURAL',
+  'LEGISLATIVE_DOC'
+] as const;
+
+const SECONDARY_TYPES: readonly string[] = [
+  'MEDIA_NEWS',
+  'PUBLIC_COMPLAINT',
+  'SOCIAL_MEDIA',
+  'OTHER_VISUAL'
+] as const;
+
+/**
+ * Classifies a document source into an evidentiary tier based on source_type.
+ *
+ * @param sourceType - The source_type field from DocumentSource (can be null/undefined)
+ * @returns The evidence group: 'primary', 'legal', or 'secondary'
+ */
+function getEvidenceGroup(sourceType: string | null | undefined): EvidenceGroup {
+  if (!sourceType) return 'secondary';
+
+  if (PRIMARY_TYPES.includes(sourceType)) return 'primary';
+  if (LEGAL_TYPES.includes(sourceType)) return 'legal';
+  if (SECONDARY_TYPES.includes(sourceType)) return 'secondary';
+
+  // Unknown source_type defaults to secondary
+  return 'secondary';
+}
+
+interface SectionHeaderProps {
+  group: EvidenceGroup;
+  count: number;
+  t: (key: string, options?: { count?: number }) => string;
+}
+
+/**
+ * Section header component for evidence tier grouping.
+ * Displays a badge with tier-specific colors and document count.
+ */
+const SectionHeader: React.FC<SectionHeaderProps> = ({ group, count, t }) => {
+  const config = {
+    primary: {
+      bgColor: 'bg-[#E6F1FB] dark:bg-blue-950/30',
+      textColor: 'text-[#0C447C] dark:text-blue-300',
+      labelKey: 'caseDetail.evidenceGroups.primary'
+    },
+    legal: {
+      bgColor: 'bg-[#EEEDFE] dark:bg-purple-950/30',
+      textColor: 'text-[#3C3489] dark:text-purple-300',
+      labelKey: 'caseDetail.evidenceGroups.legal'
+    },
+    secondary: {
+      bgColor: 'bg-[#F1EFE8] dark:bg-gray-800/30',
+      textColor: 'text-[#5F5E5A] dark:text-gray-300',
+      labelKey: 'caseDetail.evidenceGroups.secondary'
+    }
+  };
+
+  const { bgColor, textColor, labelKey } = config[group];
+
+  return (
+    <div className="flex items-center gap-3 mb-3 pb-2 border-b border-border">
+      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${bgColor} ${textColor}`}>
+        {t(labelKey)}
+      </span>
+      <span className="text-sm text-muted-foreground">
+        {t('caseDetail.evidenceGroups.documentCount', { count })}
+      </span>
+    </div>
+  );
+};
+
 const CaseDetail = () => {
   const { t, i18n } = useTranslation();
   const currentLang = i18n.language;
   const { id } = useParams();
-  const caseId = id ? parseInt(id) : undefined;
   const trackedCaseIdRef = useRef<string | null>(null);
   const [isAskDrawerOpen, setIsAskDrawerOpen] = useState(false);
   const [showAskPopup, setShowAskPopup] = useState(true);
@@ -68,9 +152,9 @@ const CaseDetail = () => {
   const [isIntroFinished, setIsIntroFinished] = useState(false);
 
   const { data: caseData, isLoading, isError } = useQuery({
-    queryKey: ['case', caseId],
-    queryFn: () => getCaseById(caseId!),
-    enabled: caseId != null,
+    queryKey: ['case', id],
+    queryFn: () => getCaseById(id!),
+    enabled: id != null,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -91,6 +175,15 @@ const CaseDetail = () => {
     queries: uniqueNesIds.map((nesId) => ({
       queryKey: ['nes-entity', nesId],
       queryFn: () => getEntityById(nesId),
+      staleTime: 10 * 60 * 1000,
+      retry: false,
+    })),
+  });
+
+  const courtCaseQueries = useQueries({
+    queries: (caseData?.court_cases ?? []).map((courtCaseId) => ({
+      queryKey: ['court-case', courtCaseId],
+      queryFn: () => getCourtCase(courtCaseId),
       staleTime: 10 * 60 * 1000,
       retry: false,
     })),
@@ -150,6 +243,22 @@ const CaseDetail = () => {
     source: resolvedSources[evidence.source_id] ?? null,
     evidenceDescription: evidence.description,
   }));
+
+  // Group evidence by tier
+  const groupedEvidence: Record<EvidenceGroup, Array<typeof caseData.evidence[0] & { originalIndex: number }>> = {
+    primary: [],
+    legal: [],
+    secondary: []
+  };
+
+  (caseData?.evidence ?? []).forEach((evidence, index) => {
+    const source = resolvedSources[evidence.source_id];
+    const group = getEvidenceGroup(source?.source_type);
+    groupedEvidence[group].push({ ...evidence, originalIndex: index });
+  });
+
+  // Render order: primary -> legal -> secondary
+  const renderOrder: EvidenceGroup[] = ['primary', 'legal', 'secondary'];
 
   if (isLoading) {
     return (
@@ -219,7 +328,7 @@ const CaseDetail = () => {
     .replace(/\s+/g, ' ')
     .trim()
     .substring(0, 160);
-  const metaDescription = plainDescription || caseData.key_allegations.slice(0, 2).join('. ').substring(0, 160);
+  const metaDescription = caseData.narrative?.core_claim || plainDescription || caseData.key_allegations?.slice(0, 2).join('. ').substring(0, 160) || "";
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -296,57 +405,65 @@ const CaseDetail = () => {
                     />
                   )}
 
-                  <div className="grid grid-cols-1 gap-4">
-                    <div className="flex items-start text-muted-foreground">
-                      <User className="mr-2 h-5 w-5 flex-shrink-0" />
-                      <div className="text-sm flex flex-wrap gap-1">
-                        {caseData.entities.filter(e => e.type === 'accused').map((e, index, arr) => {
-                          const entity = e.nes_id ? resolvedEntities[e.nes_id] : null;
-                          let displayName = entity?.names?.[0]?.en?.full || entity?.names?.[0]?.ne?.full || e.display_name || e.nes_id || 'Unknown';
-                          displayName = translateDynamicText(displayName, currentLang);
-                          return (
-                            <span key={e.id}>
-                              <Link to={`/entity/${e.id}`} className="text-primary hover:underline">{displayName}</Link>
-                              {index < arr.length - 1 && ', '}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    </div>
-                    <div className="flex items-center text-muted-foreground">
-                      <MapPin className="mr-2 h-5 w-5" />
-                      <div className="text-sm flex flex-wrap gap-1">
-                        {(() => {
-                          const locations = caseData.entities.filter(e => e.type === 'location');
-                          return locations.length > 0 ? locations.map((e, index) => {
-                            const entity = e.nes_id ? resolvedEntities[e.nes_id] : null;
-                            let displayName = entity?.names?.[0]?.en?.full || entity?.names?.[0]?.ne?.full || e.display_name || e.nes_id || 'Unknown';
-                            displayName = translateDynamicText(displayName, currentLang);
-                            return (
-                              <span key={e.id}>
-                                <Link to={`/entity/${e.id}`} className="text-primary hover:underline">{displayName}</Link>
-                                {index < locations.length - 1 && ', '}
-                              </span>
-                            );
-                          }) : 'N/A';
-                        })()}
-                      </div>
-                    </div>
-                    <div className="flex items-center text-muted-foreground">
-                      <Calendar className="mr-2 h-5 w-5" />
-                      <span className="text-sm">
-                        {t("caseDetail.period")}:{" "}
-                        {formatCaseDateRange(caseData.case_start_date, caseData.case_end_date, t("cases.status.ongoing"))}
+            <div className="grid grid-cols-1 gap-4">
+              <div className="flex items-start text-muted-foreground">
+                <User className="mr-2 h-5 w-5 flex-shrink-0" />
+                <div className="text-sm flex flex-wrap gap-1">
+                  {caseData.entities.filter(e => e.type === 'accused').map((e, index, arr) => {
+                    const entity = e.nes_id ? resolvedEntities[e.nes_id] : null;
+                    let displayName = entity?.names?.[0]?.en?.full || entity?.names?.[0]?.ne?.full || e.display_name || e.nes_id || t('common.notAvailable');
+                    displayName = translateDynamicText(displayName, currentLang);
+                    return (
+                      <span key={e.id}>
+                        <Link to={`/entity/${e.id}`} className="text-primary hover:underline">{displayName}</Link>
+                        {index < arr.length - 1 && ', '}
                       </span>
-                    </div>
-                  </div>
+                    );
+                  })}
                 </div>
+              </div>
+              <div className="flex items-center text-muted-foreground">
+                <MapPin className="mr-2 h-5 w-5" />
+                <div className="text-sm flex flex-wrap gap-1">
+                  {(() => {
+                    const locations = caseData.entities.filter(e => e.type === 'location');
+                    return locations.length > 0 ? locations.map((e, index) => {
+                      const entity = e.nes_id ? resolvedEntities[e.nes_id] : null;
+                      let displayName = entity?.names?.[0]?.en?.full || entity?.names?.[0]?.ne?.full || e.display_name || e.nes_id || t('common.notAvailable');
+                      displayName = translateDynamicText(displayName, currentLang);
+                      return (
+                        <span key={e.id}>
+                          <Link to={`/entity/${e.id}`} className="text-primary hover:underline">{displayName}</Link>
+                          {index < locations.length - 1 && ', '}
+                        </span>
+                      );
+                    }) : t('common.notAvailable');
+                  })()}
+                </div>
+              </div>
+              <div className="flex items-center text-muted-foreground">
+                <Calendar className="mr-2 h-5 w-5" />
+                <span className="text-sm">
+                  {t("caseDetail.period")}:{" "}
+                  {formatCaseDateRange(caseData.case_start_date, caseData.case_end_date, t("cases.status.ongoing"))}
+                </span>
+              </div>
+              {(caseData.financials?.bigo_display || caseData.financials?.alleged_amount_npr != null || (caseData.bigo != null && caseData.bigo > 0)) && (
+                <div className="flex items-center text-muted-foreground">
+                  <Banknote className="mr-2 h-5 w-5" />
+                  <span className="text-sm">
+                    {t("caseDetail.embezzledAmount")}: {caseData.financials?.bigo_display || formatBigo(caseData.financials?.alleged_amount_npr || caseData.bigo)}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
 
                 <Separator className="mb-8 hidden print:block" />
 
                 <div className={cn(
                   "grid gap-8 transition-[grid-template-columns] duration-300 ease-out print:block",
-                  caseData.timeline.length > 0 && !isAskDrawerOpen && "lg:grid-cols-[minmax(0,1fr)_20rem] xl:grid-cols-[minmax(0,1fr)_24rem]"
+                  (caseData.timeline || []).length > 0 && !isAskDrawerOpen && "lg:grid-cols-[minmax(0,1fr)_20rem] xl:grid-cols-[minmax(0,1fr)_24rem]"
                 )}>
                   <div className="min-w-0 lg:col-start-1">
                     <Card className="mb-6 sm:mb-8">
@@ -358,7 +475,7 @@ const CaseDetail = () => {
                       </CardHeader>
                       <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
                         <ul className="space-y-3 sm:space-y-4">
-                          {caseData.key_allegations.map((allegation, index) => (
+                          {(caseData.key_allegations || []).map((allegation, index) => (
                             <li
                               key={index}
                               className="flex items-start gap-3 rounded-2xl bg-muted/35 p-3 sm:bg-transparent sm:p-0"
@@ -371,9 +488,54 @@ const CaseDetail = () => {
                               </p>
                             </li>
                           ))}
+                          {(caseData.key_allegations || []).length === 0 && (
+                            <li className="text-sm text-muted-foreground italic">
+                              {t("common.notAvailable")}
+                            </li>
+                          )}
                         </ul>
                       </CardContent>
                     </Card>
+
+                    {caseData.outcomes && (
+                      <Card className="mb-8 border-l-4 border-l-primary">
+                        <CardHeader>
+                          <CardTitle className="flex items-center text-primary">
+                            <Scale className="mr-2 h-5 w-5" />
+                            {t("caseDetail.outcomes", "Verdict & Outcomes")}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid gap-6 sm:grid-cols-2">
+                            <div>
+                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                                {t("caseDetail.verdict", "Verdict")}
+                              </p>
+                              <p className="text-lg font-bold">
+                                {caseData.outcomes.verdict || t("common.pending", "Pending")}
+                              </p>
+                            </div>
+                            {caseData.outcomes.sentence_months ? (
+                              <div>
+                                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                                  {t("caseDetail.sentence", "Sentence")}
+                                </p>
+                                <p className="text-lg font-bold">
+                                  {caseData.outcomes.sentence_months} {t("common.months", "Months")}
+                                </p>
+                              </div>
+                            ) : null}
+                          </div>
+                          {caseData.outcomes.notes && (
+                            <div className="mt-4 pt-4 border-t border-border/60">
+                              <p className="text-sm text-muted-foreground leading-relaxed">
+                                {caseData.outcomes.notes}
+                              </p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    )}
 
                     {hasInvolvedParties && (
                       <section className="mb-8">
@@ -414,7 +576,7 @@ const CaseDetail = () => {
                   </div>
 
                   <CaseTimeline
-                    timeline={caseData.timeline}
+                    timeline={caseData.timeline || []}
                     title={t("caseDetail.timeline")}
                     className={cn(
                       "print:static print:mb-8 lg:col-start-2 lg:row-start-1 lg:row-span-2",
@@ -434,6 +596,32 @@ const CaseDetail = () => {
                         <ResponsiveTable html={caseData.description} />
                       </CardContent>
                     </Card>
+
+                    {(caseData.court_cases ?? []).length > 0 && (
+                      <Card className="mb-8">
+                        <CardHeader>
+                          <CardTitle className="flex items-center">
+                            <Scale className="mr-2 h-5 w-5" />
+                            {t("caseDetail.courtCase", "Court Case")}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            {(caseData.court_cases ?? []).map((courtCaseId, index) => {
+                              const query = courtCaseQueries[index];
+                              return (
+                                <CourtCaseCard
+                                  key={courtCaseId}
+                                  courtCaseId={courtCaseId}
+                                  courtCase={query?.data as CourtCase | undefined}
+                                  isLoading={query?.isLoading ?? false}
+                                />
+                              );
+                            })}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
 
                     {caseData.evidence.length > 0 && (
                       <Card className="mb-8">

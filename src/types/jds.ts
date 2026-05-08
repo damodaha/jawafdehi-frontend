@@ -78,9 +78,81 @@ export interface EvidenceEntry {
   description: string;
 }
 
+export interface NarrativeData {
+  core_claim: string | null;
+  impact: string | null;
+  expected_service: string | null;
+  alleged_irregularity: string | null;
+}
+
+export interface FinancialData {
+  alleged_amount_npr: number | null;
+  recovered_amount_npr: number | null;
+  fines_npr: number | null;
+  currency: string;
+  bigo_display: string | null;
+}
+
+export interface OutcomeData {
+  verdict: 'GUILTY' | 'ACQUITTED' | 'PENDING' | string | null;
+  sentence_months: number | null;
+  notes: string | null;
+}
+
+export interface CourtCaseHearing {
+  id: number;
+  case_number: string;
+  court_identifier: string;
+  hearing_date_bs: string;
+  hearing_date_ad: string;
+  bench: string | null;
+  bench_type: string;
+  judge_names: string | null;
+  lawyer_names: string | null;
+  serial_no: string;
+  case_status: string;
+  decision_type: string;
+  remarks: string;
+}
+
+export interface CourtCaseEntity {
+  id: number;
+  case_number: string;
+  court_identifier: string;
+  side: string;
+  name: string;
+  address: string | null;
+  nes_id: string | null;
+}
+
+export interface CourtCase {
+  case_number: string;
+  court_identifier: string;
+  registration_date_bs: string | null;
+  registration_date_ad: string | null;
+  case_type: string | null;
+  division: string | null;
+  category: string | null;
+  section: string | null;
+  plaintiff: string | null;
+  defendant: string | null;
+  original_case_number: string;
+  case_id: string | null;
+  priority: string | null;
+  registration_number: string;
+  case_status: string | null;
+  verdict_date_bs: string | null;
+  verdict_date_ad: string | null;
+  verdict_judge: string | null;
+  status: string;
+  hearings: CourtCaseHearing[];
+  entities: CourtCaseEntity[];
+}
+
 export interface Case {
   id: number;
   case_id: string; // Unique identifier shared across versions
+  slug: string | null; // URL-friendly slug; older cases may not have one yet
   case_type: CaseType;
   state: CaseState; // Current state in the workflow
   title: string;
@@ -95,6 +167,10 @@ export interface Case {
   key_allegations: string[]; // List of key allegation statements
   timeline: TimelineEntry[];
   evidence: EvidenceEntry[];
+  narrative?: NarrativeData | null;
+  financials?: FinancialData | null;
+  outcomes?: OutcomeData | null;
+  court_cases: string[]; // Court case IDs (e.g., "special:081-CR-0060")
   notes: string; // Internal notes (HTML from TinyMCE)
   missing_details?: string | null;
   bigo?: number | null;
@@ -102,7 +178,13 @@ export interface Case {
   updated_at: string; // ISO datetime
 }
 
-export type CaseDetail = Case;
+export interface CaseDetail extends Case {
+  bigo: number | null; // Embezzled/irregular amount in NPR (null if not applicable)
+  court_cases: string[] | null;
+  financials?: FinancialData | null;
+  narrative?: NarrativeData | null;
+  outcomes?: OutcomeData | null;
+}
 
 export interface DocumentSource {
   id: number;
