@@ -50,21 +50,6 @@
       "browseCases": "Browse Cases",
       "learnMore": "Learn More"
     },
-    "stats": {
-      "totalCases": "Total Cases Documented",
-      "totalCasesValue": "127",
-      "totalCasesDesc": "Verified corruption cases",
-      "entitiesTracked": "Entities Tracked",
-      "entitiesTrackedValue": "89",
-      "entitiesTrackedDesc": "Public organizations monitored",
-      "underInvestigation": "Cases Under Investigation",
-      "underInvestigationValue": "43",
-      "underInvestigationDesc": "Active investigations",
-      "resolved": "Cases Resolved",
-      "resolvedValue": "31",
-      "resolvedDesc": "Successfully concluded",
-      "trend": "↑ 12% this quarter"
-    },
     "featuredCases": {
       "title": "Featured Cases",
       "description": "Recent high-impact corruption cases under public scrutiny",

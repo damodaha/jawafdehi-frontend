@@ -50,21 +50,6 @@
       "browseCases": "मुद्दाहरू ब्राउज गर्नुहोस्",
       "learnMore": "थप जान्नुहोस्"
     },
-    "stats": {
-      "totalCases": "कुल दस्तावेजीकृत मुद्दाहरू",
-      "totalCasesValue": "१२७",
-      "totalCasesDesc": "प्रमाणित भ्रष्टाचारका मुद्दाहरू",
-      "entitiesTracked": "ट्र्याक गरिएका व्यक्ति/संस्थाहरू",
-      "entitiesTrackedValue": "८९",
-      "entitiesTrackedDesc": "निगरानी गरिएका सार्वजनिक व्यक्ति/संस्थाहरू",
-      "underInvestigation": "अनुसन्धानमा रहेका मुद्दाहरू",
-      "underInvestigationValue": "४३",
-      "underInvestigationDesc": "सक्रिय अनुसन्धानहरू",
-      "resolved": "समाधान भएका मुद्दाहरू",
-      "resolvedValue": "३१",
-      "resolvedDesc": "सफलतापूर्वक निष्कर्ष",
-      "trend": "↑ यो त्रैमासिकमा 12%"
-    },
     "featuredCases": {
       "title": "विशेष मुद्दाहरू",
       "description": "सार्वजनिक जाँचमा रहेका हालैका उच्च प्रभाव भ्रष्टाचारका मुद्दाहरू",
