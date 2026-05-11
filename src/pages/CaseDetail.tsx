@@ -801,9 +801,10 @@ const CaseDetail = () => {
             url={canonicalUrl}
             title={caseData.title}
             description={plainDescription}
-            variant="default"
+            variant="outline"
             size="lg"
             showLabel={true}
+            className="shadow-lg border-2 hover:shadow-xl"
           />
         </div>
       )}
@@ -815,9 +816,9 @@ const CaseDetail = () => {
             <Tooltip delayDuration={200}>
               <TooltipTrigger asChild>
                 <Button
-                  variant="default"
+                  variant="outline"
                   size="icon"
-                  className="rounded-lg shadow-lg hover:shadow-xl transition-all"
+                  className="rounded-lg shadow-lg border-2 hover:shadow-xl transition-all"
                   onClick={() => setIsShareOpen(true)}
                   aria-label={t("share.share")}
                 >
