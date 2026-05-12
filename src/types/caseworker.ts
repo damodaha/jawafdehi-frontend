@@ -100,6 +100,146 @@ export interface KnowledgeCollection {
   updated_at: string;
 }
 
+export interface KnowledgeSource {
+  id: number;
+  collection: number;
+  collection_name: string;
+  title: string;
+  source_type: string;
+  source_url: string;
+  chunk_count?: number;
+  storage_path: string;
+  checksum: string;
+  metadata: Record<string, unknown>;
+  access_level: "private" | "public";
+  is_active: boolean;
+  owner: number | null;
+  allowed_users: number[];
+  allowed_groups: number[];
+  case: number | null;
+  document_source: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface KnowledgeImportManifest {
+  collection: {
+    name: string;
+    display_name?: string;
+    description?: string;
+    access_level?: "private" | "public";
+    is_active?: boolean;
+  } | string;
+  source: {
+    title: string;
+    source_type?: string;
+    source_url?: string;
+    url?: string;
+    storage_path?: string;
+    checksum?: string;
+    metadata?: Record<string, unknown>;
+    access_level?: "private" | "public";
+    is_active?: boolean;
+  };
+  document?: {
+    text?: string;
+    markdown?: string;
+    content?: string;
+    content_file?: string;
+    markdown_file?: string;
+    text_file?: string;
+    section_title?: string;
+    metadata?: Record<string, unknown>;
+    pages?: Array<{
+      page?: number;
+      page_start?: number;
+      page_end?: number;
+      text?: string;
+      content?: string;
+      section_title?: string;
+      metadata?: Record<string, unknown>;
+    }>;
+  };
+  chunking?: {
+    strategy?: "recursive" | "page_recursive";
+    chunk_size?: number;
+    chunk_overlap?: number;
+    min_chunk_chars?: number;
+    separators?: string[];
+  };
+  embedding?: boolean | {
+    auto?: boolean;
+    model?: string;
+    batch_size?: number;
+    metadata?: Record<string, unknown>;
+  };
+  chunks?: Array<{
+    text?: string;
+    content?: string;
+    chunk_index?: number;
+    page?: number;
+    page_start?: number;
+    page_end?: number;
+    section_title?: string;
+    table_title?: string;
+    metadata?: Record<string, unknown>;
+  }>;
+}
+
+export interface KnowledgeImportResult {
+  collection: KnowledgeCollection;
+  source: KnowledgeSource;
+  chunks_imported: number;
+  embeddings_imported?: number;
+}
+
+export interface KnowledgeSourceImportPayload {
+  collection_name: string;
+  collection_display_name?: string;
+  source_title?: string;
+  source_type?: string;
+  access_level?: "private" | "public";
+  embed?: boolean;
+  source_url?: string;
+  text?: string;
+  markdown?: string;
+  manifest?: KnowledgeImportManifest | Record<string, unknown>;
+  file?: File;
+  pages?: string;
+  page_start?: number;
+  page_end?: number;
+  expand_catalog?: boolean;
+  convert_linked_documents?: boolean;
+}
+
+export interface KnowledgeSourceImportResult {
+  collection: KnowledgeCollection;
+  source: KnowledgeSource | null;
+  sources_imported: number;
+  chunks_imported: number;
+  embeddings_imported: number;
+  failures: Array<{ item?: string; error: string }>;
+}
+
+export interface RAGSkillProfile {
+  id: number;
+  name: string;
+  display_name: string;
+  description: string;
+  skill: number;
+  collections: number[];
+  trigger_keywords: string[];
+  priority: number;
+  max_results: number;
+  min_keyword_matches: number;
+  requires_citations: boolean;
+  is_active: boolean;
+  source_path: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface PublicChatConfig {
   id: number;
   name: string;
@@ -107,19 +247,13 @@ export interface PublicChatConfig {
   enabled: boolean;
   prompt: number;
   llm_provider: number | null;
-  classifier_llm_provider: number | null;
   quota_scope: "ip_session" | "session" | "ip";
   quota_limit: number;
   quota_window_seconds: number;
   max_question_chars: number;
   max_history_turns: number;
   max_history_chars: number;
-  max_mcp_results: number;
   max_tool_calls: number;
-  max_evidence_chars: number;
-  knowledge_rag_enabled: boolean;
-  knowledge_collections: number[];
-  max_knowledge_results: number;
   created_at: string;
   updated_at: string;
 }
