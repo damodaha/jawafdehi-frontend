@@ -1,12 +1,14 @@
 import * as Sentry from "@sentry/react";
 
+const HARDCODED_DSN = "https://examplePublicKey@o0.ingest.sentry.io/0";
+
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN as string | undefined;
 
 export function initSentry(): void {
-  if (!SENTRY_DSN) return;
+  const dsn = SENTRY_DSN || HARDCODED_DSN;
 
   Sentry.init({
-    dsn: SENTRY_DSN,
+    dsn,
     environment: import.meta.env.MODE,
     integrations: [
       Sentry.browserTracingIntegration(),
