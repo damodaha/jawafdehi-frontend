@@ -118,8 +118,6 @@
       "location": "Locations",
       "unknown": "Other Related Parties"
     },
-    "showAllAccused": "Show all accused ({{count}})",
-    "showLessAccused": "Show fewer accused",
     "andMoreAccused": "and {{count}} more",
     "evidence": "Evidence & Sources",
     "missingDetails": "Missing Details",

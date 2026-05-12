@@ -159,7 +159,6 @@ const CaseDetail = () => {
   const [showAskPopup, setShowAskPopup] = useState(true);
   const [isAskCondensed, setIsAskCondensed] = useState(false);
   const [isIntroFinished, setIsIntroFinished] = useState(false);
-  const [showAllAccused, setShowAllAccused] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const isMobile = useIsMobile();
 
@@ -177,8 +176,9 @@ const CaseDetail = () => {
 
   const accusedEntities = caseData?.entities.filter(e => e.type === 'accused') ?? [];
   const accusedCount = accusedEntities.length;
-  const collapsedAccused = accusedCount > 3 && !showAllAccused;
-  const visibleAccusedEntities = collapsedAccused ? accusedEntities.slice(0, 3) : accusedEntities;
+  const BANNER_ACCUSED_LIMIT = 5;
+  const collapsedAccused = accusedCount > BANNER_ACCUSED_LIMIT;
+  const visibleAccusedEntities = collapsedAccused ? accusedEntities.slice(0, BANNER_ACCUSED_LIMIT) : accusedEntities;
   const hiddenAccusedCount = accusedCount - visibleAccusedEntities.length;
 
   const sourceQueries = useQueries({
@@ -458,16 +458,6 @@ const CaseDetail = () => {
                   )}
                 </div>
               </div>
-              {accusedCount > 3 && (
-                <div className="mt-2">
-                  <Button variant="ghost" size="sm" onClick={() => setShowAllAccused((prev) => !prev)}>
-                    {showAllAccused 
-                      ? t('caseDetail.showLessAccused') 
-                      : t('caseDetail.showAllAccused', { count: accusedCount })
-                    }
-                  </Button>
-                </div>
-              )}
               <div className="flex items-center text-muted-foreground">
                 <MapPin className="mr-2 h-5 w-5" />
                 <div className="text-sm flex flex-wrap gap-1">
@@ -555,15 +545,8 @@ const CaseDetail = () => {
                             return Object.entries(groupedEntities)
                               .sort(([typeA], [typeB]) => (RELATION_PRIORITY[typeA] ?? 99) - (RELATION_PRIORITY[typeB] ?? 99))
                               .map(([type, entities]) => {
-                                // Compute label for each relation type
                                 const typeKey = `caseDetail.relationTypes.${type}`;
                                 const label = t(typeKey, { defaultValue: unknownLabel });
-                                
-                                // Limit accused entities to 3 initially
-                                const limitedEntities = type === 'accused' && entities.length > 3 && !showAllAccused 
-                                  ? entities.slice(0, 3) 
-                                  : entities;
-                                const hasMoreAccused = type === 'accused' && entities.length > 3;
 
                                 return (
                                   <div key={type} className="space-y-4">
@@ -574,28 +557,11 @@ const CaseDetail = () => {
                                     <div className="h-px w-full bg-border/60" />
                                   </div>
                                   <CaseEntityChips
-                                    entities={limitedEntities}
+                                    entities={entities}
                                     resolvedEntities={resolvedEntities}
                                     language={currentLang}
+                                    initialLimit={8}
                                   />
-                                  {hasMoreAccused && !showAllAccused && (
-                                    <Button 
-                                      variant="ghost" 
-                                      size="sm"
-                                      onClick={() => setShowAllAccused(true)}
-                                    >
-                                      {t('caseDetail.showAllAccused', { count: accusedCount })}
-                                    </Button>
-                                  )}
-                                  {hasMoreAccused && showAllAccused && (
-                                    <Button 
-                                      variant="ghost" 
-                                      size="sm"
-                                      onClick={() => setShowAllAccused(false)}
-                                    >
-                                      {t('caseDetail.showLessAccused')}
-                                    </Button>
-                                  )}
                                 </div>
                               );
                             });
