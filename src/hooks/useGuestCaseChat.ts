@@ -1,24 +1,46 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { askPublicQuestionStream, getPublicChatSessionId } from "@/services/public-chat";
 import type { CaseDetail } from "@/types/jds";
-import type { GuestCaseChatMessage } from "@/types/guest-chat";
-import type { GuestCaseSourceEntry } from "@/services/guest-chat-adapter";
-import { askGuestCaseQuestion } from "@/services/guest-chat-adapter";
+import type { GuestCaseChatCitation, GuestCaseChatMessage } from "@/types/guest-chat";
+import type { PublicChatHistoryItem, PublicChatSource } from "@/types/public-chat";
 
 interface UseGuestCaseChatOptions {
   caseId: number;
   caseTitle: string;
   caseData: CaseDetail;
-  sourceEntries: GuestCaseSourceEntry[];
   defaultSuggestedQuestions: string[];
+}
+
+interface SubmitCaseQuestionInput {
+  question: string;
+  history: PublicChatHistoryItem[];
+}
+
+function buildCaseScopedQuestion(caseId: number, caseData: CaseDetail, question: string) {
+  const identifier = caseData.case_id || String(caseId);
+  return `For Jawafdehi case ${identifier} (${caseData.title}), answer this case-page question: ${question}`;
+}
+
+function sourceToCitation(source: PublicChatSource, index: number): GuestCaseChatCitation {
+  const sourceId =
+    Number(source.source_id) ||
+    Number(source.document_id) ||
+    Number(source.chunk_id) ||
+    index + 1;
+
+  return {
+    sourceId,
+    sourceTitle: source.title,
+    reason: source.snippet,
+  };
 }
 
 export function useGuestCaseChat({
   caseId,
   caseTitle,
   caseData,
-  sourceEntries,
   defaultSuggestedQuestions,
 }: UseGuestCaseChatOptions) {
   const { t, i18n } = useTranslation();
@@ -28,14 +50,20 @@ export function useGuestCaseChat({
   const previousDefaultSuggestedQuestionsRef = useRef(defaultSuggestedQuestions);
 
   const mutation = useMutation({
-    mutationFn: async (question: string) =>
-      askGuestCaseQuestion({
-        caseId,
-        question,
-        caseData,
-        sourceEntries,
+    mutationFn: async ({ question, history }: SubmitCaseQuestionInput) => {
+      const response = await askPublicQuestionStream({
+        question: buildCaseScopedQuestion(caseId, caseData, question),
+        history,
         language: i18n.language,
-      }),
+        sessionId: getPublicChatSessionId(),
+      });
+      return {
+        answer: response.answer_text,
+        citations: response.sources.map(sourceToCitation),
+        followups: response.follow_up_questions,
+        origin: "public-read-adapter" as const,
+      };
+    },
   });
   const { reset: resetMutation } = mutation;
 
@@ -66,6 +94,12 @@ export function useGuestCaseChat({
   const submitQuestion = async (question: string) => {
     const timestamp = new Date().toISOString();
     const loadingMessageId = `assistant-loading-${Date.now()}`;
+    const history = messages
+      .filter((message) => !message.isLoading && !message.isError)
+      .map((message) => ({
+        role: message.role,
+        content: message.content,
+      }));
 
     setMessages((current) => [
       ...current,
@@ -87,7 +121,7 @@ export function useGuestCaseChat({
     setError(null);
 
     try {
-      const result = await mutation.mutateAsync(question);
+      const result = await mutation.mutateAsync({ question, history });
       setMessages((current) =>
         current.map((message) =>
           message.id === loadingMessageId
