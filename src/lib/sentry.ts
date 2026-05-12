@@ -1,12 +1,14 @@
 import * as Sentry from "@sentry/react";
 
+const HARDCODED_DSN = "https://f5fafd04ccca67355a3b404d1b209e94@o4511364048027648.ingest.de.sentry.io/4511366946226256";
+
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN as string | undefined;
 
 export function initSentry(): void {
-  if (!SENTRY_DSN) return;
+  const dsn = SENTRY_DSN || HARDCODED_DSN;
 
   Sentry.init({
-    dsn: SENTRY_DSN,
+    dsn,
     environment: import.meta.env.MODE,
     integrations: [
       Sentry.browserTracingIntegration(),
