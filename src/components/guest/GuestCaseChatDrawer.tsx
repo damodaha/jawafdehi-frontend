@@ -58,7 +58,6 @@ export function GuestCaseChatDrawer({
       caseId,
       caseTitle,
       caseData,
-      sourceEntries: sources,
       defaultSuggestedQuestions,
     });
 
@@ -230,7 +229,7 @@ export function GuestCaseChatDrawer({
               placeholder={t("guestChatInput.askCasePlaceholder")}
               submitLabel={t("guestChatInput.submit")}
               loadingLabel={t("guestChatInput.answering")}
-              disabled
+              disabled={isSubmitting}
               isSubmitting={isSubmitting}
               onSubmit={submitQuestion}
             />
