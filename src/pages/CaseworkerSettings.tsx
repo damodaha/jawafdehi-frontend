@@ -62,6 +62,70 @@ function errorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Import failed";
 }
 
+const SOURCE_TYPE_OPTIONS = [
+  { value: "document", label: "Document" },
+  { value: "annual_report", label: "Annual Report" },
+  { value: "case_evidence", label: "Case Evidence" },
+  { value: "court_decision", label: "Court Decision" },
+  { value: "law_journal", label: "Law Journal" },
+  { value: "faq", label: "FAQ" },
+  { value: "methodology", label: "Methodology" },
+  { value: "webpage", label: "Webpage" },
+  { value: "json", label: "JSON" },
+] as const;
+
+const SOURCE_TYPE_VALUES = new Set(SOURCE_TYPE_OPTIONS.map((option) => option.value));
+
+function SourceTypeControl({
+  value,
+  onChange,
+  idPrefix,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  idPrefix: string;
+}) {
+  const selectedValue = SOURCE_TYPE_VALUES.has(value as (typeof SOURCE_TYPE_OPTIONS)[number]["value"]) ? value : "custom";
+  const customValue = selectedValue === "custom" ? value : "";
+
+  return (
+    <div className="space-y-1">
+      <Label htmlFor={`${idPrefix}-select`}>Source Type</Label>
+      <Select
+        value={selectedValue}
+        onValueChange={(nextValue) => {
+          if (nextValue === "custom") {
+            onChange(SOURCE_TYPE_VALUES.has(value as (typeof SOURCE_TYPE_OPTIONS)[number]["value"]) ? "" : value);
+            return;
+          }
+          onChange(nextValue);
+        }}
+      >
+        <SelectTrigger id={`${idPrefix}-select`}>
+          <SelectValue placeholder="Choose source type" />
+        </SelectTrigger>
+        <SelectContent>
+          {SOURCE_TYPE_OPTIONS.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+          <SelectItem value="custom">Custom...</SelectItem>
+        </SelectContent>
+      </Select>
+      {selectedValue === "custom" ? (
+        <Input
+          id={`${idPrefix}-custom`}
+          value={customValue}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder="custom_source_type"
+        />
+      ) : null}
+      <p className="text-xs text-muted-foreground">Used as metadata for search filtering; the importer will not guess it.</p>
+    </div>
+  );
+}
+
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-border bg-white shadow-sm">
@@ -791,10 +855,7 @@ function KnowledgeTab({
                 <Label htmlFor="knowledge-source-title">Source Title</Label>
                 <Input id="knowledge-source-title" value={sourceTitle} onChange={(event) => setSourceTitle(event.target.value)} placeholder="Optional; inferred for URLs/files" />
               </div>
-              <div className="space-y-1">
-                <Label htmlFor="knowledge-source-type">Source Type</Label>
-                <Input id="knowledge-source-type" value={sourceType} onChange={(event) => setSourceType(event.target.value)} placeholder="annual_report" />
-              </div>
+              <SourceTypeControl value={sourceType} onChange={setSourceType} idPrefix="knowledge-source-type" />
 
               {mode === "url" ? (
                 <div className="space-y-1 sm:col-span-2">
@@ -927,10 +988,11 @@ function KnowledgeTab({
               <Label htmlFor="edit-source-title">Title</Label>
               <Input id="edit-source-title" value={sourceForm.title} onChange={(event) => setSourceForm((current) => ({ ...current, title: event.target.value }))} />
             </div>
-            <div className="space-y-1">
-              <Label htmlFor="edit-source-type">Source Type</Label>
-              <Input id="edit-source-type" value={sourceForm.source_type} onChange={(event) => setSourceForm((current) => ({ ...current, source_type: event.target.value }))} />
-            </div>
+            <SourceTypeControl
+              value={sourceForm.source_type}
+              onChange={(value) => setSourceForm((current) => ({ ...current, source_type: value }))}
+              idPrefix="edit-source-type"
+            />
             <div className="space-y-1">
               <Label htmlFor="edit-source-url">Source URL</Label>
               <Input id="edit-source-url" value={sourceForm.source_url} onChange={(event) => setSourceForm((current) => ({ ...current, source_url: event.target.value }))} />
@@ -1342,7 +1404,7 @@ function PublicChatTab({
         max_question_chars: 1000,
         max_history_turns: 6,
         max_history_chars: 4000,
-        max_tool_calls: 3,
+        max_tool_calls: 8,
         llm_provider: null,
         ...form,
       });
@@ -1350,10 +1412,11 @@ function PublicChatTab({
     setForm(saved);
   };
 
-  const numberField = (field: keyof PublicChatConfig, label: string) => (
+  const numberField = (field: keyof PublicChatConfig, label: string, helpText?: string) => (
     <div className="space-y-1">
       <Label>{label}</Label>
       <Input type="number" min={1} value={Number(form[field] ?? 1)} onChange={(event) => setForm((current) => ({ ...current, [field]: Number(event.target.value) }))} />
+      {helpText ? <p className="text-xs leading-5 text-muted-foreground">{helpText}</p> : null}
     </div>
   );
 
@@ -1391,7 +1454,11 @@ function PublicChatTab({
         {numberField("max_question_chars", "Max Question Characters")}
         {numberField("max_history_turns", "Max History Turns")}
         {numberField("max_history_chars", "Max History Characters")}
-        {numberField("max_tool_calls", "Max Tool Calls")}
+        {numberField(
+          "max_tool_calls",
+          "Max Agent Tool Calls",
+          "Maximum read-tool calls the public chat agent may make per answer. Higher values help complex report questions but increase latency and cost.",
+        )}
       </div>
       <Button size="sm" onClick={save}><Check className="mr-1 h-4 w-4" /> Save Public Chat Config</Button>
     </div>
