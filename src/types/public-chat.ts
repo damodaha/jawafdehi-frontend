@@ -4,6 +4,7 @@ export interface PublicChatHistoryItem {
 }
 
 export interface PublicChatSource {
+  source_ref?: string;
   title: string;
   url: string;
   type: string;
@@ -14,6 +15,10 @@ export interface PublicChatSource {
   page_start?: number | null;
   page_end?: number | null;
   score?: number | null;
+  retrieval_mode?: string | null;
+  citation_identifier?: string | null;
+  citation_publisher?: string | null;
+  citation_publication_date?: string | null;
 }
 
 export interface PublicChatRelatedCase {
