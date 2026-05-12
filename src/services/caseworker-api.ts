@@ -9,6 +9,12 @@ import type {
   CaseworkerUser,
   PublicChatConfig,
   KnowledgeCollection,
+  KnowledgeSource,
+  RAGSkillProfile,
+  KnowledgeImportManifest,
+  KnowledgeImportResult,
+  KnowledgeSourceImportPayload,
+  KnowledgeSourceImportResult,
 } from "@/types/caseworker";
 
 const API_BASE_URL = import.meta.env.VITE_JDS_API_BASE_URL || "https://portal.jawafdehi.org/api";
@@ -201,11 +207,87 @@ export async function updatePublicChatConfig(id: number, payload: Partial<Public
   return data;
 }
 
+// RAG Skill Profiles
+
+export async function listRAGSkillProfiles(): Promise<{ results: RAGSkillProfile[] } | RAGSkillProfile[]> {
+  const { data } = await client.get("/rag-skill-profiles/");
+  return data;
+}
+
+export async function createRAGSkillProfile(payload: Partial<RAGSkillProfile>): Promise<RAGSkillProfile> {
+  const { data } = await client.post("/rag-skill-profiles/", payload);
+  return data;
+}
+
+export async function updateRAGSkillProfile(id: number, payload: Partial<RAGSkillProfile>): Promise<RAGSkillProfile> {
+  const { data } = await client.patch(`/rag-skill-profiles/${id}/`, payload);
+  return data;
+}
+
+export async function deleteRAGSkillProfile(id: number) {
+  await client.delete(`/rag-skill-profiles/${id}/`);
+}
+
 // Knowledge
 
 export async function listKnowledgeCollections(): Promise<{ results: KnowledgeCollection[] } | KnowledgeCollection[]> {
   const { data } = await client.get(`${API_BASE_URL}/knowledge/collections/`);
   return data;
+}
+
+export async function listKnowledgeSources(params: { collection?: number; search?: string } = {}): Promise<{ results: KnowledgeSource[] } | KnowledgeSource[]> {
+  const { data } = await client.get(`${API_BASE_URL}/knowledge/sources/`, { params });
+  return data;
+}
+
+export async function updateKnowledgeCollection(
+  id: number,
+  payload: Partial<KnowledgeCollection>,
+): Promise<KnowledgeCollection> {
+  const { data } = await client.patch(`${API_BASE_URL}/knowledge/collections/${id}/`, payload);
+  return data;
+}
+
+export async function updateKnowledgeSource(
+  id: number,
+  payload: Partial<KnowledgeSource>,
+): Promise<KnowledgeSource> {
+  const { data } = await client.patch(`${API_BASE_URL}/knowledge/sources/${id}/`, payload);
+  return data;
+}
+
+export async function importKnowledgeManifest(manifest: KnowledgeImportManifest): Promise<KnowledgeImportResult> {
+  const { data } = await client.post(`${API_BASE_URL}/knowledge/import/`, manifest);
+  return data;
+}
+
+export async function importKnowledgeSource(payload: KnowledgeSourceImportPayload): Promise<KnowledgeSourceImportResult> {
+  if (payload.file) {
+    const form = new FormData();
+    appendSourceImportForm(form, payload);
+    const { data } = await client.post(`${API_BASE_URL}/knowledge/import-source/`, form, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return data;
+  }
+
+  const { data } = await client.post(`${API_BASE_URL}/knowledge/import-source/`, payload);
+  return data;
+}
+
+function appendSourceImportForm(form: FormData, payload: KnowledgeSourceImportPayload) {
+  Object.entries(payload).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === "") return;
+    if (key === "file" && value instanceof File) {
+      form.append("file", value);
+      return;
+    }
+    if (key === "manifest") {
+      form.append(key, JSON.stringify(value));
+      return;
+    }
+    form.append(key, String(value));
+  });
 }
 
 // MCP Servers
