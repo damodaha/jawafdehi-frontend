@@ -8,6 +8,7 @@ import { BotTypingBubble } from "@/components/guest/BotTypingBubble";
 import { Header } from "@/components/Header";
 import { GuestAnswerBlock } from "@/components/guest/GuestAnswerBlock";
 import { GuestChatInput } from "@/components/guest/GuestChatInput";
+import { ChatMarkdown } from "@/components/guest/ChatMarkdown";
 import { PublicChatRelatedCases } from "@/components/guest/PublicChatRelatedCases";
 import { PublicChatSources } from "@/components/guest/PublicChatSources";
 import { Button } from "@/components/ui/button";
@@ -215,7 +216,7 @@ export default function GuestChat() {
                     <div key={turn.id} className="space-y-5">
                       <div className="flex justify-end">
                         <div className="max-w-[85%] rounded-[28px] bg-primary px-5 py-4 text-sm leading-7 text-primary-foreground shadow-sm">
-                          {turn.question}
+                          <ChatMarkdown content={turn.question} tone="user" />
                         </div>
                       </div>
 
@@ -241,7 +242,7 @@ export default function GuestChat() {
                   {(submittedQuestion || isLoading) ? (
                     <div className="flex justify-end">
                       <div className="max-w-[85%] rounded-[28px] bg-primary px-5 py-4 text-sm leading-7 text-primary-foreground shadow-sm">
-                        {submittedQuestion}
+                        <ChatMarkdown content={submittedQuestion} tone="user" />
                       </div>
                     </div>
                   ) : null}

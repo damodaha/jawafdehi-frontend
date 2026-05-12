@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { ChatMarkdown } from "@/components/guest/ChatMarkdown";
 
 interface GuestAnswerBlockProps {
   answer: string;
@@ -21,7 +22,7 @@ export function GuestAnswerBlock({
         />
       </div>
       <div className="min-w-0 flex-1 rounded-[28px] border border-border/70 bg-card p-5 shadow-sm">
-        <p className="whitespace-pre-line text-sm leading-7 text-foreground">{answer}</p>
+        <ChatMarkdown content={answer} />
         {resultCount > 0 ? (
           <p className="mt-3 text-xs text-muted-foreground">
             {t("guestAnswerBlock.resultSummary", { count: resultCount })}

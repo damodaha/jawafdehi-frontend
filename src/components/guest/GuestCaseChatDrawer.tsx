@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Sparkles, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { BotTypingBubble } from "@/components/guest/BotTypingBubble";
+import { ChatMarkdown } from "@/components/guest/ChatMarkdown";
 import { GuestChatInput } from "@/components/guest/GuestChatInput";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -190,7 +191,10 @@ export function GuestCaseChatDrawer({
                                 : "border-border/70 bg-card"
                             }`}
                           >
-                            <p className="whitespace-pre-wrap text-sm leading-7">{message.content}</p>
+                            <ChatMarkdown
+                              content={message.content}
+                              tone={message.role === "user" ? "user" : "assistant"}
+                            />
                             {message.citations?.length ? (
                               <div className="mt-3 space-y-2">
                                 {message.citations.map((citation) => (
