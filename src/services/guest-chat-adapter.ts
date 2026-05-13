@@ -9,6 +9,7 @@ import type {
   GuestCaseResultItem,
   GuestEntityMatch,
 } from "@/types/guest-chat";
+import { stripMarkdown } from "@/utils/markdown";
 
 const MAX_CASE_PAGES = 50;
 const DEFAULT_FOLLOWUPS_EN = [
@@ -48,15 +49,7 @@ function stripHtml(value: string | null | undefined): string {
     return "";
   }
 
-  return value
-    .replace(/<[^>]*>/g, " ")
-    .replace(/!\[.*?\]\(.*?\)/g, "")
-    .replace(/\[([^\]]*)\]\(.*?\)/g, "$1")
-    .replace(/```[\s\S]*?```/g, "")
-    .replace(/`([^`]+)`/g, "$1")
-    .replace(/[#*_~>|]/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
+  return stripMarkdown(value.replace(/<[^>]*>/g, " "));
 }
 
 function normalize(value: string): string {

@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Header } from "@/components/Header";
 import { GuestCaseChatDrawer } from "@/components/guest/GuestCaseChatDrawer";
 import { DocumentSourceCard } from "@/components/DocumentSourceCard";
+import { ResponsiveTable } from "@/components/ResponsiveTable";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { CourtCaseCard } from "@/components/CourtCaseCard";
