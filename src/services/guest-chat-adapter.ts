@@ -2,6 +2,7 @@ import { GUEST_TOPIC_KNOWLEDGE, type GuestTopicId } from "@/data/guest-knowledge
 import { searchEntities } from "@/services/api";
 import { getCaseById, getCases, getDocumentSourceById } from "@/services/jds-api";
 import type { Case, CaseDetail, DocumentSource } from "@/types/jds";
+import { stripMarkdown } from "@/utils/markdown";
 import type {
   GuestAskResponse,
   GuestCaseChatCitation,
@@ -49,7 +50,7 @@ function stripHtml(value: string | null | undefined): string {
     return "";
   }
 
-  return stripMarkdown(value.replace(/<[^>]*>/g, " "));
+  return stripMarkdown(value.replace(/<[^>]*>/g, " ")).trim();
 }
 
 function normalize(value: string): string {

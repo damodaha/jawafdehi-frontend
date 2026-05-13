@@ -15,6 +15,7 @@ import { ShareButton } from "@/components/ShareButton";
 import { CaseDetailBanner } from "@/components/CaseDetailBanner";
 import { CaseTimeline } from "@/components/CaseTimeline";
 import { CaseEntityChips } from "@/components/CaseEntityChips";
+import { ResponsiveTable } from "@/components/ResponsiveTable";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
