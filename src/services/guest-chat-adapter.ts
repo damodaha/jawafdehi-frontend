@@ -10,6 +10,7 @@ import type {
   GuestCaseResultItem,
   GuestEntityMatch,
 } from "@/types/guest-chat";
+import { stripMarkdown } from "@/utils/markdown";
 
 const MAX_CASE_PAGES = 50;
 const DEFAULT_FOLLOWUPS_EN = [
@@ -49,7 +50,7 @@ function stripHtml(value: string | null | undefined): string {
     return "";
   }
 
-  return stripMarkdown(value).replace(/<[^>]*>/g, " ").trim();
+  return stripMarkdown(value.replace(/<[^>]*>/g, " ")).trim();
 }
 
 function normalize(value: string): string {
