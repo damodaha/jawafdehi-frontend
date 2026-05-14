@@ -534,7 +534,7 @@ const CaseDetail = () => {
                     </Card>
 
                     {hasInvolvedParties && (
-                      <section className="mb-8">
+                      <section>
                         <h2 className="mb-5 text-2xl font-semibold text-foreground">
                           {t("caseDetail.partiesInvolved")}
                         </h2>
