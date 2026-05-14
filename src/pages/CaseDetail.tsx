@@ -7,12 +7,15 @@ import { Header } from "@/components/Header";
 import { GuestCaseChatDrawer } from "@/components/guest/GuestCaseChatDrawer";
 import { DocumentSourceCard } from "@/components/DocumentSourceCard";
 import { ResponsiveTable } from "@/components/ResponsiveTable";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { CourtCaseCard } from "@/components/CourtCaseCard";
 import { FloatingShareSidebar } from "@/components/FloatingShareSidebar";
 import { ShareButton } from "@/components/ShareButton";
 import { CaseDetailBanner } from "@/components/CaseDetailBanner";
 import { CaseTimeline } from "@/components/CaseTimeline";
 import { CaseEntityChips } from "@/components/CaseEntityChips";
+import { ResponsiveTable } from "@/components/ResponsiveTable";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -31,6 +34,7 @@ import type { CourtCase, DocumentSource, JawafEntity } from "@/types/jds";
 import type { Entity } from "@/types/nes";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { formatCaseDateRange } from "@/utils/date";
+import { stripMarkdown } from "@/utils/markdown";
 import { ReportCaseDialog } from "@/components/ReportCaseDialog";
 import { DisqusComments } from "@/components/DisqusComments";
 import { JAWAFDEHI_WHATSAPP_NUMBER, JAWAFDEHI_EMAIL } from "@/config/constants";
@@ -342,21 +346,7 @@ const CaseDetail = () => {
 
   const canonicalUrl = `https://jawafdehi.org/case/${id}`;
   const isAskPopupVisible = showAskPopup && !isAskDrawerOpen;
-  const plainDescription = caseData.description
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&ndash;/g, '–')
-    .replace(/&mdash;/g, '—')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&[a-z]+;/gi, ' ')
-    .replace(/&#\d+;/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .substring(0, 160);
+  const plainDescription = stripMarkdown(caseData.description).substring(0, 160);
   const metaDescription = plainDescription || caseData.key_allegations?.slice(0, 2).join('. ').substring(0, 160) || "";
 
   return (
@@ -590,7 +580,7 @@ const CaseDetail = () => {
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="overflow-hidden">
-                        <ResponsiveTable html={caseData.description} />
+                        <Markdown remarkPlugins={[remarkGfm]} className="prose-content text-foreground leading-relaxed [&_p]:mb-3 [&_p:last-child]:mb-0 [&_ul]:space-y-2 [&_ul]:my-4 [&_li]:ml-6 [&_li]:pl-2 [&_a]:underline [&_strong]:font-semibold [&_em]:italic [&_h1]:text-xl [&_h1]:font-bold [&_h1]:mb-2 [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mb-2 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mb-1">{caseData.description}</Markdown>
                       </CardContent>
                     </Card>
 

@@ -2,6 +2,7 @@ import { GUEST_TOPIC_KNOWLEDGE, type GuestTopicId } from "@/data/guest-knowledge
 import { searchEntities } from "@/services/api";
 import { getCaseById, getCases, getDocumentSourceById } from "@/services/jds-api";
 import type { Case, CaseDetail, DocumentSource } from "@/types/jds";
+import { stripMarkdown } from "@/utils/markdown";
 import type {
   GuestAskResponse,
   GuestCaseChatCitation,
@@ -9,6 +10,7 @@ import type {
   GuestCaseResultItem,
   GuestEntityMatch,
 } from "@/types/guest-chat";
+import { stripMarkdown } from "@/utils/markdown";
 
 const MAX_CASE_PAGES = 50;
 const DEFAULT_FOLLOWUPS_EN = [
@@ -48,7 +50,7 @@ function stripHtml(value: string | null | undefined): string {
     return "";
   }
 
-  return value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  return stripMarkdown(value.replace(/<[^>]*>/g, " ")).trim();
 }
 
 function normalize(value: string): string {
