@@ -501,7 +501,7 @@ const CaseDetail = () => {
                   "grid gap-8 transition-[grid-template-columns] duration-300 ease-out print:block",
                   (caseData.timeline || []).length > 0 && !isAskDrawerOpen && "lg:grid-cols-[minmax(0,1fr)_20rem] xl:grid-cols-[minmax(0,1fr)_24rem]"
                 )}>
-                  <div className="min-w-0 lg:col-start-1">
+                  <div className="min-w-0 lg:col-start-1 mx-auto max-w-4xl w-full">
                     <Card className="mb-6 sm:mb-8">
                       <CardHeader className="px-4 py-4 sm:px-6 sm:py-6">
                         <CardTitle className="flex items-center text-xl sm:text-2xl">
@@ -580,7 +580,7 @@ const CaseDetail = () => {
                     )}
                   />
 
-                  <div className="min-w-0 lg:col-start-1">
+                  <div className="min-w-0 lg:col-start-1 mx-auto max-w-4xl w-full">
                     <Card className="mb-8">
                       <CardHeader>
                         <CardTitle className="flex items-center">
