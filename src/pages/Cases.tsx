@@ -48,7 +48,7 @@ const Cases = () => {
   const [statusFilter, setStatusFilter] = useState<'all' | 'ongoing' | 'closed' | 'others'>('all');
   const [page, setPage] = useState(1);
 
-  const { data: casesData, isLoading: loading, isError, refetch } = useQuery({
+  const { data: casesData, isLoading: loading, isFetching, isError, refetch } = useQuery({
     queryKey: ['cases', { page }],
     queryFn: () => getCases({ page }),
     staleTime: 5 * 60 * 1000,
@@ -174,7 +174,7 @@ const Cases = () => {
           </div>
 
           {/* Cases Grid */}
-          {isError && page === 1 ? (
+          {isError ? (
             <Alert variant="destructive" className="mb-6">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription className="flex items-center justify-between">
@@ -233,7 +233,7 @@ const Cases = () => {
                       entityNames={entityNames}
                       location={locationNames}
                       date={formatDateWithBS(caseItem.created_at, 'PPP')}
-                      status="ongoing"
+                      status={getCaseStatus(caseItem)}
                       tags={caseItem.tags || []}
                       description={caseItem.description.replace(/<[^>]*>/g, '').substring(0, 200)}
                       allegations={caseItem.key_allegations}
@@ -248,11 +248,11 @@ const Cases = () => {
                 <div className="mt-8 flex justify-center">
                   <Button
                     onClick={() => setPage(p => p + 1)}
-                    disabled={loading}
+                    disabled={isFetching}
                     variant="outline"
                     size="lg"
                   >
-                    {loading ? t("cases.loadingMore") : t("cases.loadMore")}
+                    {isFetching ? t("cases.loadingMore") : t("cases.loadMore")}
                   </Button>
                 </div>
               )}
