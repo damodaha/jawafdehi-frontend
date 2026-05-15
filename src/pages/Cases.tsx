@@ -55,7 +55,7 @@ const Cases = () => {
   const [statusFilter, setStatusFilter] = useState<'all' | 'ongoing' | 'closed' | 'others'>('all');
   const [page, setPage] = useState(1);
 
-  const { data: casesData, isLoading: loading, isFetching, isError, refetch } = useQuery({
+  const { data: casesData, isLoading: loading, isFetching, isPlaceholderData, isError, refetch } = useQuery({
     queryKey: ['cases', { page }],
     queryFn: () => getCases({ page }),
     staleTime: 5 * 60 * 1000,
@@ -65,9 +65,9 @@ const Cases = () => {
 
   const [allCases, setAllCases] = useState<Case[]>([]);
   useEffect(() => {
-    if (!casesData) return;
+    if (!casesData || isPlaceholderData) return;
     setAllCases(prev => page === 1 ? casesData.results : [...prev, ...casesData.results]);
-  }, [casesData, page]);
+  }, [casesData, page, isPlaceholderData]);
 
   const totalCount = casesData?.count ?? 0;
   const isInitialLoading = loading && page === 1 && allCases.length === 0;
