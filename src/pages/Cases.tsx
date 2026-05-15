@@ -251,7 +251,7 @@ const Cases = () => {
                   );
                 })}
               </div>
-              {!searchQuery && casesData?.next && (
+              {!searchQuery && !isError && casesData?.next && (
                 <div className="mt-8 flex justify-center">
                   <Button
                     onClick={() => setPage(p => p + 1)}
