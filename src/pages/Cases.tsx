@@ -41,6 +41,13 @@ function getCaseStatus(caseItem: Case): 'ongoing' | 'closed' | 'others' {
   return 'others';
 }
 
+function mapCaseStatusToBadge(status: 'ongoing' | 'closed' | 'others'): 'ongoing' | 'resolved' | 'under-investigation' {
+  switch (status) {
+    case 'ongoing': return 'ongoing';
+    case 'closed': return 'resolved';
+    case 'others': return 'under-investigation';
+  }
+}
 const Cases = () => {
   const { t, i18n } = useTranslation();
   const currentLang = i18n.language;
@@ -233,7 +240,7 @@ const Cases = () => {
                       entityNames={entityNames}
                       location={locationNames}
                       date={formatDateWithBS(caseItem.created_at, 'PPP')}
-                      status={getCaseStatus(caseItem)}
+                      status={mapCaseStatusToBadge(getCaseStatus(caseItem))}
                       tags={caseItem.tags || []}
                       description={caseItem.description.replace(/<[^>]*>/g, '').substring(0, 200)}
                       allegations={caseItem.key_allegations}
