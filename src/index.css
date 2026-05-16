@@ -115,6 +115,6 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Noto Sans Devanagari', 'Noto Sans', Arial, sans-serif;
+    font-family: Helvetica, Arial, 'Noto Sans Devanagari', sans-serif;
   }
 }
