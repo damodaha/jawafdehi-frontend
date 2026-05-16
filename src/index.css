@@ -1,4 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;500;700;900&display=swap');
+@font-face {
+  font-family: 'Noto Sans Devanagari';
+  src: url('/font/Noto_Sans_Devanagari/NotoSansDevanagari-VariableFont_wdth,wght.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
 
 @tailwind base;
 @tailwind components;
@@ -109,6 +115,6 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Noto Serif Devanagari', serif;
+    font-family: 'Noto Sans Devanagari', 'Noto Sans', Arial, sans-serif;
   }
 }
