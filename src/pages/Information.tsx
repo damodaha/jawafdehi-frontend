@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Faq } from "@/components/home/faq";
 import { AlertCircle, Shield, Search, FileCheck, Lock, Users, TrendingUp } from "lucide-react";
 
 const Information = () => {
@@ -199,96 +199,7 @@ const Information = () => {
           </div>
         </section>
 
-        {/* FAQ Section */}
-        <section className="py-12 md:py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold text-foreground mb-8">{t("information.faq.title")}</h2>
-
-              <Accordion type="single" collapsible className="space-y-4">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger className="text-left">
-                    {t("information.faq.howToReport.question")}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <p className="text-muted-foreground mb-3">
-                      {t("information.faq.howToReport.answer1")}
-                    </p>
-                    <p className="text-muted-foreground">
-                      {t("information.faq.howToReport.answer2")}
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-2">
-                  <AccordionTrigger className="text-left">
-                    {t("information.faq.afterSubmit.question")}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <p className="text-muted-foreground">
-                      {t("information.faq.afterSubmit.answer")}
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-3">
-                  <AccordionTrigger className="text-left">
-                    {t("information.faq.anonymous.question")}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <p className="text-muted-foreground">
-                      {t("information.faq.anonymous.answer")}
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-4">
-                  <AccordionTrigger className="text-left">
-                    {t("information.faq.entityResponse.question")}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <p className="text-muted-foreground">
-                      {t("information.faq.entityResponse.answer")}
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-5">
-                  <AccordionTrigger className="text-left">
-                    {t("information.faq.inaccurate.question")}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <p className="text-muted-foreground">
-                      {t("information.faq.inaccurate.answer")}
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-6">
-                  <AccordionTrigger className="text-left">
-                    {t("information.faq.funding.question")}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <p className="text-muted-foreground">
-                      {t("information.faq.funding.answer")}
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-7">
-                  <AccordionTrigger className="text-left">
-                    {t("information.faq.useInfo.question")}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <p className="text-muted-foreground">
-                      {t("information.faq.useInfo.answer")}
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </div>
-          </div>
-        </section>
+        <Faq />
       </main>
 
     </div>
