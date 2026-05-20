@@ -44,6 +44,7 @@ const utilityButtonClass =
   "h-10 w-10 rounded-full border border-border/70 bg-background/70 text-foreground/75 shadow-sm shadow-foreground/5 transition-all duration-200 hover:-translate-y-0.5 hover:border-foreground/15 hover:bg-background hover:text-foreground hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
 
 const desktopNavWidthClass: Record<string, string> = {
+  home: "min-w-[4.5rem]",
   process: "min-w-[7.25rem]",
   cases: "min-w-[4.75rem]",
   volunteer: "min-w-[6.25rem]",
@@ -53,7 +54,7 @@ const desktopNavWidthClass: Record<string, string> = {
 
 const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
   cn(
-    "rounded-2xl px-4 py-3 text-base font-semibold transition-all duration-200",
+    "rounded-2xl px-4 py-3 text-sm font-normal transition-all duration-200",
     isActive
       ? "bg-secondary text-secondary-foreground"
       : "text-foreground/75 hover:bg-secondary/70 hover:text-foreground",
@@ -75,6 +76,7 @@ export function Navbar() {
 
   const navItems = useMemo<NavItem[]>(
     () => [
+      { key: "home", label: t("nav.home"), to: "/", exact: true },
       { key: "process", label: t("nav.ourProcess"), to: "/our-process" },
       { key: "cases", label: t("nav.cases"), to: "/cases" },
       { key: "volunteer", label: t("nav.volunteer"), to: "/volunteer" },
@@ -179,11 +181,12 @@ export function Navbar() {
             <NavLink
               key={item.key}
               to={item.to}
+              end={item.exact}
               ref={setNavRef(item.key)}
               onPointerEnter={() => setHoveredKey(item.key)}
               className={({ isActive }) =>
                 cn(
-                  "relative z-10 inline-flex h-10 items-center justify-center rounded-full px-3 text-center text-[13px] font-semibold text-foreground/68 transition-colors duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  "relative z-10 inline-flex h-10 items-center justify-center rounded-full px-3 text-center text-sm font-normal text-foreground/68 transition-colors duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   desktopNavWidthClass[item.key],
                   isActive && "text-foreground",
                 )
@@ -198,7 +201,7 @@ export function Navbar() {
               ref={setNavRef("about")}
               onPointerEnter={() => setHoveredKey("about")}
               className={cn(
-                "relative z-10 inline-flex h-10 items-center justify-center gap-1 rounded-full px-3 text-center text-[13px] font-semibold text-foreground/68 transition-colors duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                "relative z-10 inline-flex h-10 items-center justify-center gap-1 rounded-full px-3 text-center text-sm font-normal text-foreground/68 transition-colors duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 desktopNavWidthClass.about,
                 (activeKey === "about" || aboutOpen) && "text-foreground",
               )}
@@ -215,16 +218,16 @@ export function Navbar() {
               align="center"
               className="mt-3 w-48 rounded-2xl border-border/70 bg-background/95 p-2 shadow-xl shadow-foreground/10 backdrop-blur-[12px]"
             >
-              <DropdownMenuItem asChild className="rounded-xl font-medium">
+              <DropdownMenuItem asChild className="rounded-xl text-sm font-normal">
                 <Link to="/about">{t("nav.about")}</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild className="rounded-xl font-medium">
+              <DropdownMenuItem asChild className="rounded-xl text-sm font-normal">
                 <Link to="/team">{t("nav.team")}</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild className="rounded-xl font-medium">
+              <DropdownMenuItem asChild className="rounded-xl text-sm font-normal">
                 <Link to="/products">{t("nav.products")}</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild className="rounded-xl font-medium">
+              <DropdownMenuItem asChild className="rounded-xl text-sm font-normal">
                 <Link to="/updates">{t("nav.updates")}</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -287,13 +290,11 @@ export function Navbar() {
               </SheetHeader>
 
               <nav className="mt-8 flex flex-col gap-2">
-                <NavLink to="/" end className={mobileNavLinkClass} onClick={() => setIsOpen(false)}>
-                  {t("nav.home")}
-                </NavLink>
                 {navItems.map((item) => (
                   <NavLink
                     key={item.key}
                     to={item.to}
+                    end={item.exact}
                     className={mobileNavLinkClass}
                     onClick={() => setIsOpen(false)}
                   >
@@ -303,13 +304,13 @@ export function Navbar() {
                 <NavLink to="/about" className={mobileNavLinkClass} onClick={() => setIsOpen(false)}>
                   {t("nav.about")}
                 </NavLink>
-                <Link to="/team" className="rounded-2xl px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:bg-secondary/70 hover:text-foreground" onClick={() => setIsOpen(false)}>
+                <Link to="/team" className="rounded-2xl px-4 py-2 text-sm font-normal text-muted-foreground transition-colors hover:bg-secondary/70 hover:text-foreground" onClick={() => setIsOpen(false)}>
                   {t("nav.team")}
                 </Link>
-                <Link to="/products" className="rounded-2xl px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:bg-secondary/70 hover:text-foreground" onClick={() => setIsOpen(false)}>
+                <Link to="/products" className="rounded-2xl px-4 py-2 text-sm font-normal text-muted-foreground transition-colors hover:bg-secondary/70 hover:text-foreground" onClick={() => setIsOpen(false)}>
                   {t("nav.products")}
                 </Link>
-                <Link to="/updates" className="rounded-2xl px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:bg-secondary/70 hover:text-foreground" onClick={() => setIsOpen(false)}>
+                <Link to="/updates" className="rounded-2xl px-4 py-2 text-sm font-normal text-muted-foreground transition-colors hover:bg-secondary/70 hover:text-foreground" onClick={() => setIsOpen(false)}>
                   {t("nav.updates")}
                 </Link>
               </nav>
