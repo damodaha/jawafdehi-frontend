@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, FileText, Download } from "lucide-react";
 import Markdown from "react-markdown";
 import NotFound from "./NotFound";
-import { Header } from "@/components/Header";
 import { useTranslation } from "react-i18next";
 import { stripMarkdown } from "@/utils/markdown";
 
@@ -31,7 +30,6 @@ const UpdateDetail = () => {
                 <meta name="twitter:card" content="summary_large_image" />
                 {update.thumbnail && <meta name="twitter:image" content={update.thumbnail} />}
             </Helmet>
-            <Header />
 
             <main id="main-content" className="flex-1 py-8 md:py-12">
                 <div className="container max-w-5xl mx-auto px-4 animate-fade-in">

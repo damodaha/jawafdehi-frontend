@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
-import { Header } from "@/components/Header";
 import EntityCard from "@/components/EntityCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -141,7 +140,6 @@ const Entities = () => {
         <meta name="twitter:description" content="Explore profiles of Nepali public officials, politicians, and organizations tracked on Jawafdehi. View their associated corruption and misconduct cases." />
         <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
       </Helmet>
-      <Header />
 
       <main id="main-content" className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">

@@ -1,6 +1,5 @@
 import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
-import { Header } from "@/components/Header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Shield, Eye, Target, Users } from "lucide-react";
 import { Helmet } from "react-helmet-async";
@@ -26,7 +25,6 @@ const About = () => {
         <meta name="twitter:description" content="Learn about Jawafdehi — Nepal's open corruption accountability platform. Meet the team behind Let's Build Nepal and NewNepal.org working to promote transparency." />
         <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
       </Helmet>
-      <Header />
 
       <main id="main-content" className="flex-1">
         {/* Hero Section */}

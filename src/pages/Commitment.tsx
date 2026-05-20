@@ -1,5 +1,4 @@
 import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import { Helmet } from "react-helmet-async";
 import { Archive, Scale, Sparkles, Users, Globe, GitBranch, CheckCircle2, Infinity as InfinityIcon } from "lucide-react";
 
@@ -64,7 +63,6 @@ const Commitment = () => {
         <meta name="twitter:description" content="Jawafdehi's commitments to the Nepali public: permanent records, factual accuracy, open source technology, and free access forever." />
         <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
       </Helmet>
-      <Header />
 
       <main id="main-content" className="flex-1">
         {/* Header */}

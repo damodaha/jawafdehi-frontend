@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { Footer } from "@/components/Footer";
 import { BotTypingBubble } from "@/components/guest/BotTypingBubble";
-import { Header } from "@/components/Header";
 import { GuestAnswerBlock } from "@/components/guest/GuestAnswerBlock";
 import { GuestChatInput } from "@/components/guest/GuestChatInput";
 import { GuestCaseResultList } from "@/components/guest/GuestCaseResultList";
@@ -115,8 +114,6 @@ export default function GuestChat() {
         <title>{t("guestChat.metaTitle")}</title>
         <meta name="description" content={t("guestChat.metaDescription")} />
       </Helmet>
-
-      <Header />
 
       <main id="main-content" className="container mx-auto h-[calc(100vh-5rem)] px-4 py-6 md:h-[calc(100vh-5.5rem)] md:py-8">
         <div className="mx-auto flex h-full max-w-[768px] flex-col">

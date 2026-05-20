@@ -1,5 +1,4 @@
 import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import {
@@ -79,7 +78,6 @@ const Volunteer = () => (
       <meta name="twitter:description" content="Join Jawafdehi as a volunteer. Help build Nepal's permanent corruption case archive — as a researcher, engineer, journalist, or translator." />
       <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
     </Helmet>
-    <Header />
 
     <main id="main-content" className="flex-1">
       {/* Hero */}

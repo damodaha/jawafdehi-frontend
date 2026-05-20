@@ -7,7 +7,6 @@ import {
   listMCPServers, createMCPServer, testMCPConnection,
 } from "@/services/caseworker-api";
 import type { Skill, LLMProvider, MCPServer } from "@/types/caseworker";
-import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -429,7 +428,6 @@ const CaseworkerSettings = () => {
   if (!isAdmin) {
     return (
       <div className="min-h-screen bg-muted/20 flex flex-col">
-        <Header />
         <div className="flex-1 flex items-center justify-center">
           <p className="text-muted-foreground">Access denied. Administrator role required.</p>
         </div>
@@ -445,7 +443,6 @@ const CaseworkerSettings = () => {
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col">
-      <Header />
       <div className="flex-1 container mx-auto px-4 py-6 max-w-4xl">
         <div className="flex items-center gap-3 mb-6">
           <Button variant="ghost" size="sm" asChild>

@@ -1,9 +1,9 @@
 import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { CaseCard } from "@/components/CaseCard";
-import { HeroChatDemo } from "@/components/home/HeroChatDemo";
-import { Archive, Scale, Sparkles, ArrowRight, Search } from "lucide-react";
+import { Hero } from "@/components/home/hero";
+import { Features } from "@/components/home/features";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
@@ -173,70 +173,12 @@ const Index = () => {
           ]
         })}</script>
       </Helmet>
-      <Header />
 
       <main id="main-content" className="flex-1">
-        {/* ── Hero ── */}
-        <section className="relative bg-gradient-to-br from-primary via-navy-dark to-slate-800 py-16 md:py-28 overflow-hidden">
-          <div className="absolute inset-0 bg-grid-white/[0.04] bg-[size:24px_24px]" />
-
-          <div className="container mx-auto px-4 relative">
-            <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.12fr)] lg:items-stretch">
-
-              {/* Left — headline + stats + CTAs */}
-              <div className="flex h-full flex-col justify-center">
-                <div className="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm text-white/80">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
-                  CIAA Cases &nbsp;·&nbsp; Official Documents &nbsp;·&nbsp; Verified Facts
-                </div>
-
-                <h1 className="text-4xl md:text-5xl font-bold text-white mb-3 leading-tight tracking-tight">
-                  Nepal's Permanent<br />
-                  <span className="text-amber-400">Corruption Case</span> Archive
-                </h1>
-
-                <p className="text-xl text-white/90 font-medium mb-3 leading-snug">
-                  Reviewed, digestible case summaries —<br className="hidden sm:block" /> written for every Nepali, not just lawyers.
-                </p>
-
-                <p className="text-amber-300/90 font-semibold tracking-wide mb-6 text-base italic">
-                  Accountability has no expiry.
-                </p>
-
-                <p className="text-base text-white/65 mb-5 leading-relaxed">
-                  Every CIAA case documented, simplified, and permanently accessible. Original filings, legal timelines, and verified facts — AI-assisted, human-reviewed, free forever.
-                </p>
-
-                {/* Inline stats */}
-                <div className="flex flex-wrap gap-8 mb-6">
-                  <div>
-                    <div className="text-3xl font-bold text-white tabular-nums">{getStatValue(stats?.published_cases)}</div>
-                    <div className="text-sm text-white/65 mt-0.5">Cases Documented</div>
-                  </div>
-                  <div className="border-l border-white/20 pl-8">
-                    <div className="text-3xl font-bold text-white tabular-nums">{getStatValue(stats?.entities_tracked)}</div>
-                    <div className="text-sm text-white/65 mt-0.5">Officials &amp; Entities Tracked</div>
-                  </div>
-                  <div className="border-l border-white/20 pl-8">
-                    <div className="text-3xl font-bold text-amber-400">Free</div>
-                    <div className="text-sm text-white/65 mt-0.5">Forever. No paywall. Ever.</div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-3">
-                    <Button variant="default" asChild className="font-semibold">
-                    <Link to="/cases">
-                      <Search className="mr-2 h-5 w-5" />
-                      Browse Cases
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-
-              <HeroChatDemo />
-            </div>
-          </div>
-        </section>
+        <Hero
+          casesDocumented={getStatValue(stats?.published_cases)}
+          officialsAndEntitiesTracked={getStatValue(stats?.entities_tracked)}
+        />
 
         {/* ── Trust strip ── */}
         <section className="bg-primary/5 border-b border-border py-5">
@@ -273,47 +215,7 @@ const Index = () => {
           </div>
         </section>
 
-        {/* ── Three Pillars ── */}
-        <section className="py-12 md:py-20 bg-background border-b border-border">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-              <div className="space-y-4">
-                <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Archive className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold text-foreground">CIAA Case Archive</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  We index every case the Commission for the Investigation of Abuse of Authority files — including supporting documents, court orders, and legal filings, all in one place.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Scale className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold text-foreground">Plain-Language Summaries</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Complex legal filings rewritten so any citizen can understand them — not just lawyers. Every summary is reviewed by human volunteers for factual accuracy before it is published.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="h-12 w-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                  <Sparkles className="h-6 w-6 text-amber-600" />
-                </div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="text-xl font-bold text-foreground">AI Case Research</h3>
-                  <span className="text-xs font-semibold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
-                    Coming Soon
-                  </span>
-                </div>
-                <p className="text-muted-foreground leading-relaxed">
-                  Ask any question about a case or corruption trend in Nepali or English. Natural language queries against the full case archive — instant, sourced answers.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
+        <Features />
 
         {/* ── Recently Documented Cases ── */}
         <section className="py-12 md:py-16 bg-muted/20">

@@ -1,5 +1,4 @@
 import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import { Helmet } from "react-helmet-async";
 import { Mail, Linkedin, Facebook, Github, Globe, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -50,7 +49,6 @@ const OurTeam = () => {
         <meta name="twitter:description" content="Meet the Nepali volunteers building Jawafdehi — Nepal's permanent corruption case archive." />
         <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
       </Helmet>
-      <Header />
 
       <main id="main-content" className="flex-1">
         {/* Hero */}

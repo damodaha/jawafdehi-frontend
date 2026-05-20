@@ -1,5 +1,4 @@
 import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import { Helmet } from "react-helmet-async";
 import { Database, Code2, LayoutDashboard, Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -56,7 +55,6 @@ const OurProducts = () => (
       <meta name="twitter:description" content="Every product Jawafdehi builds is open source and free to use. Explore our public APIs, web platform, and civic data services." />
       <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
     </Helmet>
-    <Header />
 
     <main id="main-content" className="flex-1">
       {/* Hero */}

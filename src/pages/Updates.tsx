@@ -5,7 +5,6 @@ import { updates } from "@/data/updates";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { format } from "date-fns";
 import { CalendarIcon, ChevronRight } from "lucide-react";
-import { Header } from "@/components/Header";
 import { useTranslation } from "react-i18next";
 
 const Updates = () => {
@@ -28,7 +27,6 @@ const Updates = () => {
         <meta name="twitter:description" content="Latest news, announcements, and updates from the Jawafdehi team on Nepal's corruption accountability platform." />
         <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
       </Helmet>
-            <Header />
 
             <main id="main-content" className="flex-1 py-8 md:py-12">
                 <div className="container max-w-5xl mx-auto space-y-8 px-4 animate-fade-in">

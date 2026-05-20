@@ -5,7 +5,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ClientOnly } from "@/components/ClientOnly";
 import { SentryErrorFallback } from "@/components/SentryErrorFallback";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+import { AppLayout } from "@/components/AppLayout";
 import Index from "./pages/Index";
 import Cases from "./pages/Cases";
 import Entities from "./pages/Entities";
@@ -54,44 +55,47 @@ const App = () => (
       </ClientOnly>
       <Suspense fallback={<RouteLoadingFallback />}>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/cases" element={<Cases />} />
-          <Route path="/case/:id" element={<CaseDetail />} />
-          <Route path="/entities" element={<Entities />} />
-          <Route path="/entity/:id" element={<EntityProfile />} />
-          <Route path="/ask" element={<GuestChat />} />
-          <Route path="/report" element={<ReportAllegation />} />
-          <Route path="/entity-response/:id" element={<EntityResponse />} />
-          <Route path="/moderation" element={<ModerationDashboard />} />
-          <Route path="/feedback" element={<Feedback />} />
-          <Route path="/updates" element={<Updates />} />
-          <Route path="/updates/:id" element={<UpdateDetail />} />
-          <Route path="/information" element={<Information />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/commitment" element={<Commitment />} />
-          <Route path="/our-process" element={<OurProcess />} />
-          <Route path="/team" element={<OurTeam />} />
-          <Route path="/volunteer" element={<Volunteer />} />
-          <Route path="/products" element={<OurProducts />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<TermsOfService />} />
           {/* Embed route for oEmbed iframe */}
           <Route path="/embed/case/:id" element={<EmbedCaseCard />} />
-          {/* Caseworker portal */}
-          <Route
-            path="/caseworker/*"
-            element={
-              <CaseworkerAuthProvider>
-                <Routes>
-                  <Route path="login" element={<CaseworkerLogin />} />
-                  <Route path="dashboard" element={<CaseworkerDashboard />} />
-                  <Route path="settings" element={<CaseworkerSettings />} />
-                </Routes>
-              </CaseworkerAuthProvider>
-            }
-          />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<Index />} />
+            <Route path="/cases" element={<Cases />} />
+            <Route path="/case/:id" element={<CaseDetail />} />
+            <Route path="/entities" element={<Entities />} />
+            <Route path="/entity/:id" element={<EntityProfile />} />
+            <Route path="/ask" element={<GuestChat />} />
+            <Route path="/report" element={<ReportAllegation />} />
+            <Route path="/entity-response/:id" element={<EntityResponse />} />
+            <Route path="/moderation" element={<ModerationDashboard />} />
+            <Route path="/feedback" element={<Feedback />} />
+            <Route path="/updates" element={<Updates />} />
+            <Route path="/updates/:id" element={<UpdateDetail />} />
+            <Route path="/information" element={<Information />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/commitment" element={<Commitment />} />
+            <Route path="/our-process" element={<OurProcess />} />
+            <Route path="/team" element={<OurTeam />} />
+            <Route path="/volunteer" element={<Volunteer />} />
+            <Route path="/products" element={<OurProducts />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            {/* Caseworker portal */}
+            <Route
+              path="/caseworker/*"
+              element={
+                <CaseworkerAuthProvider>
+                  <Routes>
+                    <Route path="login" element={<CaseworkerLogin />} />
+                    <Route path="dashboard" element={<CaseworkerDashboard />} />
+                    <Route path="settings" element={<CaseworkerSettings />} />
+                  </Routes>
+                </CaseworkerAuthProvider>
+              }
+            />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Route>
         </Routes>
       </Suspense>
     </TooltipProvider>

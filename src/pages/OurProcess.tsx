@@ -1,5 +1,4 @@
 import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import { Helmet } from "react-helmet-async";
 import {
   Search, ShieldCheck, FileText, Sparkles, RefreshCw, FlaskConical,
@@ -78,7 +77,6 @@ const OurProcess = () => (
       <meta name="twitter:description" content="How Jawafdehi discovers, researches, compiles, and publishes CIAA corruption cases — from raw government documents to a permanent public archive." />
       <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
     </Helmet>
-    <Header />
 
     <main id="main-content" className="flex-1">
       {/* Hero */}

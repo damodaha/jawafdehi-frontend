@@ -1,5 +1,4 @@
 import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import { Helmet } from "react-helmet-async";
 
 const TermsOfService = () => {
@@ -21,7 +20,6 @@ const TermsOfService = () => {
         <meta name="twitter:description" content="Jawafdehi's terms of service — guidelines for using Nepal's open corruption accountability platform and public case archive." />
         <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
       </Helmet>
-      <Header />
 
       <main id="main-content" className="flex-1">
         <section className="bg-gradient-to-br from-primary via-navy-dark to-slate-800 py-16 md:py-20">
