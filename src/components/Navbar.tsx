@@ -250,7 +250,7 @@ export function Navbar() {
 
           <Button
             asChild
-            variant="navPrimary"
+            variant="primary"
             size="navCta"
           >
             <Link to="/cases">
@@ -313,7 +313,7 @@ export function Navbar() {
               <div className="mt-8 grid gap-3 rounded-[1.75rem] border border-border/70 bg-secondary/45 p-3">
                 <Button
                   asChild
-                  variant="navPrimary"
+                  variant="primary"
                   size="navSheet"
                   onClick={() => setIsOpen(false)}
                 >
@@ -322,7 +322,7 @@ export function Navbar() {
                     {t("header.browseCases")}
                   </Link>
                 </Button>
-                <Button asChild variant="navSecondary" size="navSheet" onClick={() => setIsOpen(false)}>
+                <Button asChild variant="secondary" size="navSheet" onClick={() => setIsOpen(false)}>
                   <Link to="/ask">
                     <MessageCircle className="h-4 w-4" />
                     {t("header.askJawafdehi")}
