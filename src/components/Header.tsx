@@ -114,7 +114,7 @@ export const Header = () => {
             </Link>
           </Button>
           <Button asChild variant="outline">
-            <Link to="/cases">{t("header.viewCases")}</Link>
+            <Link to="/cases">{t("header.browseCases")}</Link>
           </Button>
         </div>
 
@@ -178,7 +178,7 @@ export const Header = () => {
                     </Link>
                   </Button>
                   <Button asChild variant="outline" className="w-full" onClick={() => setIsOpen(false)}>
-                    <Link to="/cases">{t("header.viewCases")}</Link>
+                    <Link to="/cases">{t("header.browseCases")}</Link>
                   </Button>
                 </div>
               </nav>

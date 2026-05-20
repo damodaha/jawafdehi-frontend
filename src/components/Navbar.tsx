@@ -144,7 +144,7 @@ export function Navbar() {
         >
           <span
             aria-hidden="true"
-            className="absolute left-1 top-1 h-10 rounded-full bg-secondary shadow-sm transition-[transform,width,opacity] duration-300 ease-out motion-reduce:transition-none"
+            className="absolute left-0 top-1 h-10 rounded-full bg-secondary shadow-sm transition-[transform,width,opacity] duration-300 ease-out motion-reduce:transition-none"
             style={pillStyle}
           />
 
@@ -224,11 +224,11 @@ export function Navbar() {
           <Button
             asChild
             variant="primary"
-            className="h-11 min-w-[9.5rem] rounded-full bg-accent px-5 text-[13px] font-bold text-accent-foreground shadow-lg shadow-accent/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-accent/90 hover:shadow-xl hover:shadow-accent/25"
+            className="h-11 min-w-[9.5rem] rounded-full bg-primary px-5 text-[13px] font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-colors duration-200 hover:bg-primary/85"
           >
             <Link to="/cases">
               <Search className="h-4 w-4" />
-              {t("header.viewCases")}
+              {t("header.browseCases")}
             </Link>
           </Button>
         </div>
@@ -290,12 +290,12 @@ export function Navbar() {
                 <Button
                   asChild
                   variant="primary"
-                  className="h-11 rounded-full bg-accent font-bold text-accent-foreground hover:bg-accent/90"
+                  className="h-11 rounded-full bg-primary font-bold text-primary-foreground hover:bg-primary/90"
                   onClick={() => setIsOpen(false)}
                 >
                   <Link to="/cases">
                     <Search className="h-4 w-4" />
-                    {t("header.viewCases")}
+                    {t("header.browseCases")}
                   </Link>
                 </Button>
                 <Button asChild variant="secondary" className="h-11 rounded-full font-bold" onClick={() => setIsOpen(false)}>
