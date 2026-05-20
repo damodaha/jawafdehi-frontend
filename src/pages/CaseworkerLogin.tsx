@@ -30,7 +30,7 @@ const CaseworkerLogin = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-700 px-4">
-      <div className="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-8 space-y-6">
+      <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 text-card-foreground shadow-2xl space-y-6">
         <div className="text-center space-y-1">
           <div className="flex justify-center mb-3">
             <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -69,7 +69,7 @@ const CaseworkerLogin = () => {
           </div>
 
           {(formError || error) && (
-            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
+            <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-300">
               {formError || error}
             </p>
           )}

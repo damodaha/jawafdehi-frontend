@@ -10,7 +10,7 @@ const TEAMS = [
   {
     icon: Search,
     name: "Data Scraping Team",
-    color: "bg-blue-500/10 text-blue-600",
+    color: "bg-blue-500/10 text-blue-600 dark:text-blue-300",
     responsibilities: [
       "Archive government documents into digital text for large-scale analysis",
       "Scrape Nepali media sources — existing and newly identified",
@@ -21,7 +21,7 @@ const TEAMS = [
   {
     icon: Megaphone,
     name: "Outreach Team",
-    color: "bg-emerald-500/10 text-emerald-600",
+    color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300",
     responsibilities: [
       "Build relationships with investigative journalists, corruption watchdogs, and YouTubers",
       "Source evidence and case leads from civil society organisations",
@@ -94,7 +94,7 @@ const Volunteer = () => (
               Jawafdehi runs entirely on volunteer effort. Whether you are a technology enthusiast, a working professional, a legal expert, or a student — if you believe corruption should not be forgotten, there is a place for you here. Join a worldwide network of Nepali professional volunteers building the infrastructure for accountability.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
-              <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold">
+              <Button asChild size="lg" className="bg-white text-slate-950 hover:bg-white/90 dark:bg-white dark:text-slate-950 dark:hover:bg-white/90 font-semibold">
                 <a href="https://github.com/Jawafdehi" target="_blank" rel="noopener noreferrer">
                   <Github className="mr-2 h-5 w-5" />
                   Find us on GitHub

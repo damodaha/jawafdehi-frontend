@@ -7,66 +7,76 @@ type CtaProps = {
   className?: string;
 };
 
-const buttonClassName = "h-12 rounded-[3px] px-7 text-sm font-semibold";
-
 export function Cta({ className }: CtaProps) {
   return (
     <section
       id="contribute"
       className={cn(
-        "container relative isolate mx-auto overflow-hidden border-b border-border bg-background py-14 md:py-18 lg:py-20",
+        "container mx-auto border-b border-border bg-background py-14 md:py-18 lg:py-20",
         className,
       )}
       aria-labelledby="contribute-title"
     >
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 opacity-[0.34] [background-image:radial-gradient(hsl(var(--foreground)/0.16)_0.75px,transparent_0.75px)] [background-size:18px_18px]"
-      />
+      <div className="relative isolate overflow-hidden rounded-lg bg-[linear-gradient(135deg,hsl(var(--primary))_0%,hsl(var(--primary))_34%,hsl(var(--accent))_100%)] px-6 py-10 shadow-xl shadow-accent/10 dark:bg-[linear-gradient(135deg,hsl(215_70%_12%)_0%,hsl(220_38%_18%)_42%,hsl(354_66%_37%)_100%)] sm:px-10 md:px-12 md:py-12">
+        <div
+          aria-hidden="true"
+          className="absolute -right-20 -top-28 -z-10 h-80 w-80 rounded-full bg-secondary/30 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_16%_20%,hsl(var(--secondary)/0.24),transparent_34%),linear-gradient(135deg,hsl(var(--primary)/0.3)_0%,transparent_48%,hsl(var(--accent)/0.2)_100%)]"
+        />
 
-      <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
-        <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-[3px] border border-accent/20 bg-accent/10 text-accent">
-          <Heart className="h-6 w-6" aria-hidden="true" />
-        </div>
+        <div className="flex max-w-3xl flex-col items-start">
+          <div className="mb-6 flex h-11 w-11 items-center justify-center rounded-md border border-white/15 bg-white/10 text-white shadow-sm shadow-primary/20">
+            <Heart className="h-5 w-5" aria-hidden="true" />
+          </div>
 
-        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
-          Volunteer with Jawafdehi
-        </p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80">
+            Volunteer with Jawafdehi
+          </p>
 
-        <h2
-          id="contribute-title"
-          className="mt-4 max-w-2xl text-3xl font-extrabold leading-tight tracking-normal text-primary md:text-4xl"
-        >
-          Ready to contribute?
-        </h2>
-
-        <p className="mt-5 max-w-xl text-sm leading-6 text-muted-foreground md:text-base">
-          Start by exploring the codebase on GitHub or send us an email to
-          introduce yourself and tell us which team interests you.
-        </p>
-
-        <div className="mt-8 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row">
-          <Button asChild variant="primary" className={buttonClassName}>
-            <a
-              href="https://github.com/Jawafdehi"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Github className="h-4 w-4" aria-hidden="true" />
-              GitHub - Jawafdehi
-            </a>
-          </Button>
-
-          <Button
-            asChild
-            variant="outline"
-            className={cn(buttonClassName, "border-border bg-background hover:bg-muted")}
+          <h2
+            id="contribute-title"
+            className="mt-4 max-w-2xl text-3xl font-extrabold leading-tight tracking-normal text-white md:text-4xl"
           >
-            <a href="mailto:cases@jawafdehi.org">
-              <Mail className="h-4 w-4" aria-hidden="true" />
-              Email us
-            </a>
-          </Button>
+            Ready to contribute?
+          </h2>
+
+          <p className="mt-5 max-w-2xl text-sm leading-7 text-white/90 md:text-base">
+            Start by exploring the codebase on GitHub or send us an email to
+            introduce yourself and tell us which team interests you.
+          </p>
+
+          <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <Button
+              asChild
+              variant="primary"
+              size="lg"
+              className="bg-white text-slate-950 shadow-lg shadow-black/10 hover:bg-white/90 dark:bg-white dark:text-slate-950 dark:hover:bg-white/90"
+            >
+              <a
+                href="https://github.com/Jawafdehi"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Github className="h-4 w-4" aria-hidden="true" />
+                GitHub
+              </a>
+            </Button>
+
+            <Button
+              asChild
+              variant="secondary"
+              size="lg"
+              className="border border-white/20 bg-white/10 text-white hover:bg-white/18 hover:text-white dark:border-white/20 dark:bg-white/10 dark:text-white dark:hover:bg-white/18"
+            >
+              <a href="mailto:cases@jawafdehi.org">
+                <Mail className="h-4 w-4" aria-hidden="true" />
+                Email us
+              </a>
+            </Button>
+          </div>
         </div>
       </div>
     </section>
