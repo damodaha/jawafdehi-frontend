@@ -1,4 +1,3 @@
-import { Footer } from "@/components/Footer";
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -227,9 +226,6 @@ export default function EntityResponse() {
           </Card>
         </div>
       </main>
-
-      <Footer />
-
 
     </div>
   );

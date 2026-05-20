@@ -1,4 +1,3 @@
-import { Footer } from "@/components/Footer";
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
@@ -328,9 +327,6 @@ export default function ReportAllegation() {
           </Card>
         </div>
       </main>
-
-      <Footer />
-
 
     </div>
   );

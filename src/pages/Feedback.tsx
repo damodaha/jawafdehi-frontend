@@ -1,4 +1,3 @@
-import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -46,9 +45,6 @@ export default function Feedback() {
           </Card>
         </div>
       </main>
-
-      <Footer />
-
 
     </div>
   );

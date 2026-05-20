@@ -1,4 +1,3 @@
-import { Footer } from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
 import {
   Search, ShieldCheck, FileText, Sparkles, RefreshCw, FlaskConical,
@@ -144,9 +143,6 @@ const OurProcess = () => (
         </div>
       </section>
     </main>
-
-      <Footer />
-
 
   </div>
 );

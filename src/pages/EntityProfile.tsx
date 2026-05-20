@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { Footer } from "@/components/Footer";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
@@ -115,9 +114,6 @@ export default function EntityProfile() {
           />
         )}
       </main>
-
-      <Footer />
-
 
     </div>
   );

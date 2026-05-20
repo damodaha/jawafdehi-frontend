@@ -1,4 +1,3 @@
-import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { CaseCard } from "@/components/CaseCard";
 import { Hero } from "@/components/home/hero";
@@ -255,9 +254,6 @@ const Index = () => {
         </section>
 
       </main>
-
-      <Footer />
-
 
     </div>
   );

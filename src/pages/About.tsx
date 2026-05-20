@@ -1,4 +1,3 @@
-import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@/components/ui/card";
 import { Shield, Eye, Target, Users } from "lucide-react";
@@ -154,9 +153,6 @@ const About = () => {
         </section>
 
       </main>
-
-      <Footer />
-
 
     </div>
   );

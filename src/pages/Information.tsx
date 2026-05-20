@@ -1,4 +1,3 @@
-import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -291,9 +290,6 @@ const Information = () => {
           </div>
         </section>
       </main>
-
-      <Footer />
-
 
     </div>
   );

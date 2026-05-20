@@ -1,4 +1,3 @@
-import { Footer } from "@/components/Footer";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { updates } from "@/data/updates";
@@ -129,9 +128,6 @@ const UpdateDetail = () => {
                     </article>
                 </div>
             </main>
-
-      <Footer />
-
       
         </div>
     );

@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { Footer } from "@/components/Footer";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
@@ -789,9 +788,6 @@ const CaseDetail = () => {
           )}
         </div>
       )}
-
-      <Footer />
-
 
     </div>
   );

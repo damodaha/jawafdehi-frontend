@@ -1,4 +1,3 @@
-import { Footer } from "@/components/Footer";
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
@@ -280,9 +279,6 @@ const Cases = () => {
           )}
         </div>
       </main>
-
-      <Footer />
-
 
     </div>
   );
