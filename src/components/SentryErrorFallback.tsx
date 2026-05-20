@@ -8,14 +8,14 @@ interface SentryErrorFallbackProps {
 export function SentryErrorFallback({ error, resetError }: SentryErrorFallbackProps) {
   return (
     <div
-      className="flex min-h-screen items-center justify-center bg-gray-100 px-4"
+      className="flex min-h-screen items-center justify-center bg-background px-4 text-foreground"
       role="alert"
     >
       <div className="max-w-md text-center">
-        <h1 className="mb-2 text-2xl font-bold text-gray-900">
+        <h1 className="mb-2 text-2xl font-bold text-foreground">
           Something went wrong
         </h1>
-        <p className="mb-6 text-gray-600">
+        <p className="mb-6 text-muted-foreground">
           An unexpected error occurred. Please try again.
         </p>
         {resetError && (

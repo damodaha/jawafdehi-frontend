@@ -21,7 +21,7 @@ type Tab = "skills" | "llm" | "mcp";
 
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-xl border border-border shadow-sm">
+    <div className="rounded-xl border border-border bg-card text-card-foreground shadow-sm">
       <div className="px-5 py-4 border-b border-border">
         <h2 className="font-semibold text-foreground">{title}</h2>
       </div>
@@ -129,7 +129,7 @@ function SkillsTab() {
               </div>
             </div>
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-destructive">{error}</p>}
           <div className="flex gap-2">
             <Button size="sm" onClick={save}><Check className="h-4 w-4 mr-1" /> Save</Button>
             <Button size="sm" variant="ghost" onClick={cancel}><X className="h-4 w-4 mr-1" /> Cancel</Button>
@@ -262,7 +262,7 @@ function LLMTab() {
               <Input id="llm-max-tokens" type="number" min={100} value={form.max_tokens ?? 2000} onChange={(e) => setForm((p) => ({ ...p, max_tokens: parseInt(e.target.value) }))} />
             </div>
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-destructive">{error}</p>}
           <div className="flex gap-2">
             <Button size="sm" onClick={save}><Check className="h-4 w-4 mr-1" /> Save</Button>
             <Button size="sm" variant="ghost" onClick={cancel}><X className="h-4 w-4 mr-1" /> Cancel</Button>
@@ -279,9 +279,9 @@ function LLMTab() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="font-medium text-sm capitalize">{p.provider_type}</p>
-                  {p.is_active && <span className="text-xs bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">Active</span>}
-                  {status[p.id] === true && <span className="text-xs bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full flex items-center gap-0.5"><Zap className="h-3 w-3" /> Connected</span>}
-                  {status[p.id] === false && <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full">Failed</span>}
+                  {p.is_active && <span className="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200 px-1.5 py-0.5 rounded-full">Active</span>}
+                  {status[p.id] === true && <span className="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200 px-1.5 py-0.5 rounded-full flex items-center gap-0.5"><Zap className="h-3 w-3" /> Connected</span>}
+                  {status[p.id] === false && <span className="text-xs bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-200 px-1.5 py-0.5 rounded-full">Failed</span>}
                 </div>
                 <p className="text-xs text-muted-foreground font-mono">{p.model}</p>
               </div>
@@ -381,7 +381,7 @@ function MCPTab() {
               <Input id="mcp-auth-token" type="password" value={form.auth_token ?? ""} onChange={(e) => setForm((p) => ({ ...p, auth_token: e.target.value }))} />
             </div>
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-destructive">{error}</p>}
           <div className="flex gap-2">
             <Button size="sm" onClick={save}><Check className="h-4 w-4 mr-1" /> Save</Button>
             <Button size="sm" variant="ghost" onClick={cancel}><X className="h-4 w-4 mr-1" /> Cancel</Button>
@@ -399,12 +399,12 @@ function MCPTab() {
                 <div className="flex items-center gap-2">
                   <p className="font-medium text-sm">{s.display_name ?? s.name}</p>
                   <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                    s.status === "connected" ? "bg-emerald-100 text-emerald-700"
-                    : s.status === "error" ? "bg-red-100 text-red-700"
+                    s.status === "connected" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200"
+                    : s.status === "error" ? "bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-200"
                     : "bg-muted text-muted-foreground"
                   }`}>{s.status}</span>
-                  {status[s.id] === true && <span className="text-xs bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full flex items-center gap-0.5"><Zap className="h-3 w-3" /> OK</span>}
-                  {status[s.id] === false && <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full">Failed</span>}
+                  {status[s.id] === true && <span className="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200 px-1.5 py-0.5 rounded-full flex items-center gap-0.5"><Zap className="h-3 w-3" /> OK</span>}
+                  {status[s.id] === false && <span className="text-xs bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-200 px-1.5 py-0.5 rounded-full">Failed</span>}
                 </div>
                 <p className="text-xs text-muted-foreground font-mono truncate">{s.url}</p>
               </div>
