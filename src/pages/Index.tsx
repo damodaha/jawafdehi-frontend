@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { CaseCard } from "@/components/CaseCard";
 import { Hero } from "@/components/home/hero";
+import { Faq } from "@/components/home/faq";
 import { Features } from "@/components/home/features";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -252,7 +253,7 @@ const Index = () => {
             </div>
           </div>
         </section>
-
+<Faq /> 
       </main>
 
     </div>

@@ -22,6 +22,38 @@
     "askJawafdehi": "Ask Jawafdehi",
     "browseCases": "Browse Cases"
   },
+  "searchCommand": {
+    "title": "Search Jawafdehi",
+    "description": "Search pages and tools across Jawafdehi.",
+    "open": "Open site search",
+    "placeholder": "Search pages and tools...",
+    "noResults": "No matching pages found.",
+    "pages": "Pages",
+    "pageTitles": {
+      "report": "Report Allegation",
+      "feedback": "Submit Feedback",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    },
+    "descriptions": {
+      "home": "Return to the Jawafdehi homepage.",
+      "cases": "Open the dedicated case search and browsing page.",
+      "entities": "Find tracked people, offices, and organizations.",
+      "information": "Read public information and resources.",
+      "process": "See how records are reviewed and documented.",
+      "commitment": "Read the principles behind the archive.",
+      "volunteer": "Help build the accountability archive.",
+      "about": "Learn about Jawafdehi and its mission.",
+      "team": "Meet the people behind Jawafdehi.",
+      "products": "Explore Jawafdehi tools and products.",
+      "updates": "Read recent platform updates.",
+      "ask": "Ask questions with Jawafdehi's assistant.",
+      "report": "Submit an allegation or public-interest corruption lead.",
+      "feedback": "Send bugs, feature ideas, corrections, or general feedback.",
+      "privacy": "Read how Jawafdehi handles data, cookies, logs, and user information.",
+      "terms": "Read platform rules, public domain data terms, disclaimers, and permitted use."
+    }
+  },
   "footer": {
     "title": "Jawafdehi",
     "subtitle": "Nepal",
@@ -423,7 +455,9 @@
       }
     },
     "faq": {
+    
       "title": "Frequently Asked Questions",
+      "description": "We compiled a list of answers to address your most pressing questions regarding Jawafdehi.",
       "howToReport": {
         "question": "How can I report a corruption case?",
         "answer1": "You can report a case through our \"Report Allegation\" form. Please provide as much detail and supporting documentation as possible. You can choose to submit anonymously or with your identity.",
