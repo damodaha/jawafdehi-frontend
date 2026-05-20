@@ -57,7 +57,7 @@ const OurProducts = () => (
 
     <main id="main-content" className="flex-1">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-primary via-navy-dark to-slate-800 py-16 md:py-24">
+      <section id="products-hero" className="bg-gradient-to-br from-primary via-navy-dark to-slate-800 py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-widest text-primary-foreground/50 mb-4">
@@ -74,7 +74,7 @@ const OurProducts = () => (
       </section>
 
       {/* Products */}
-      <section className="py-12 md:py-16 border-b border-border">
+      <section id="stack" className="py-12 md:py-16 border-b border-border">
         <div className="container mx-auto px-4">
           <div className="mb-10">
             <h2 className="text-2xl font-bold text-foreground mb-2">The Stack</h2>
@@ -116,7 +116,7 @@ const OurProducts = () => (
       </section>
 
       {/* Open source CTA */}
-      <section className="py-12 md:py-16 bg-muted/20">
+      <section id="github" className="py-12 md:py-16 bg-muted/20">
         <div className="container mx-auto px-4 text-center">
           <Github className="h-8 w-8 text-primary mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-foreground mb-3">Everything is on GitHub</h2>

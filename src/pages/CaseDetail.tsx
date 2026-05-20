@@ -489,7 +489,7 @@ const CaseDetail = () => {
                   <div className="min-w-0 lg:col-start-1 mx-auto max-w-4xl w-full">
                     <Card className="mb-6 sm:mb-8">
                       <CardHeader className="px-4 py-4 sm:px-6 sm:py-6">
-                        <CardTitle className="flex items-center text-xl sm:text-2xl">
+                        <CardTitle id="allegations" className="flex items-center text-xl sm:text-2xl">
                           <AlertTriangle className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                           {t("caseDetail.allegations")}
                         </CardTitle>
@@ -519,7 +519,7 @@ const CaseDetail = () => {
                     </Card>
 
                     {hasInvolvedParties && (
-                      <section>
+                      <section id="parties-involved">
                         <h2 className="mb-5 text-2xl font-semibold text-foreground">
                           {t("caseDetail.partiesInvolved")}
                         </h2>
@@ -568,7 +568,7 @@ const CaseDetail = () => {
                   <div className="min-w-0 lg:col-start-1 mx-auto max-w-4xl w-full">
                     <Card className="mb-8">
                       <CardHeader>
-                        <CardTitle className="flex items-center">
+                        <CardTitle id="overview" className="flex items-center">
                           <FileText className="mr-2 h-5 w-5" />
                           {t("caseDetail.overview")}
                         </CardTitle>
@@ -583,7 +583,7 @@ const CaseDetail = () => {
                     {(caseData.court_cases ?? []).length > 0 && (
                       <Card className="mb-8">
                         <CardHeader>
-                          <CardTitle className="flex items-center">
+                          <CardTitle id="court-case" className="flex items-center">
                             <Scale className="mr-2 h-5 w-5" />
                             {t("caseDetail.courtCase", "Court Case")}
                           </CardTitle>
@@ -609,7 +609,7 @@ const CaseDetail = () => {
                     {caseData.evidence.length > 0 && (
                       <Card className="mb-8">
                         <CardHeader>
-                          <CardTitle className="flex items-center">
+                          <CardTitle id="evidence" className="flex items-center">
                             <FileText className="mr-2 h-5 w-5" />
                             {t("caseDetail.evidence")}
                           </CardTitle>
@@ -634,7 +634,7 @@ const CaseDetail = () => {
                     )}
 
                     {caseData.missing_details && (
-                      <section className="mb-8 border-t border-border pt-5">
+                      <section id="missing-details" className="mb-8 border-t border-border pt-5">
                         <h2 className="mb-3 flex items-center text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                           <Info className="mr-2 h-4 w-4" />
                           {t("caseDetail.missingDetails")}
@@ -646,7 +646,7 @@ const CaseDetail = () => {
                     )}
 
                     {caseData.notes && (
-                      <section className="mb-8 border-t border-border pt-5">
+                      <section id="notes" className="mb-8 border-t border-border pt-5">
                         <h2 className="mb-3 flex items-center text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                           <StickyNote className="mr-2 h-4 w-4" />
                           {t("caseDetail.notes")}
