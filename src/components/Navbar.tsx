@@ -160,7 +160,7 @@ export function Navbar() {
           <img
             src="/assets/logo.png"
             alt="Jawafdehi"
-            className="h-10 w-auto object-contain"
+            className="h-8 w-auto object-contain"
           />
         </Link>
 
@@ -281,7 +281,7 @@ export function Navbar() {
                   <img
                     src="/assets/logo.png"
                     alt="Jawafdehi"
-                    className="h-10 w-auto object-contain"
+                    className="h-8 w-auto object-contain"
                   />
                 </SheetTitle>
               </SheetHeader>
