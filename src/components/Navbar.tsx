@@ -40,9 +40,6 @@ type PillStyle = {
   width: number;
 };
 
-const utilityButtonClass =
-  "h-10 w-10 rounded-full border border-border/70 bg-background/70 text-foreground/75 shadow-sm shadow-foreground/5 transition-all duration-200 hover:-translate-y-0.5 hover:border-foreground/15 hover:bg-background hover:text-foreground hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
-
 const desktopNavWidthClass: Record<string, string> = {
   home: "min-w-[4.5rem]",
   process: "min-w-[7.25rem]",
@@ -56,8 +53,8 @@ const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
   cn(
     "rounded-2xl px-4 py-3 text-sm font-normal transition-all duration-200",
     isActive
-      ? "bg-secondary text-secondary-foreground"
-      : "text-foreground/75 hover:bg-secondary/70 hover:text-foreground",
+      ? "bg-secondary/55 text-foreground/80"
+      : "text-foreground/65 hover:bg-secondary/35 hover:text-foreground/80",
   );
 
 export function Navbar() {
@@ -173,7 +170,7 @@ export function Navbar() {
         >
           <span
             aria-hidden="true"
-            className="absolute left-0 top-1 h-10 rounded-full bg-secondary shadow-sm transition-[transform,width,opacity] duration-300 ease-out motion-reduce:transition-none"
+            className="absolute left-0 top-1 h-10 rounded-full bg-secondary/45 shadow-sm transition-[transform,width,opacity] duration-300 ease-out motion-reduce:transition-none"
             style={pillStyle}
           />
 
@@ -186,9 +183,9 @@ export function Navbar() {
               onPointerEnter={() => setHoveredKey(item.key)}
               className={({ isActive }) =>
                 cn(
-                  "relative z-10 inline-flex h-10 items-center justify-center rounded-full px-3 text-center text-sm font-normal text-foreground/68 transition-colors duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  "relative z-10 inline-flex h-10 items-center justify-center rounded-full px-3 text-center text-sm font-normal text-foreground/62 transition-colors duration-200 hover:text-foreground/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   desktopNavWidthClass[item.key],
-                  isActive && "text-foreground",
+                  isActive && "text-foreground/82",
                 )
               }
             >
@@ -201,9 +198,9 @@ export function Navbar() {
               ref={setNavRef("about")}
               onPointerEnter={() => setHoveredKey("about")}
               className={cn(
-                "relative z-10 inline-flex h-10 items-center justify-center gap-1 rounded-full px-3 text-center text-sm font-normal text-foreground/68 transition-colors duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                "relative z-10 inline-flex h-10 items-center justify-center gap-1 rounded-full px-3 text-center text-sm font-normal text-foreground/62 transition-colors duration-200 hover:text-foreground/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 desktopNavWidthClass.about,
-                (activeKey === "about" || aboutOpen) && "text-foreground",
+                (activeKey === "about" || aboutOpen) && "text-foreground/82",
               )}
             >
               {t("nav.about")}
@@ -239,11 +236,10 @@ export function Navbar() {
 
           <div className="flex items-center gap-1 rounded-full border border-border/70 bg-background/58 p-1 shadow-sm shadow-foreground/5">
             <Button
-              variant="ghost"
+              variant="navIcon"
               size="icon"
               type="button"
               onClick={() => setIsSearchOpen(true)}
-              className={utilityButtonClass}
               aria-label={t("searchCommand.open")}
               title={t("searchCommand.open")}
             >
@@ -254,8 +250,8 @@ export function Navbar() {
 
           <Button
             asChild
-            variant="primary"
-            className="h-11 min-w-[9.5rem] rounded-full bg-primary px-5 text-[13px] font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-colors duration-200 hover:bg-primary/85"
+            variant="navPrimary"
+            size="navCta"
           >
             <Link to="/cases">
               <Search className="h-4 w-4" />
@@ -270,9 +266,8 @@ export function Navbar() {
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button
-                variant="ghost"
-                size="icon"
-                className="h-11 w-11 rounded-full border border-border/70 bg-background/70 text-foreground shadow-sm"
+                variant="navIcon"
+                size="navMenuIcon"
               >
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">{t("nav.menu")}</span>
@@ -318,8 +313,8 @@ export function Navbar() {
               <div className="mt-8 grid gap-3 rounded-[1.75rem] border border-border/70 bg-secondary/45 p-3">
                 <Button
                   asChild
-                  variant="primary"
-                  className="h-11 rounded-full bg-primary font-bold text-primary-foreground hover:bg-primary/90"
+                  variant="navPrimary"
+                  size="navSheet"
                   onClick={() => setIsOpen(false)}
                 >
                   <Link to="/cases">
@@ -327,7 +322,7 @@ export function Navbar() {
                     {t("header.browseCases")}
                   </Link>
                 </Button>
-                <Button asChild variant="secondary" className="h-11 rounded-full font-bold" onClick={() => setIsOpen(false)}>
+                <Button asChild variant="navSecondary" size="navSheet" onClick={() => setIsOpen(false)}>
                   <Link to="/ask">
                     <MessageCircle className="h-4 w-4" />
                     {t("header.askJawafdehi")}

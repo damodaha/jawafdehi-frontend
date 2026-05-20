@@ -18,7 +18,7 @@ type HeroAction = {
   label: string;
   to: string;
   variant: NonNullable<ButtonProps["variant"]>;
-  className?: string;
+  external?: boolean;
 };
 
 type HeroMapImage = {
@@ -36,13 +36,8 @@ const heroCopy = {
 };
 
 const heroActions: HeroAction[] = [
-  { label: "Browse Cases", to: "/cases", variant: "primary" },
-  {
-    label: "Our Process",
-    to: "/our-process",
-    variant: "outline",
-    className: "border-border bg-background hover:bg-muted",
-  },
+  { label: "AI Research", to: "https://chat.jawafdehi.org", variant: "primary", external: true },
+  { label: "Learn More", to: "/our-process", variant: "secondary" },
 ];
 
 const heroMapImages: HeroMapImage[] = [
@@ -55,8 +50,6 @@ const heroMapImages: HeroMapImage[] = [
     className: "hidden dark:block",
   },
 ];
-
-const buttonClassName = "h-12 rounded-[3px] px-7 text-sm font-semibold";
 
 export function Hero({
   casesDocumented,
@@ -108,14 +101,20 @@ export function Hero({
 function HeroActions({ actions }: { actions: HeroAction[] }) {
   return (
     <div className="flex flex-col gap-3  sm:flex-row">
-      {actions.map(({ label, to, variant, className }) => (
+      {actions.map(({ label, to, variant, external }) => (
         <Button
           asChild
           key={to}
           variant={variant}
-          className={cn(buttonClassName, className)}
+          size="lg"
         >
-          <Link to={to}>{label}</Link>
+          {external ? (
+            <a href={to} target="_blank" rel="noopener noreferrer">
+              {label}
+            </a>
+          ) : (
+            <Link to={to}>{label}</Link>
+          )}
         </Button>
       ))}
     </div>

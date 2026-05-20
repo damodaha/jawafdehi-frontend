@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { CaseCard } from "@/components/CaseCard";
 import { Hero } from "@/components/home/hero";
 import { Faq } from "@/components/home/faq";
-import { Features } from "@/components/home/features";
+import { Cta } from "@/components/home/cta";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -182,7 +182,7 @@ const Index = () => {
 
 
         {/* ── What we're building ── */}
-        <section id="archive-intro" className="py-12 bg-muted/30 border-b border-border">
+        {/* <section id="archive-intro" className="py-12 bg-muted/30 border-b border-border">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center">
               <p className="text-base md:text-lg text-foreground/80 leading-relaxed">
@@ -192,9 +192,9 @@ const Index = () => {
               </p>
             </div>
           </div>
-        </section>
+        </section>  */}
 
-        <Features />
+        {/* <Features /> */}
 
         {/* ── Recently Documented Cases ── */}
         <section id="recent-cases" className="py-12 md:py-16 bg-muted/20">
@@ -232,7 +232,8 @@ const Index = () => {
             </div>
           </div>
         </section>
-<Faq /> 
+        <Cta />
+        <Faq />
       </main>
 
     </div>

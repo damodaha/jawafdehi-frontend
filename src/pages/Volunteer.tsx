@@ -1,8 +1,9 @@
 import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
+import { Cta } from "@/components/home/cta";
 import {
   Search, Megaphone, Globe, BookOpen, FlaskConical,
-  Github, Mail, Heart,
+  Github, Mail,
 } from "lucide-react";
 
 const TEAMS = [
@@ -194,31 +195,7 @@ const Volunteer = () => (
         </div>
       </section>
 
-      {/* CTA */}
-      <section id="contribute" className="py-12 md:py-16 bg-muted/20">
-        <div className="container mx-auto px-4 text-center">
-          <Heart className="h-8 w-8 text-primary mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-foreground mb-3">Ready to contribute?</h2>
-          <p className="text-muted-foreground max-w-xl mx-auto mb-8">
-            Start by exploring the codebase on GitHub or send us an email to introduce yourself and tell us which team interests you.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button asChild>
-              <a href="https://github.com/Jawafdehi" target="_blank" rel="noopener noreferrer">
-                <Github className="mr-2 h-4 w-4" />
-                GitHub — Jawafdehi
-              </a>
-            </Button>
-            <a
-              href="mailto:cases@jawafdehi.org"
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm transition-colors"
-            >
-              <Mail className="h-4 w-4" />
-              Email us at cases@jawafdehi.org
-            </a>
-          </div>
-        </div>
-      </section>
+      <Cta />
     </main>
 
   </div>
