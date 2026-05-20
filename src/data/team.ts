@@ -58,14 +58,6 @@ export const teamMembers: TeamMember[] = [
     ],
   },
   {
-    displayName: { en: "Jenish Khanal", ne: "जेनिस खनाल" },
-    thumb: "https://s3.jawafdehi.org/team/jenish.jpeg",
-    description: "Volunteer, Let's Build Nepal",
-    contacts: [
-      { type: "linkedin", value: "https://www.linkedin.com/in/jenish-khanal-709458201/" },
-    ],
-  },
-  {
     displayName: { en: "Rohan Raj Gautam", ne: "रोहन राज गौतम" },
     thumb: "https://s3.jawafdehi.org/team/rohan2.jpg",
     description: "Software Engineer; Volunteer, Let's Build Nepal",
