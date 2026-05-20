@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 
 import { Button, type ButtonProps } from "@/components/ui/button";
+import { CountUpValue } from "@/components/ui/count-up-value";
 import { cn } from "@/lib/utils";
 
 type HeroProps = {
@@ -127,7 +128,7 @@ function HeroStats({ stats }: { stats: HeroStat[] }) {
       {stats.map(({ value, label }) => (
         <div key={label} className="min-w-0">
           <p className="text-2xl font-bold leading-none text-primary tabular-nums">
-            {value}
+            <CountUpValue value={value} />
           </p>
           <p className="mt-2 whitespace-nowrap text-base text-muted-foreground">
             {label}
