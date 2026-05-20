@@ -1,7 +1,6 @@
 import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
-import { Header } from "@/components/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 import { FeedbackForm } from "@/components/FeedbackForm";
@@ -27,7 +26,6 @@ export default function Feedback() {
         <meta name="twitter:description" content="Share your feedback, suggestions, or corrections with the Jawafdehi team to help improve Nepal's corruption accountability platform." />
         <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
       </Helmet>
-      <Header />
 
       <main id="main-content" className="flex-1">
         <div className="container mx-auto px-4 py-8 md:py-12 max-w-2xl">

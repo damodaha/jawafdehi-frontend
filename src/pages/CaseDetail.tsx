@@ -3,7 +3,6 @@ import { Footer } from "@/components/Footer";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
-import { Header } from "@/components/Header";
 import { GuestCaseChatDrawer } from "@/components/guest/GuestCaseChatDrawer";
 import { DocumentSourceCard } from "@/components/DocumentSourceCard";
 import { ResponsiveTable } from "@/components/ResponsiveTable";
@@ -295,7 +294,6 @@ const CaseDetail = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
         <main id="main-content" className="flex-1 py-8 md:py-12">
           <div className="container mx-auto px-4 max-w-5xl">
             <Skeleton className="h-10 w-32 mb-6" />
@@ -321,7 +319,6 @@ const CaseDetail = () => {
   if (isError || !caseData) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
         <main id="main-content" className="flex-1 py-8 md:py-12">
           <div className="container mx-auto px-4 max-w-5xl">
             <Button variant="ghost" asChild className="mb-6">
@@ -373,7 +370,6 @@ const CaseDetail = () => {
         <link rel="alternate" type="application/json" href={`https://portal.jawafdehi.org/api/cases/${id}/`} title="Case data (JSON API)" />
         <link rel="alternate" type="application/json+oembed" href={`https://jawafdehi.org/oembed?url=${encodeURIComponent(canonicalUrl)}&format=json`} title={`${caseData.title} oEmbed`} />
       </Helmet>
-      <Header />
       <CaseDetailBanner
         caseData={caseData}
         resolvedEntities={resolvedEntities}

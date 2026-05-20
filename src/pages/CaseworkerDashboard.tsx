@@ -3,7 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { useCaseworkerAuth } from "@/context/CaseworkerAuthContext";
 import { listSkills, listDrafts, generateSummary } from "@/services/caseworker-api";
 import type { Skill, Draft, ChatMessage, ChatTab } from "@/types/caseworker";
-import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { SendHorizonal, Plus, X, Settings, LogOut } from "lucide-react";
@@ -172,7 +171,6 @@ const CaseworkerDashboard = () => {
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col">
-      <Header />
 
       <div className="flex-1 container mx-auto px-4 py-6 max-w-7xl">
         {/* top bar */}
