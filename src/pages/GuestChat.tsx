@@ -3,7 +3,6 @@ import { Helmet } from "react-helmet-async";
 import { AlertCircle, PencilLine } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
-import { Footer } from "@/components/Footer";
 import { BotTypingBubble } from "@/components/guest/BotTypingBubble";
 import { GuestAnswerBlock } from "@/components/guest/GuestAnswerBlock";
 import { GuestChatInput } from "@/components/guest/GuestChatInput";
@@ -242,9 +241,6 @@ export default function GuestChat() {
             </div>
           </section>
         </div>
-      </main>
-
-      <Footer />
-    </div>
+      </main>    </div>
   );
 }

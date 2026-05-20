@@ -1,4 +1,3 @@
-import { Footer } from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
 import { Mail, Linkedin, Facebook, Github, Globe, Users, Instagram } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -139,9 +138,6 @@ const OurTeam = () => {
           </div>
         </section>
       </main>
-
-      <Footer />
-
 
     </div>
   );

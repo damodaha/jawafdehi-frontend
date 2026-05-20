@@ -1,4 +1,3 @@
-import { Footer } from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
 import { Database, Code2, LayoutDashboard, Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -133,9 +132,6 @@ const OurProducts = () => (
         </div>
       </section>
     </main>
-
-      <Footer />
-
 
   </div>
 );

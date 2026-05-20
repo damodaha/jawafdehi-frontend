@@ -1,4 +1,3 @@
-import { Footer } from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
 
 const Privacy = () => {
@@ -146,10 +145,7 @@ const Privacy = () => {
             </div>
           </div>
         </section>
-      </main>
-
-      <Footer />
-    </div>
+      </main>    </div>
   );
 };
 

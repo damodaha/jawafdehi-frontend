@@ -1,4 +1,3 @@
-import { Footer } from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import {
@@ -221,9 +220,6 @@ const Volunteer = () => (
         </div>
       </section>
     </main>
-
-      <Footer />
-
 
   </div>
 );

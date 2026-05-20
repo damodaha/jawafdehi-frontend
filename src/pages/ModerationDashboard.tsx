@@ -1,4 +1,3 @@
-import { Footer } from "@/components/Footer";
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
@@ -341,9 +340,6 @@ export default function ModerationDashboard() {
           </Tabs>
         </div>
       </main>
-
-      <Footer />
-
 
     </div>
   );

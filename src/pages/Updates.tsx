@@ -1,4 +1,3 @@
-import { Footer } from "@/components/Footer";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { updates } from "@/data/updates";
@@ -61,9 +60,6 @@ const Updates = () => {
                     </div>
                 </div>
             </main>
-
-      <Footer />
-
       
         </div>
     );
