@@ -30,28 +30,28 @@ export const LanguageToggle = () => {
       aria-checked={currentLanguage === "en"}
       aria-label={`${t("common.changeLanguage")}: ${nextLanguageLabel}`}
       title={`${t("common.changeLanguage")}: ${nextLanguageLabel}`}
-      className="relative inline-flex h-8 w-[78px] items-center rounded-full border border-primary/40 bg-background px-1 text-sm font-semibold text-primary shadow-sm transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      className="relative inline-flex h-10 w-[84px] shrink-0 items-center overflow-hidden rounded-full border border-border/70 bg-background/70 px-1 text-sm font-semibold leading-none text-foreground shadow-sm shadow-foreground/5 transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-foreground/15 hover:bg-background hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
     >
       <span
         aria-hidden="true"
         className={cn(
-          "absolute top-1/2 h-6 w-8 -translate-y-1/2 rounded-full bg-primary/85 shadow-sm transition-transform duration-200",
-          currentLanguage === "en" ? "translate-x-0" : "translate-x-8",
+          "absolute top-1/2 h-8 w-9 -translate-y-1/2 rounded-full bg-foreground shadow-sm transition-transform duration-200 motion-reduce:transition-none",
+          currentLanguage === "en" ? "translate-x-0" : "translate-x-[38px]",
         )}
       />
-      <span className="relative z-10 grid w-full grid-cols-2 items-center">
+      <span className="relative z-10 grid h-full w-full grid-cols-2 items-center">
         <span
           className={cn(
-            "text-center text-[11px] tracking-wide transition-colors",
-            currentLanguage === "en" ? "text-primary-foreground" : "text-muted-foreground",
+            "grid h-full place-items-center text-center text-[11px] font-bold leading-none transition-colors",
+            currentLanguage === "en" ? "text-background" : "text-muted-foreground",
           )}
         >
           EN
         </span>
         <span
           className={cn(
-            "text-center text-[11px] tracking-wide transition-colors",
-            currentLanguage === "ne" ? "text-primary-foreground" : "text-muted-foreground",
+            "grid h-full place-items-center text-center text-[11px] font-bold leading-none transition-colors",
+            currentLanguage === "ne" ? "text-background" : "text-muted-foreground",
           )}
         >
           ने

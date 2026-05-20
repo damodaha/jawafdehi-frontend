@@ -27,7 +27,7 @@ export const ThemeToggle = () => {
         disabled
         aria-label={placeholderLabel}
         title={placeholderLabel}
-        className="rounded-full border border-border/70"
+        className="h-10 w-10 rounded-full border border-border/70 bg-background/70 text-foreground/75 shadow-sm shadow-foreground/5"
       >
         <Monitor className="h-4 w-4" />
       </Button>
@@ -42,7 +42,7 @@ export const ThemeToggle = () => {
       onClick={() => setTheme(isDark ? "light" : "dark")}
       aria-label={label}
       title={label}
-      className="rounded-full border border-border/70"
+      className="h-10 w-10 rounded-full border border-border/70 bg-background/70 text-foreground/75 shadow-sm shadow-foreground/5 transition-all duration-200 hover:-translate-y-0.5 hover:border-foreground/15 hover:bg-background hover:text-foreground hover:shadow-md"
     >
       {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
     </Button>
