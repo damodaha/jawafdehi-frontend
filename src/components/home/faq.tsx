@@ -65,6 +65,7 @@ export function Faq({ className }: FaqProps) {
 
   return (
     <section
+      id="faq"
       className={cn("bg-background py-12 md:py-16", className)}
       aria-labelledby="faq-title"
     >

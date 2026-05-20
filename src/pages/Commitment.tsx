@@ -65,7 +65,7 @@ const Commitment = () => {
 
       <main id="main-content" className="flex-1">
         {/* Header */}
-        <section className="bg-primary py-16 md:py-24">
+        <section id="commitment-hero" className="bg-primary py-16 md:py-24">
           <div className="container mx-auto px-4">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-widest text-primary-foreground/50 mb-4">
@@ -82,7 +82,7 @@ const Commitment = () => {
         </section>
 
         {/* Mission */}
-        <section className="py-12 md:py-14 border-b border-border">
+        <section id="mission" className="py-12 md:py-14 border-b border-border">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl">
               <h2 className="text-2xl font-bold text-foreground mb-5">Our Mission</h2>
@@ -97,7 +97,7 @@ const Commitment = () => {
         </section>
 
         {/* Commitments grid */}
-        <section className="py-12 md:py-16">
+        <section id="commitments" className="py-12 md:py-16">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
               {COMMITMENTS.map(({ icon: Icon, title, body }) => (

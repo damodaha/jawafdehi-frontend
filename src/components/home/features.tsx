@@ -51,7 +51,7 @@ export function Features() {
 
   return (
     <div onMouseLeave={() => setActiveFeatureId(null)}>
-      <section className="py-12 md:py-20 bg-background border-b border-border">
+      <section id="features" className="py-12 md:py-20 bg-background border-b border-border">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-10">
             {features.map((feature) => (

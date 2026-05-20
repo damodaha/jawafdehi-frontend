@@ -73,7 +73,7 @@ export function Hero({
   ];
 
   return (
-    <section className="container relative isolate mx-auto overflow-hidden border-b border-border bg-background">
+    <section id="hero" className="container relative isolate mx-auto overflow-hidden border-b border-border bg-background">
       <div
         aria-hidden="true"
         className="absolute inset-0 -z-10 opacity-[0.34] [background-image:radial-gradient(hsl(var(--foreground)/0.16)_0.75px,transparent_0.75px)] [background-size:18px_18px]"

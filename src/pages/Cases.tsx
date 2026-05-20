@@ -121,13 +121,13 @@ const Cases = () => {
 
       <main id="main-content" className="flex-1 py-8 md:py-12">
         <div className="container mx-auto px-4">
-          <div className="mb-10">
+          <section id="cases-intro" className="mb-10">
             <h1 className="text-4xl font-bold text-foreground mb-3">{t("cases.title")}</h1>
             <p className="text-muted-foreground text-lg">{t("cases.description")}</p>
-          </div>
+          </section>
 
           {/* Search and Filter Section */}
-          <div className="mb-8 flex flex-col gap-3 lg:flex-row lg:items-center">
+          <section id="case-search-section" className="mb-8 flex flex-col gap-3 lg:flex-row lg:items-center">
             <div className="relative flex-[1.5]">
               <label htmlFor="case-search" className="sr-only">
                 {t("cases.searchPlaceholder")}
@@ -168,7 +168,7 @@ const Cases = () => {
                 {t("cases.clearFilters")}
               </Button>
             </div>
-          </div>
+          </section>
 
           {/* Results Count */}
           <div className="mb-6">
@@ -190,6 +190,7 @@ const Cases = () => {
             </Alert>
           ) : null}
 
+          <section id="case-results">
           {isInitialLoading ? (
             <div role="status" aria-label={t("cases.loading")} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -277,6 +278,7 @@ const Cases = () => {
               </Button>
             </div>
           )}
+          </section>
         </div>
       </main>
 

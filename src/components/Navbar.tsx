@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -8,6 +8,7 @@ import {
   Search,
 } from "lucide-react";
 
+import { AppSearchCommand } from "@/components/AppSearchCommand";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
@@ -62,6 +63,7 @@ export function Navbar() {
   const { t } = useTranslation();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [pillStyle, setPillStyle] = useState<PillStyle>({
@@ -115,7 +117,32 @@ export function Navbar() {
     navRefs.current[key] = node;
   };
 
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const isTyping =
+        target?.tagName === "INPUT" ||
+        target?.tagName === "TEXTAREA" ||
+        target?.isContentEditable;
+
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setIsSearchOpen((open) => !open);
+        return;
+      }
+
+      if (!isTyping && event.key === "/") {
+        event.preventDefault();
+        setIsSearchOpen(true);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
   return (
+    <>
     <header className="sticky top-0 z-50 w-full bg-background/82 backdrop-blur-[12px] supports-[backdrop-filter]:bg-background/72">
       <a
         href="#main-content"
@@ -209,14 +236,15 @@ export function Navbar() {
 
           <div className="flex items-center gap-1 rounded-full border border-border/70 bg-background/58 p-1 shadow-sm shadow-foreground/5">
             <Button
-              asChild
               variant="ghost"
               size="icon"
+              type="button"
+              onClick={() => setIsSearchOpen(true)}
               className={utilityButtonClass}
+              aria-label={t("searchCommand.open")}
+              title={t("searchCommand.open")}
             >
-              <Link to="/cases" aria-label={t("nav.searchCases")} title={t("nav.searchCases")}>
-                <Search className="h-4 w-4" />
-              </Link>
+              <Search className="h-4 w-4" />
             </Button>
             <ThemeToggle />
           </div>
@@ -310,5 +338,7 @@ export function Navbar() {
         </div>
       </div>
     </header>
+    <AppSearchCommand open={isSearchOpen} onOpenChange={setIsSearchOpen} />
+    </>
   );
 }

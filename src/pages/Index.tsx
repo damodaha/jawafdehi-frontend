@@ -180,30 +180,9 @@ const Index = () => {
           officialsAndEntitiesTracked={getStatValue(stats?.entities_tracked)}
         />
 
-        {/* ── Trust strip ── */}
-        <section className="bg-primary/5 border-b border-border py-5">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:justify-center gap-y-3 gap-x-8 text-sm">
-              {[
-                { icon: "🇳🇵", text: "Built by Nepali, for Nepali" },
-                { icon: "∞", text: "Free forever — no paywall", iconClass: "text-emerald-600 font-bold" },
-                { icon: "🔓", text: "All data in the public domain" },
-                { icon: "📜", text: "Records are never deleted" },
-                { icon: "✅", text: "Human-reviewed summaries" },
-                { icon: "⚙️", text: "All technology is open source" },
-                { icon: "🤝", text: "100% volunteer-powered" },
-              ].map(({ icon, text, iconClass }) => (
-                <div key={text} className="flex items-center gap-2 text-foreground/70">
-                  <span className={`text-base flex-shrink-0 ${iconClass ?? ""}`}>{icon}</span>
-                  <span>{text}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* ── What we're building ── */}
-        <section className="py-12 bg-muted/30 border-b border-border">
+        <section id="archive-intro" className="py-12 bg-muted/30 border-b border-border">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center">
               <p className="text-base md:text-lg text-foreground/80 leading-relaxed">
@@ -218,7 +197,7 @@ const Index = () => {
         <Features />
 
         {/* ── Recently Documented Cases ── */}
-        <section className="py-12 md:py-16 bg-muted/20">
+        <section id="recent-cases" className="py-12 md:py-16 bg-muted/20">
           <div className="container mx-auto px-4">
             <div className="flex items-end justify-between mb-10">
               <div>

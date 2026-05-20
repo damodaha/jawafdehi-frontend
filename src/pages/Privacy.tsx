@@ -21,7 +21,7 @@ const Privacy = () => {
       </Helmet>
 
       <main id="main-content" className="flex-1">
-        <section className="bg-gradient-to-br from-primary via-navy-dark to-slate-800 py-16 md:py-20">
+        <section id="privacy-hero" className="bg-gradient-to-br from-primary via-navy-dark to-slate-800 py-16 md:py-20">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl">
               <h1 className="text-4xl md:text-5xl font-bold text-primary-foreground mb-4">
@@ -37,14 +37,14 @@ const Privacy = () => {
         <section className="py-12 md:py-16">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto prose prose-neutral dark:prose-invert">
-              <h2>1. Overview</h2>
+              <h2 id="overview">1. Overview</h2>
               <p>
                 Jawafdehi ("we", "our", or "us") operates the jawafdehi.org website. This Privacy Policy explains how we collect, use, and protect information when you use our platform. We believe in minimal data collection and maximum transparency — consistent with our mission as Nepal's open corruption accountability platform.
               </p>
 
-              <h2>2. Information We Collect</h2>
+              <h2 id="information-we-collect">2. Information We Collect</h2>
 
-              <h3>2.1 Information You Provide</h3>
+              <h3 id="information-you-provide">2.1 Information You Provide</h3>
               <p>
                 When you submit feedback, report an allegation, or volunteer through our platform, you may provide:
               </p>
@@ -57,7 +57,7 @@ const Privacy = () => {
                 All submissions are voluntary. You may submit feedback or reports anonymously.
               </p>
 
-              <h3>2.2 Automatically Collected Information</h3>
+              <h3 id="automatically-collected-information">2.2 Automatically Collected Information</h3>
               <p>
                 When you visit jawafdehi.org, our hosting infrastructure automatically collects standard server logs that may include:
               </p>
@@ -71,7 +71,7 @@ const Privacy = () => {
                 We use Cloudflare for DNS, CDN, and security. Cloudflare may process visitor data according to their privacy policy. We do not use any third-party analytics trackers, advertising networks, or tracking cookies.
               </p>
 
-              <h2>3. Cookies</h2>
+              <h2 id="cookies">3. Cookies</h2>
               <p>
                 Jawafdehi.org uses minimal cookies:
               </p>
@@ -83,7 +83,7 @@ const Privacy = () => {
                 We do not use tracking cookies, advertising cookies, or third-party analytics cookies.
               </p>
 
-              <h2>4. How We Use Information</h2>
+              <h2 id="how-we-use-information">4. How We Use Information</h2>
               <p>We use collected information only for:</p>
               <ul>
                 <li>Processing feedback, allegations, and volunteer submissions</li>
@@ -95,7 +95,7 @@ const Privacy = () => {
                 We never sell, rent, or share personal information with third parties for commercial purposes.
               </p>
 
-              <h2>5. Data Storage and Security</h2>
+              <h2 id="data-storage-and-security">5. Data Storage and Security</h2>
               <p>
                 Jawafdehi operates on Cloudflare infrastructure. Submission data and server logs are stored securely. We take reasonable technical and organizational measures to protect data against unauthorized access, alteration, or destruction.
               </p>
@@ -103,7 +103,7 @@ const Privacy = () => {
                 Server logs are retained for a limited period for operational purposes and are not used for user profiling.
               </p>
 
-              <h2>6. Third-Party Services</h2>
+              <h2 id="third-party-services">6. Third-Party Services</h2>
               <p>
                 We use the following third-party services that may process visitor data:
               </p>
@@ -115,12 +115,12 @@ const Privacy = () => {
                 Links to external websites (e.g., GitHub, social media, Let's Build Nepal) are governed by their respective privacy policies.
               </p>
 
-              <h2>7. Children's Privacy</h2>
+              <h2 id="childrens-privacy">7. Children's Privacy</h2>
               <p>
                 Our platform is not directed at children under 13. We do not knowingly collect personal information from children. If you believe a child has provided us with personal data, please contact us and we will delete it.
               </p>
 
-              <h2>8. Your Rights</h2>
+              <h2 id="your-rights">8. Your Rights</h2>
               <p>
                 You may request:
               </p>
@@ -133,12 +133,12 @@ const Privacy = () => {
                 To exercise these rights, contact us through the Feedback page.
               </p>
 
-              <h2>9. Changes to This Policy</h2>
+              <h2 id="policy-changes">9. Changes to This Policy</h2>
               <p>
                 We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated "Last updated" date. We encourage you to review this policy periodically.
               </p>
 
-              <h2>10. Contact</h2>
+              <h2 id="contact">10. Contact</h2>
               <p>
                 For questions about this Privacy Policy, please use our <a href="/feedback" className="text-primary hover:underline">Feedback page</a>.
               </p>

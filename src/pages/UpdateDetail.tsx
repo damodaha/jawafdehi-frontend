@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router-dom";
+import type { ReactNode } from "react";
 import { Helmet } from "react-helmet-async";
 import { updates } from "@/data/updates";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,12 @@ import Markdown from "react-markdown";
 import NotFound from "./NotFound";
 import { useTranslation } from "react-i18next";
 import { stripMarkdown } from "@/utils/markdown";
+
+const headingId = (children: ReactNode) =>
+    String(children)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
 
 const UpdateDetail = () => {
     const { id } = useParams();
@@ -61,11 +68,11 @@ const UpdateDetail = () => {
                             <Markdown
                                 // remarkPlugins={[remarkGfm]}
                                 components={{
-                                    h2: ({ node, ...props }) => (
-                                        <h2 className="text-2xl font-bold mt-10 mb-4" {...props} />
+                                    h2: ({ node, children, ...props }) => (
+                                        <h2 id={headingId(children)} className="text-2xl font-bold mt-10 mb-4" {...props}>{children}</h2>
                                     ),
-                                    h3: ({ node, ...props }) => (
-                                        <h3 className="text-xl font-semibold mt-8 mb-3" {...props} />
+                                    h3: ({ node, children, ...props }) => (
+                                        <h3 id={headingId(children)} className="text-xl font-semibold mt-8 mb-3" {...props}>{children}</h3>
                                     ),
                                     p: ({ node, ...props }) => (
                                         <p className="my-6 leading-relaxed" {...props} />

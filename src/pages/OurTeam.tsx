@@ -51,7 +51,7 @@ const OurTeam = () => {
 
       <main id="main-content" className="flex-1">
         {/* Hero */}
-        <section className="bg-gradient-to-br from-primary via-navy-dark to-slate-800 py-16 md:py-24">
+        <section id="team-hero" className="bg-gradient-to-br from-primary via-navy-dark to-slate-800 py-16 md:py-24">
           <div className="container mx-auto px-4">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-widest text-primary-foreground/50 mb-4">
@@ -68,7 +68,7 @@ const OurTeam = () => {
         </section>
 
         {/* Team grid */}
-        <section className="py-12 md:py-16">
+        <section id="team-members" className="py-12 md:py-16">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {teamMembers.map((member) => (
@@ -119,7 +119,7 @@ const OurTeam = () => {
         </section>
 
         {/* Join CTA */}
-        <section className="py-12 md:py-14 bg-muted/30 border-t border-border">
+        <section id="join-team" className="py-12 md:py-14 bg-muted/30 border-t border-border">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-2xl font-bold text-foreground mb-3">Want to contribute?</h2>
             <p className="text-muted-foreground max-w-xl mx-auto mb-6">

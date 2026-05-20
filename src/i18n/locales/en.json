@@ -29,6 +29,13 @@
     "placeholder": "Search pages and tools...",
     "noResults": "No matching pages found.",
     "pages": "Pages",
+    "line": "Line {{line}}",
+    "groups": {
+      "pages": "Pages",
+      "updates": "Updates",
+      "cases": "Cases",
+      "entities": "Entities"
+    },
     "pageTitles": {
       "report": "Report Allegation",
       "feedback": "Submit Feedback",
@@ -51,7 +58,10 @@
       "report": "Submit an allegation or public-interest corruption lead.",
       "feedback": "Send bugs, feature ideas, corrections, or general feedback.",
       "privacy": "Read how Jawafdehi handles data, cookies, logs, and user information.",
-      "terms": "Read platform rules, public domain data terms, disclaimers, and permitted use."
+      "terms": "Read platform rules, public domain data terms, disclaimers, and permitted use.",
+      "updateDetail": "Read a Jawafdehi platform update.",
+      "caseDetail": "Open a documented corruption case.",
+      "entityDetail": "Open a tracked person, office, or organization."
     }
   },
   "footer": {
