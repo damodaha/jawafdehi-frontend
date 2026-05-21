@@ -8,7 +8,7 @@ import {
   Youtube,
 } from "lucide-react";
 
-import { ProcessPipeline } from "@/components/ProcessPipeline";
+import { ProcessPipeline } from "@/components/process";
 
 const EXTERNAL_SOURCES = [
   { icon: Building2, label: "CIAA", desc: "Commission for the Investigation of Abuse of Authority" },
