@@ -28,19 +28,13 @@ export function Cta({ className }: CtaProps) {
         />
 
         <div className="flex max-w-3xl flex-col items-start">
-          <div className="mb-6 flex h-11 w-11 items-center justify-center rounded-md border border-white/15 bg-white/10 text-white shadow-sm shadow-primary/20">
-            <Heart className="h-5 w-5" aria-hidden="true" />
-          </div>
-
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80">
-            Volunteer with Jawafdehi
-          </p>
+         
 
           <h2
             id="contribute-title"
             className="mt-4 max-w-2xl text-3xl font-extrabold leading-tight tracking-normal text-white md:text-4xl"
           >
-            Ready to contribute?
+           Volunteer with Jawafdehi
           </h2>
 
           <p className="mt-5 max-w-2xl text-sm leading-7 text-white/90 md:text-base">

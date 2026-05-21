@@ -144,7 +144,7 @@ export function ProcessPipeline() {
         className="absolute inset-0 -z-10 opacity-[0.22] [background-image:radial-gradient(hsl(var(--foreground)/0.14)_0.75px,transparent_0.75px)] [background-size:18px_18px]"
       />
       <div className="container mx-auto px-4">
-        <div className="relative space-y-6 pb-[36vh] md:space-y-8">
+        <div className="relative space-y-6 pb-12 md:space-y-8 md:pb-16">
           {PIPELINE_STEPS.map((step, index) => (
             <PipelineCard
               key={step.number}
@@ -219,14 +219,9 @@ function PipelineCard({
         <div className="min-w-0 md:max-w-2xl">
           <div className="mb-6 flex items-center gap-4">
             <div
-              className={cn(
-                "flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border bg-transparent transition-colors duration-500",
-                isActive
-                  ? "border-primary/25 text-primary"
-                  : "border-border/70 text-primary/80",
-              )}
+              
             >
-              <Icon className="h-5 w-5" aria-hidden="true" />
+              <Icon className="h-8 w-8 text-primary/70" aria-hidden="true" />
             </div>
 
             <h3 className="min-w-0 text-3xl font-bold leading-tight tracking-normal text-foreground md:text-4xl">
