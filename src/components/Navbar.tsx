@@ -159,7 +159,12 @@ export function Navbar() {
           <img
             src="/assets/logo.png"
             alt="Jawafdehi"
-            className="h-8 w-auto object-contain"
+            className="h-8 w-auto object-contain dark:hidden"
+          />
+          <img
+            src="/assets/logo-dark.png"
+            alt="Jawafdehi"
+            className="hidden h-8 w-auto object-contain dark:block"
           />
         </Link>
 
@@ -279,7 +284,12 @@ export function Navbar() {
                   <img
                     src="/assets/logo.png"
                     alt="Jawafdehi"
-                    className="h-8 w-auto object-contain"
+                    className="h-8 w-auto object-contain dark:hidden"
+                  />
+                  <img
+                    src="/assets/logo-dark.png"
+                    alt="Jawafdehi"
+                    className="hidden h-8 w-auto object-contain dark:block"
                   />
                 </SheetTitle>
               </SheetHeader>
