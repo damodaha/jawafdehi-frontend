@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ExternalLink, Unlock } from "lucide-react";
 import { FaFacebook, FaYoutube, FaLinkedin, FaWhatsapp } from "react-icons/fa";
-import { SiLinktree, SiOpensourceinitiative } from "react-icons/si";
+import { SiLinktree } from "react-icons/si";
 
 import { JAWAFDEHI_SOCIALS } from "@/config/constants";
 import { cn } from "@/lib/utils";
@@ -28,7 +28,7 @@ type FooterBadge = {
 };
 
 const linkClass =
-  "group inline-flex min-h-9 items-center justify-between gap-3 rounded-full px-3 text-sm text-primary-foreground/70 transition-all duration-200 hover:bg-primary-foreground/10 hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:text-foreground/64 dark:hover:bg-secondary/45 dark:hover:text-foreground";
+  "group inline-flex min-h-9 items-center justify-between gap-3 rounded-full px-3 text-sm text-[var(--footer-muted)] transition-all duration-200 hover:bg-[var(--footer-soft)] hover:text-[var(--footer-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
 
 const footerBadges: FooterBadge[] = [
   {
@@ -39,14 +39,31 @@ const footerBadges: FooterBadge[] = [
   {
     label: "Public domain",
     icon: Unlock,
-    iconClassName: "text-emerald-600 dark:text-emerald-300",
+    iconClassName: "text-emerald-500 dark:text-emerald-300",
   },
   {
     label: "Open source",
-    icon: SiOpensourceinitiative,
-    iconClassName: "text-emerald-600 dark:text-emerald-300",
+    icon: OpenSourceFilledIcon,
+    iconClassName: "text-emerald-500 dark:text-emerald-300",
   },
 ];
+
+function OpenSourceFilledIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className={className}
+      fill="currentColor"
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 1.5a10.5 10.5 0 1 0 0 21 10.5 10.5 0 0 0 0-21Zm0 5.1a4.05 4.05 0 0 0-1.35 7.87l-2.25 5.46a8.7 8.7 0 1 1 7.2 0l-2.25-5.46A4.05 4.05 0 0 0 12 6.6Z"
+      />
+    </svg>
+  );
+}
 
 function FooterNavLink({ label, to, external }: FooterLink) {
   const content = (
@@ -76,7 +93,7 @@ function FooterNavLink({ label, to, external }: FooterLink) {
 function FooterLinkGroup({ title, links }: { title: string; links: FooterLink[] }) {
   return (
     <nav aria-label={title}>
-      <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-primary-foreground/80 dark:text-accent">
+      <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--footer-title)]">
         {title}
       </h3>
       <ul className="space-y-1">
@@ -125,12 +142,19 @@ export const Footer = () => {
   ];
 
   return (
-    <footer className="relative isolate overflow-hidden border-t border-primary/20 bg-primary text-primary-foreground dark:border-border dark:bg-background dark:text-foreground">
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 opacity-[0.22] [background-image:radial-gradient(hsl(var(--primary-foreground)/0.18)_0.75px,transparent_0.75px)] [background-size:18px_18px] dark:hidden"
-      />
-
+    <footer
+      className={cn(
+        "relative isolate overflow-hidden border-t bg-[var(--footer-bg)] text-[var(--footer-fg)]",
+        "[--footer-bg:hsl(var(--primary))] [--footer-fg:hsl(var(--primary-foreground))] [--footer-muted:hsl(var(--primary-foreground)/0.78)]",
+        "[--footer-title:hsl(354_100%_71%)]",
+        "[--footer-soft:hsl(var(--primary-foreground)/0.10)] [--footer-soft-hover:hsl(var(--primary-foreground)/0.16)]",
+        "[--footer-border:hsl(var(--primary-foreground)/0.16)] [--footer-border-hover:hsl(var(--primary-foreground)/0.28)] [--footer-dot:hsl(var(--primary-foreground)/0.30)]",
+        "border-[var(--footer-border)]",
+        "dark:[--footer-bg:hsl(var(--card))] dark:[--footer-fg:hsl(var(--card-foreground))] dark:[--footer-muted:hsl(var(--card-foreground)/0.82)]",
+        "dark:[--footer-soft:hsl(var(--background)/0.70)] dark:[--footer-soft-hover:hsl(var(--secondary)/0.45)]",
+        "dark:[--footer-border:hsl(var(--border)/0.70)] dark:[--footer-border-hover:hsl(var(--foreground)/0.20)] dark:[--footer-dot:hsl(var(--border))]",
+      )}
+    >
       <div className="container mx-auto px-4 py-12 md:py-14">
         <div className="grid gap-10 lg:grid-cols-[minmax(280px,1.15fr)_minmax(0,1.85fr)] lg:gap-14">
           <div className="space-y-6">
@@ -152,22 +176,22 @@ export const Footer = () => {
             </Link>
 
             <div className="max-w-sm space-y-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary-foreground/80 dark:text-accent">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--footer-title)]">
                 Accountability has no expiry
               </p>
-              <p className="text-sm leading-6 text-primary-foreground/72 dark:text-muted-foreground">
+              <p className="text-sm leading-6 text-[var(--footer-muted)]">
                 Nepal's permanent public archive of CIAA corruption cases, free forever, built by Nepali volunteers.
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-medium text-primary-foreground/72 dark:text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-medium text-[var(--footer-muted)]">
               {footerBadges.map(({ label, icon: Icon, marker, iconClassName }, index) => (
                 <span
                   key={label}
                   className="inline-flex items-center gap-1.5"
                 >
                   {index > 0 && (
-                    <span aria-hidden="true" className="mr-1 h-1 w-1 rounded-full bg-primary-foreground/30 dark:bg-border" />
+                    <span aria-hidden="true" className="mr-1 h-1 w-1 rounded-full bg-[var(--footer-dot)]" />
                   )}
                   {marker ? (
                     <span aria-hidden="true" className="text-sm leading-none">
@@ -191,7 +215,7 @@ export const Footer = () => {
         </div>
 
         <div className="mt-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <p className="max-w-3xl text-xs leading-5 text-primary-foreground/68 dark:text-muted-foreground">
+          <p className="max-w-3xl text-xs leading-5 text-[var(--footer-muted)]">
             {t("footer.disclaimer")}
           </p>
 
@@ -203,9 +227,8 @@ export const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={cn(
-                  "inline-flex h-10 w-10 items-center justify-center rounded-full border border-primary-foreground/15 bg-primary-foreground/10 text-primary-foreground/75 shadow-sm shadow-foreground/5 transition-all duration-200",
-                  "hover:-translate-y-0.5 hover:border-primary-foreground/25 hover:bg-primary-foreground/16 hover:text-primary-foreground hover:shadow-md",
-                  "dark:border-border/70 dark:bg-background/70 dark:text-foreground/65 dark:hover:border-foreground/15 dark:hover:bg-background dark:hover:text-primary",
+                  "inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--footer-border)] bg-[var(--footer-soft)] text-[var(--footer-muted)] shadow-sm shadow-foreground/5 transition-all duration-200",
+                  "hover:-translate-y-0.5 hover:border-[var(--footer-border-hover)] hover:bg-[var(--footer-soft-hover)] hover:text-[var(--footer-fg)] hover:shadow-md",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 )}
                 aria-label={label}
@@ -216,15 +239,15 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-6 flex flex-col gap-2 text-xs text-primary-foreground/68 dark:text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-6 flex flex-col gap-2 text-xs text-[var(--footer-muted)] sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {year} Jawafdehi. All data is in the public domain.
           </p>
           <div className="flex gap-4">
-            <Link to="/privacy" className="transition-colors hover:text-primary-foreground dark:hover:text-foreground">
+            <Link to="/privacy" className="transition-colors hover:text-[var(--footer-fg)]">
               Privacy
             </Link>
-            <Link to="/terms" className="transition-colors hover:text-primary-foreground dark:hover:text-foreground">
+            <Link to="/terms" className="transition-colors hover:text-[var(--footer-fg)]">
               Terms
             </Link>
           </div>
