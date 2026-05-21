@@ -1,23 +1,7 @@
 import { Helmet } from "react-helmet-async";
-import {
-  Building2,
-  Mic2,
-  Newspaper,
-  ShieldCheck,
-  Users,
-  Youtube,
-} from "lucide-react";
 
+import { DataSources } from "@/components/data-sources";
 import { ProcessPipeline } from "@/components/process";
-
-const EXTERNAL_SOURCES = [
-  { icon: Building2, label: "CIAA", desc: "Commission for the Investigation of Abuse of Authority" },
-  { icon: ShieldCheck, label: "CIB", desc: "Central Investigation Bureau" },
-  { icon: Newspaper, label: "Media", desc: "National and regional news organisations" },
-  { icon: Mic2, label: "Investigative Journalists", desc: "Independent reporters and press groups" },
-  { icon: Users, label: "Corruption Watchdogs", desc: "Civil society accountability organisations" },
-  { icon: Youtube, label: "YouTubers & Creators", desc: "Digital journalists covering governance" },
-];
 
 const OurProcess = () => (
   <div className="min-h-screen flex flex-col bg-background">
@@ -57,28 +41,7 @@ const OurProcess = () => (
 
       <ProcessPipeline />
 
-      {/* External sources */}
-      <section id="data-sources" className="py-12 md:py-16 bg-muted/20">
-        <div className="container mx-auto px-4">
-          <div className="mb-10">
-            <h2 className="text-2xl font-bold text-foreground mb-2">Where Our Data Comes From</h2>
-            <p className="text-muted-foreground max-w-2xl">
-              We draw from official government sources and independent civil society — always citing the origin of every claim.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            {EXTERNAL_SOURCES.map(({ icon: Icon, label, desc }) => (
-              <div key={label} className="rounded-xl border border-border bg-background p-4 text-center">
-                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                  <Icon className="h-5 w-5 text-primary" />
-                </div>
-                <div className="text-sm font-semibold text-foreground mb-1">{label}</div>
-                <div className="text-xs text-muted-foreground leading-tight">{desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <DataSources />
     </main>
 
   </div>
