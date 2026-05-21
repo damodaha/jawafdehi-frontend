@@ -28,7 +28,7 @@ type FooterBadge = {
 };
 
 const linkClass =
-  "group inline-flex min-h-9 items-center justify-between gap-3 rounded-full px-3 text-sm text-foreground/64 transition-all duration-200 hover:bg-secondary/45 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
+  "group inline-flex min-h-9 items-center justify-between gap-3 rounded-full px-3 text-sm text-primary-foreground/70 transition-all duration-200 hover:bg-primary-foreground/10 hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:text-foreground/64 dark:hover:bg-secondary/45 dark:hover:text-foreground";
 
 const footerBadges: FooterBadge[] = [
   {
@@ -76,7 +76,7 @@ function FooterNavLink({ label, to, external }: FooterLink) {
 function FooterLinkGroup({ title, links }: { title: string; links: FooterLink[] }) {
   return (
     <nav aria-label={title}>
-      <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
+      <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-primary-foreground/80 dark:text-accent">
         {title}
       </h3>
       <ul className="space-y-1">
@@ -125,10 +125,10 @@ export const Footer = () => {
   ];
 
   return (
-    <footer className="relative isolate overflow-hidden border-t border-border bg-background text-foreground">
+    <footer className="relative isolate overflow-hidden border-t border-primary/20 bg-primary text-primary-foreground dark:border-border dark:bg-background dark:text-foreground">
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 opacity-[0.22] [background-image:radial-gradient(hsl(var(--foreground)/0.15)_0.75px,transparent_0.75px)] [background-size:18px_18px] dark:hidden"
+        className="absolute inset-0 -z-10 opacity-[0.22] [background-image:radial-gradient(hsl(var(--primary-foreground)/0.18)_0.75px,transparent_0.75px)] [background-size:18px_18px] dark:hidden"
       />
 
       <div className="container mx-auto px-4 py-12 md:py-14">
@@ -140,7 +140,7 @@ export const Footer = () => {
               className="inline-flex rounded-full transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <img
-                src="/assets/logo.png"
+                src="/assets/logo-dark.png"
                 alt="Jawafdehi"
                 className="h-9 w-auto object-contain dark:hidden"
               />
@@ -152,22 +152,22 @@ export const Footer = () => {
             </Link>
 
             <div className="max-w-sm space-y-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary-foreground/80 dark:text-accent">
                 Accountability has no expiry
               </p>
-              <p className="text-sm leading-6 text-muted-foreground">
+              <p className="text-sm leading-6 text-primary-foreground/72 dark:text-muted-foreground">
                 Nepal's permanent public archive of CIAA corruption cases, free forever, built by Nepali volunteers.
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-medium text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-medium text-primary-foreground/72 dark:text-muted-foreground">
               {footerBadges.map(({ label, icon: Icon, marker, iconClassName }, index) => (
                 <span
                   key={label}
                   className="inline-flex items-center gap-1.5"
                 >
                   {index > 0 && (
-                    <span aria-hidden="true" className="mr-1 h-1 w-1 rounded-full bg-border" />
+                    <span aria-hidden="true" className="mr-1 h-1 w-1 rounded-full bg-primary-foreground/30 dark:bg-border" />
                   )}
                   {marker ? (
                     <span aria-hidden="true" className="text-sm leading-none">
@@ -191,7 +191,7 @@ export const Footer = () => {
         </div>
 
         <div className="mt-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <p className="max-w-3xl text-xs leading-5 text-muted-foreground">
+          <p className="max-w-3xl text-xs leading-5 text-primary-foreground/68 dark:text-muted-foreground">
             {t("footer.disclaimer")}
           </p>
 
@@ -203,8 +203,9 @@ export const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={cn(
-                  "inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-background/70 text-foreground/65 shadow-sm shadow-foreground/5 transition-all duration-200",
-                  "hover:-translate-y-0.5 hover:border-foreground/15 hover:bg-background hover:text-primary hover:shadow-md",
+                  "inline-flex h-10 w-10 items-center justify-center rounded-full border border-primary-foreground/15 bg-primary-foreground/10 text-primary-foreground/75 shadow-sm shadow-foreground/5 transition-all duration-200",
+                  "hover:-translate-y-0.5 hover:border-primary-foreground/25 hover:bg-primary-foreground/16 hover:text-primary-foreground hover:shadow-md",
+                  "dark:border-border/70 dark:bg-background/70 dark:text-foreground/65 dark:hover:border-foreground/15 dark:hover:bg-background dark:hover:text-primary",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 )}
                 aria-label={label}
@@ -215,15 +216,15 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-6 flex flex-col gap-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-6 flex flex-col gap-2 text-xs text-primary-foreground/68 dark:text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {year} Jawafdehi. All data is in the public domain.
           </p>
           <div className="flex gap-4">
-            <Link to="/privacy" className="transition-colors hover:text-foreground">
+            <Link to="/privacy" className="transition-colors hover:text-primary-foreground dark:hover:text-foreground">
               Privacy
             </Link>
-            <Link to="/terms" className="transition-colors hover:text-foreground">
+            <Link to="/terms" className="transition-colors hover:text-primary-foreground dark:hover:text-foreground">
               Terms
             </Link>
           </div>
