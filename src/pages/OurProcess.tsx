@@ -1,54 +1,14 @@
 import { Helmet } from "react-helmet-async";
 import {
-  Search, ShieldCheck, FileText, Sparkles, RefreshCw, FlaskConical,
-  Newspaper, Youtube, Users, Building2, Mic2,
+  Building2,
+  Mic2,
+  Newspaper,
+  ShieldCheck,
+  Users,
+  Youtube,
 } from "lucide-react";
 
-const PIPELINE_STEPS = [
-  {
-    number: "01",
-    icon: Search,
-    title: "Discovery",
-    description:
-      "Our data scraping team archives government documents, CIAA filings, court records, and CIB reports into digital text. The outreach team simultaneously works with investigative journalists, corruption watchdogs, and media organisations to surface cases not yet in the public record.",
-  },
-  {
-    number: "02",
-    icon: FlaskConical,
-    title: "Research",
-    description:
-      "Our research team investigates what constitutes corruption in each case, the role it plays in Nepali governance, and the effectiveness of existing anti-corruption frameworks. Every case is contextualised before it is written up.",
-  },
-  {
-    number: "03",
-    icon: FileText,
-    title: "Compilation",
-    description:
-      "The compilation team structures each case: key allegations, timeline of events, entities involved, and all source documents. Cases are written in plain language so citizens — not just lawyers — can understand them.",
-  },
-  {
-    number: "04",
-    icon: Sparkles,
-    title: "AI-Assisted Drafting",
-    description:
-      "AI helps our team process large volumes of legal documents faster — summarising filings, extracting key facts, and flagging inconsistencies. Every AI-generated output is reviewed and approved by a human volunteer before publication.",
-  },
-  {
-    number: "05",
-    icon: ShieldCheck,
-    title: "Verification & Publication",
-    description:
-      "All cases are cross-referenced against at least two independent sources. Once approved, the case is published to the archive — permanently. Records are never altered without a visible audit trail and never deleted.",
-  },
-  {
-    number: "06",
-    icon: RefreshCw,
-    title: "Ongoing Tracking",
-    description:
-      "Published cases are actively monitored for developments: new court orders, verdicts, appeals, and entity responses. Updates are added to the existing case record so the full history is always visible.",
-  },
-];
-
+import { ProcessPipeline } from "@/components/ProcessPipeline";
 
 const EXTERNAL_SOURCES = [
   { icon: Building2, label: "CIAA", desc: "Commission for the Investigation of Abuse of Authority" },
@@ -95,30 +55,7 @@ const OurProcess = () => (
         </div>
       </section>
 
-      {/* Pipeline */}
-      <section id="pipeline" className="py-12 md:py-16 border-b border-border">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold text-foreground mb-12">The Case Pipeline</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {PIPELINE_STEPS.map(({ number, icon: Icon, title, description }) => (
-              <div key={number} className="relative">
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="text-4xl font-black text-primary/10 leading-none mb-2">{number}</div>
-                    <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                      <Icon className="h-5 w-5 text-primary" />
-                    </div>
-                  </div>
-                  <div className="pt-1">
-                    <h3 className="text-lg font-bold text-foreground mb-2">{title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <ProcessPipeline />
 
       {/* External sources */}
       <section id="data-sources" className="py-12 md:py-16 bg-muted/20">
