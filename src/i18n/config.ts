@@ -5,14 +5,19 @@ import neTranslations from './locales/ne.json';
 
 const isSSR = typeof window === 'undefined';
 
-const getBrowserLanguage = () => {
+const getBrowserLanguage = (): 'en' | 'ne' => {
   if (isSSR) return 'ne';
 
-  const storedLanguage = window.localStorage.getItem('i18nextLng');
+  let storedLanguage: string | null = null;
+  try {
+    storedLanguage = window.localStorage.getItem('i18nextLng');
+  } catch {
+    // Storage blocked or unavailable
+  }
   if (storedLanguage?.startsWith('en')) return 'en';
   if (storedLanguage?.startsWith('ne')) return 'ne';
 
-  return window.navigator.language.startsWith('en') ? 'en' : 'ne';
+  return window.navigator.language.toLowerCase().startsWith('en') ? 'en' : 'ne';
 };
 
 i18n
@@ -43,6 +48,14 @@ if (!isSSR) {
 
   syncDocumentLanguage(i18n.language || i18n.resolvedLanguage || 'ne');
   i18n.on('languageChanged', syncDocumentLanguage);
+
+  i18n.on('languageChanged', (lng) => {
+    try {
+      window.localStorage.setItem('i18nextLng', lng);
+    } catch {
+      // Storage blocked or unavailable
+    }
+  });
 
   const browserLanguage = getBrowserLanguage();
   if (browserLanguage !== i18n.language) {
