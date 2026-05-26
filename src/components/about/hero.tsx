@@ -18,7 +18,7 @@ export function AboutHero() {
         className="absolute inset-0 z-[1] opacity-[0.22] [background-image:radial-gradient(hsl(var(--foreground)/0.14)_0.75px,transparent_0.75px)] [background-size:18px_18px]"
       />
 
-      <div className="container relative z-10 mx-auto flex min-h-[52svh] w-full items-center justify-center py-14 text-center md:py-[4.5rem] lg:py-20">
+      <div className="container relative z-10 mx-auto flex min-h-[42svh] w-full items-center justify-center py-12 text-center md:min-h-[44svh] md:py-14 lg:py-16">
         <h1 className="max-w-6xl text-[2.65rem] font-extrabold leading-[0.98] tracking-normal text-primary sm:text-5xl md:text-[3.35rem]">
           {t("about.hero.prefix")}{" "}
           <span className="text-accent sm:whitespace-nowrap">
