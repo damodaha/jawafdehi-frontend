@@ -29,12 +29,15 @@ const About = () => {
         <AboutHero />
 
         {/* About Us Section */}
-        <section id="about-us" className="py-10 md:py-14 lg:py-16">
+        <section id="about-us" className="border-t border-border/50 bg-muted/10 pt-12 pb-8 md:pt-14 md:pb-10 lg:pt-16 lg:pb-10">
           <div className="container mx-auto px-4">
-            <div className="space-y-10 md:space-y-12">
-              <div className="max-w-3xl">
+            <div className="space-y-9 md:space-y-11">
+              <div className="max-w-[44rem]">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+                  {t("about.aboutUs.eyebrow", "Who we are")}
+                </p>
                 <h2 className="mb-4 text-2xl font-bold tracking-normal text-foreground md:text-3xl">{t("about.aboutUs.title")}</h2>
-                <p className="text-base leading-8 text-muted-foreground md:text-lg">
+                <p className="text-base leading-8 text-foreground/75 md:text-[1.0625rem]">
                   {t("about.aboutUs.description").split(t("about.aboutUs.openSource")).map((part, index, array) => (
                     index < array.length - 1 ? (
                       <span key={index}>
@@ -53,12 +56,15 @@ const About = () => {
                 </p>
               </div>
 
-              <div className="ml-auto max-w-3xl text-left md:text-right">
+              <div className="ml-auto max-w-[44rem] text-left md:mr-8 md:text-right lg:mr-16">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+                  {t("about.building.eyebrow", "What we're building")}
+                </p>
                 <h2 className="mb-4 text-2xl font-bold tracking-normal text-foreground md:text-3xl">What We're Building</h2>
-                <p className="text-base leading-8 text-muted-foreground md:text-lg">
+                <p className="text-base leading-8 text-foreground/75 md:text-[1.0625rem]">
                   Corruption-related records are scattered across dozens of government portals, court systems, and public databases — inaccessible to most citizens. We are building the technology and the volunteer network to bring it all into one permanent, publicly searchable knowledge base.
                 </p>
-                <p className="mt-5 text-base leading-8 text-muted-foreground md:text-lg">
+                <p className="mt-5 text-base leading-8 text-foreground/75 md:text-[1.0625rem]">
                   Free to use. Open source. Built entirely by Nepali volunteers who believe accountability has no expiry date.
                 </p>
               </div>

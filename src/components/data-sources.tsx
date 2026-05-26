@@ -62,7 +62,7 @@ export function DataSources() {
           {EXTERNAL_SOURCES.map(({ icon: Icon, imageSrc, label, desc }) => (
             <div
               key={label}
-              className="group grid min-h-[245px] grid-rows-[6rem_2.5rem_auto] items-start rounded-lg border border-border/55 bg-card p-8 text-center shadow-[0_16px_42px_rgba(15,23,42,0.055)] transition-[background-color,border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-1 hover:border-foreground/15 hover:bg-background hover:shadow-[0_22px_56px_rgba(15,23,42,0.08)] motion-reduce:transform-none motion-reduce:transition-none"
+              className="group grid min-h-[245px] grid-rows-[6rem_2.5rem_auto] items-start rounded-lg border border-border/55 bg-card p-8 text-center shadow-[0_16px_42px_rgba(15,23,42,0.055)] transition-[background-color,border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-1 hover:border-foreground/20 hover:bg-background hover:shadow-[0_22px_56px_rgba(15,23,42,0.08)] motion-reduce:transform-none motion-reduce:transition-none dark:border-white/10 dark:bg-secondary/45 dark:shadow-black/20 dark:hover:border-white/20 dark:hover:bg-secondary/60"
             >
               <div className="flex h-24 items-center justify-center">
                 {imageSrc ? (

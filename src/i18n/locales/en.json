@@ -354,8 +354,12 @@
     },
     "aboutUs": {
       "title": "About Us",
+      "eyebrow": "Who we are",
       "description": "Jawafdehi is an open-source civic‑tech platform for Nepal built by Nepali to document allegations of corruption. Grounded in a Gen‑Z mandate for transparency and action, Jawafdehi aims to become the Nepali accountability system to bring an end to the practice of unaccountability—holding corrupt politicians, individuals, and others accountable through independent, evidence‑first, and citizen‑powered means. Using AI to process government documents, track news sources, and generate comprehensive investigation reports, Jawafdehi scales the fight against corruption through technology.",
       "openSource": "open-source"
+    },
+    "building": {
+      "eyebrow": "What we're building"
     },
     "mission": {
       "title": "Our Mission",
@@ -364,6 +368,7 @@
     },
     "values": {
       "title": "Our Core Values",
+      "description": "The principles that guide how we document, verify, and serve the public.",
       "integrity": {
         "title": "Integrity",
         "description": "We document public-interest cases with fairness, care, and ethical responsibility."
