@@ -2,7 +2,11 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { trackEvent } from "@/utils/analytics";
 
-export const LanguageToggle = () => {
+type LanguageToggleProps = {
+  quiet?: boolean;
+};
+
+export const LanguageToggle = ({ quiet = false }: LanguageToggleProps) => {
   const { i18n, t } = useTranslation();
   const currentLanguage = i18n.language?.startsWith("en") ? "en" : "ne";
   const nextLanguage = currentLanguage === "en" ? "ne" : "en";
@@ -30,7 +34,12 @@ export const LanguageToggle = () => {
       aria-checked={currentLanguage === "en"}
       aria-label={`${t("common.changeLanguage")}: ${nextLanguageLabel}`}
       title={`${t("common.changeLanguage")}: ${nextLanguageLabel}`}
-      className="relative inline-flex h-10 w-[84px] shrink-0 items-center overflow-hidden rounded-full border border-border/70 bg-background/70 px-1 text-sm font-semibold leading-none text-foreground shadow-sm shadow-foreground/5 transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-foreground/15 hover:bg-background hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      className={cn(
+        "relative inline-flex h-10 w-[84px] shrink-0 items-center overflow-hidden rounded-full border px-1 text-sm font-semibold leading-none text-foreground transition-[background-color,border-color,box-shadow,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        quiet
+          ? "border-transparent bg-transparent shadow-none hover:border-transparent hover:bg-secondary/30 hover:shadow-none"
+          : "border-border/70 bg-background/70 shadow-sm shadow-foreground/5 hover:-translate-y-0.5 hover:border-foreground/15 hover:bg-background hover:shadow-md",
+      )}
     >
       <span
         aria-hidden="true"
