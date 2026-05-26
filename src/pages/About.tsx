@@ -29,12 +29,12 @@ const About = () => {
         <AboutHero />
 
         {/* About Us Section */}
-        <section id="about-us" className="py-12 md:py-16">
+        <section id="about-us" className="py-10 md:py-14 lg:py-16">
           <div className="container mx-auto px-4">
-            <div className="space-y-12 md:space-y-16">
+            <div className="space-y-10 md:space-y-12">
               <div className="max-w-3xl">
-                <h2 className="text-3xl font-bold text-foreground mb-6">{t("about.aboutUs.title")}</h2>
-                <p className="text-lg text-muted-foreground leading-relaxed">
+                <h2 className="mb-4 text-2xl font-bold tracking-normal text-foreground md:text-3xl">{t("about.aboutUs.title")}</h2>
+                <p className="text-base leading-8 text-muted-foreground md:text-lg">
                   {t("about.aboutUs.description").split(t("about.aboutUs.openSource")).map((part, index, array) => (
                     index < array.length - 1 ? (
                       <span key={index}>
@@ -43,7 +43,7 @@ const About = () => {
                           href="https://github.com/Jawafdehi"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-primary hover:underline"
+                          className="font-medium text-primary underline-offset-4 hover:underline"
                         >
                           {t("about.aboutUs.openSource")}
                         </a>
@@ -54,11 +54,11 @@ const About = () => {
               </div>
 
               <div className="ml-auto max-w-3xl text-left md:text-right">
-                <h2 className="text-3xl font-bold text-foreground mb-6">What We're Building</h2>
-                <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+                <h2 className="mb-4 text-2xl font-bold tracking-normal text-foreground md:text-3xl">What We're Building</h2>
+                <p className="text-base leading-8 text-muted-foreground md:text-lg">
                   Corruption-related records are scattered across dozens of government portals, court systems, and public databases — inaccessible to most citizens. We are building the technology and the volunteer network to bring it all into one permanent, publicly searchable knowledge base.
                 </p>
-                <p className="text-lg text-muted-foreground leading-relaxed">
+                <p className="mt-5 text-base leading-8 text-muted-foreground md:text-lg">
                   Free to use. Open source. Built entirely by Nepali volunteers who believe accountability has no expiry date.
                 </p>
               </div>
