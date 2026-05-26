@@ -3,6 +3,7 @@ import { Mail, Linkedin, Facebook, Github, Globe, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { teamMembers } from "@/data/team";
 import type { Contact } from "@/data/team";
+import { Cta } from "@/components/home/cta";
 
 const ContactIcon = ({ contact }: { contact: Contact }) => {
   const href = contact.type === "email" ? `mailto:${contact.value}` : contact.value;
@@ -51,16 +52,31 @@ const OurTeam = () => {
 
       <main id="main-content" className="flex-1">
         {/* Hero */}
-        <section id="team-hero" className="bg-gradient-to-br from-primary via-navy-dark to-slate-800 py-16 md:py-24">
-          <div className="container mx-auto px-4">
-            <div className="max-w-2xl">
-              <p className="text-sm font-semibold uppercase tracking-widest text-primary-foreground/50 mb-4">
-                Our Team
-              </p>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-5 leading-tight">
-                Built by Nepali volunteers, for Nepal
+        <section id="team-hero" className="relative isolate -mt-[76px] overflow-hidden bg-background pt-[76px]">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-20 left-[64%] z-0 h-[320px] w-[560px] max-w-none -translate-x-1/2 opacity-[0.34] blur-[124px] dark:hidden sm:-top-24 sm:left-[65%] sm:h-[400px] sm:w-[680px] sm:opacity-[0.38] sm:blur-[136px] lg:-top-28 lg:left-[66%] lg:h-[500px] lg:w-[820px] lg:opacity-[0.42] lg:blur-[152px]"
+          >
+            <div className="absolute right-[4%] top-10 h-[66%] w-[54%] rounded-full bg-accent opacity-85" />
+            <div className="absolute left-[32%] top-24 h-[52%] w-[42%] rounded-full bg-accent opacity-55" />
+            <div className="absolute -left-[14%] top-[46%] h-[34%] w-[26%] rounded-full bg-primary opacity-35" />
+          </div>
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 z-[1] opacity-[0.22] [background-image:radial-gradient(hsl(var(--foreground)/0.14)_0.75px,transparent_0.75px)] [background-size:18px_18px]"
+          />
+
+          <div className="container relative z-10 mx-auto flex min-h-[52svh] w-full items-center justify-center py-14 text-center md:py-[4.5rem] lg:py-20">
+            <div className="mx-auto max-w-5xl">
+              
+              <h1 className="text-[2.65rem] font-extrabold leading-[0.98] tracking-normal text-primary sm:text-5xl md:text-[3.35rem]">
+                Built by{" "}
+                <span className="text-accent sm:whitespace-nowrap">
+                  Nepali volunteers
+                </span>
+                <span className="block text-primary">for Nepal</span>
               </h1>
-              <p className="text-lg text-primary-foreground/70 leading-relaxed">
+              <p className="mx-auto mt-6 max-w-3xl text-base leading-8 text-muted-foreground md:text-lg">
                 Jawafdehi runs entirely on volunteer effort from Nepali citizens across technology, research, journalism, and public policy. No corporate interests. No government funding. Just people who believe accountability matters.
               </p>
             </div>
@@ -118,24 +134,7 @@ const OurTeam = () => {
           </div>
         </section>
 
-        {/* Join CTA */}
-        <section id="join-team" className="py-12 md:py-14 bg-muted/30 border-t border-border">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-2xl font-bold text-foreground mb-3">Want to contribute?</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto mb-6">
-              We're always looking for volunteers — engineers, researchers, journalists, and translators who care about accountability in Nepal.
-            </p>
-            <a
-              href="https://github.com/Jawafdehi"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
-            >
-              <Github className="h-4 w-4" />
-              Find us on GitHub
-            </a>
-          </div>
-        </section>
+       <Cta/>
       </main>
 
     </div>
