@@ -1,9 +1,8 @@
 import { Helmet } from "react-helmet-async";
-import { Button } from "@/components/ui/button";
 import { Cta } from "@/components/home/cta";
+import { VolunteerHero } from "@/components/volunteer/hero";
 import {
   Search, Megaphone, Globe, BookOpen, FlaskConical,
-  Github, Mail,
 } from "lucide-react";
 
 const TEAMS = [
@@ -80,37 +79,7 @@ const Volunteer = () => (
     </Helmet>
 
     <main id="main-content" className="flex-1">
-      {/* Hero */}
-      <section id="volunteer-hero" className="bg-gradient-to-br from-primary via-navy-dark to-slate-800 py-16 md:py-24">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-widest text-primary-foreground/50 mb-4">
-              Volunteer with Us
-            </p>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-5 leading-tight">
-              Help build Nepal's permanent accountability record
-            </h1>
-            <p className="text-lg text-primary-foreground/70 leading-relaxed mb-8">
-              Jawafdehi runs entirely on volunteer effort. Whether you are a technology enthusiast, a working professional, a legal expert, or a student — if you believe corruption should not be forgotten, there is a place for you here. Join a worldwide network of Nepali professional volunteers building the infrastructure for accountability.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button asChild size="lg" className="bg-white text-slate-950 hover:bg-white/90 dark:bg-white dark:text-slate-950 dark:hover:bg-white/90 font-semibold">
-                <a href="https://github.com/Jawafdehi" target="_blank" rel="noopener noreferrer">
-                  <Github className="mr-2 h-5 w-5" />
-                  Find us on GitHub
-                </a>
-              </Button>
-              <a
-                href="mailto:cases@jawafdehi.org"
-                className="flex items-center gap-2 text-white/70 hover:text-white text-sm transition-colors"
-              >
-                <Mail className="h-4 w-4" />
-                Email us at cases@jawafdehi.org
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      <VolunteerHero />
 
       {/* Who we're looking for */}
       <section id="who-we-need" className="py-12 md:py-16 border-b border-border">
