@@ -344,7 +344,14 @@
   },
   "about": {
     "title": "About Jawafdehi",
-    "subtitle": "A civic tech initiative committed to transparency, accountability, and justice in Nepal.",
+    "subtitle": "We are a civic tech initiative committed to transparency, accountability, and justice in Nepal.",
+    "hero": {
+      "prefix": "We are a civic tech initiative committed to",
+      "valuesStart": "transparency, accountability,",
+      "valuesConnector": "and",
+      "valuesEnd": "justice",
+      "suffix": "in Nepal."
+    },
     "aboutUs": {
       "title": "About Us",
       "description": "Jawafdehi is an open-source civic‑tech platform for Nepal built by Nepali to document allegations of corruption. Grounded in a Gen‑Z mandate for transparency and action, Jawafdehi aims to become the Nepali accountability system to bring an end to the practice of unaccountability—holding corrupt politicians, individuals, and others accountable through independent, evidence‑first, and citizen‑powered means. Using AI to process government documents, track news sources, and generate comprehensive investigation reports, Jawafdehi scales the fight against corruption through technology.",
@@ -359,19 +366,19 @@
       "title": "Our Core Values",
       "integrity": {
         "title": "Integrity",
-        "description": "We maintain the highest standards of honesty and ethical conduct in all our investigations and documentation."
+        "description": "We document public-interest cases with fairness, care, and ethical responsibility."
       },
       "transparency": {
         "title": "Transparency",
-        "description": "All our processes, sources, and methodologies are open and accessible to the public for scrutiny and verification."
+        "description": "We make records, sources, and case information open and accessible."
       },
       "accuracy": {
         "title": "Accuracy",
-        "description": "Every case is thoroughly verified through multiple sources before publication to ensure factual accuracy and reliability."
+        "description": "Every case is grounded in verifiable public documents and cited sources."
       },
       "publicService": {
         "title": "Public Service",
-        "description": "We serve the public interest by providing free access to information that affects every Nepali citizen."
+        "description": "We build for citizens, researchers, journalists, and communities seeking accountability."
       }
     },
     "partners": {

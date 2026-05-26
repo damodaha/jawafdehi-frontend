@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { Card, CardContent } from "@/components/ui/card";
-import { Shield, Eye, Target, Users } from "lucide-react";
+import { CoreValues } from "@/components/about/core-values";
+import { AboutHero } from "@/components/about/hero";
 import { Helmet } from "react-helmet-async";
 
 const About = () => {
@@ -26,25 +26,13 @@ const About = () => {
       </Helmet>
 
       <main id="main-content" className="flex-1">
-        {/* Hero Section */}
-        <section id="about-hero" className="bg-gradient-to-br from-primary via-navy-dark to-slate-800 py-16 md:py-20">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl">
-              <h1 className="text-4xl md:text-5xl font-bold text-primary-foreground mb-6">
-                {t("about.title")}
-              </h1>
-              <p className="text-xl text-primary-foreground/80 leading-relaxed">
-                {t("about.subtitle")}
-              </p>
-            </div>
-          </div>
-        </section>
+        <AboutHero />
 
         {/* About Us Section */}
         <section id="about-us" className="py-12 md:py-16">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-              <div>
+            <div className="space-y-12 md:space-y-16">
+              <div className="max-w-3xl">
                 <h2 className="text-3xl font-bold text-foreground mb-6">{t("about.aboutUs.title")}</h2>
                 <p className="text-lg text-muted-foreground leading-relaxed">
                   {t("about.aboutUs.description").split(t("about.aboutUs.openSource")).map((part, index, array) => (
@@ -65,7 +53,7 @@ const About = () => {
                 </p>
               </div>
 
-              <div>
+              <div className="ml-auto max-w-3xl text-left md:text-right">
                 <h2 className="text-3xl font-bold text-foreground mb-6">What We're Building</h2>
                 <p className="text-lg text-muted-foreground leading-relaxed mb-6">
                   Corruption-related records are scattered across dozens of government portals, court systems, and public databases — inaccessible to most citizens. We are building the technology and the volunteer network to bring it all into one permanent, publicly searchable knowledge base.
@@ -78,79 +66,7 @@ const About = () => {
           </div>
         </section>
 
-        {/* Core Values Section */}
-        <section id="values" className="py-12 md:py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold text-foreground mb-10 text-center">{t("about.values.title")}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="rounded-lg bg-primary/10 p-3">
-                        <Shield className="h-6 w-6 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-foreground mb-2">{t("about.values.integrity.title")}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {t("about.values.integrity.description")}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="rounded-lg bg-primary/10 p-3">
-                        <Eye className="h-6 w-6 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-foreground mb-2">{t("about.values.transparency.title")}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {t("about.values.transparency.description")}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="rounded-lg bg-primary/10 p-3">
-                        <Target className="h-6 w-6 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-foreground mb-2">{t("about.values.accuracy.title")}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {t("about.values.accuracy.description")}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="rounded-lg bg-primary/10 p-3">
-                        <Users className="h-6 w-6 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-foreground mb-2">{t("about.values.publicService.title")}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {t("about.values.publicService.description")}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </div>
-        </section>
+        <CoreValues />
 
       </main>
 
