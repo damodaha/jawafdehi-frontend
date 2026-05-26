@@ -49,6 +49,9 @@ const desktopNavWidthClass: Record<string, string> = {
   about: "min-w-[5.75rem]",
 };
 
+const useIsomorphicLayoutEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
+
 const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
   cn(
     "rounded-2xl px-4 py-3 text-sm font-normal transition-all duration-200",
@@ -62,6 +65,7 @@ export function Navbar() {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [pillStyle, setPillStyle] = useState<PillStyle>({
@@ -93,9 +97,10 @@ export function Navbar() {
   }, [location.pathname, navItems]);
 
   const pillKey = hoveredKey ?? activeKey;
+  const showPill = isScrolled && Boolean(pillKey);
 
-  useLayoutEffect(() => {
-    if (!pillKey) {
+  useIsomorphicLayoutEffect(() => {
+    if (!showPill || !pillKey) {
       setPillStyle((current) => ({ ...current, opacity: 0 }));
       return;
     }
@@ -110,11 +115,22 @@ export function Navbar() {
       transform: `translateX(${node.offsetLeft}px)`,
       width: node.offsetWidth,
     });
-  }, [pillKey, location.pathname]);
+  }, [pillKey, showPill, location.pathname]);
 
   const setNavRef = (key: string) => (node: HTMLElement | null) => {
     navRefs.current[key] = node;
   };
+
+  useEffect(() => {
+    const updateScrolled = () => {
+      const nextScrolled = window.scrollY > 20;
+      setIsScrolled((current) => (current === nextScrolled ? current : nextScrolled));
+    };
+
+    updateScrolled();
+    window.addEventListener("scroll", updateScrolled, { passive: true });
+    return () => window.removeEventListener("scroll", updateScrolled);
+  }, []);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -142,7 +158,7 @@ export function Navbar() {
 
   return (
     <>
-    <header className="sticky top-0 z-50 w-full bg-background/82 backdrop-blur-[12px] supports-[backdrop-filter]:bg-background/72">
+    <header className="sticky top-0 z-50 w-full bg-transparent transition-colors duration-200 ease-out">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-foreground focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
@@ -171,11 +187,19 @@ export function Navbar() {
         <nav
           aria-label="Primary"
           onPointerLeave={() => setHoveredKey(null)}
-          className="relative hidden items-center justify-self-center rounded-full border border-border/70 bg-background/58 p-1 shadow-sm shadow-foreground/5 lg:flex"
+          className={cn(
+            "relative hidden items-center justify-self-center rounded-full border p-1 transition-all duration-200 ease-out lg:flex",
+            isScrolled
+              ? "border-slate-200/70 bg-white/85 shadow-sm shadow-foreground/5 backdrop-blur-md dark:border-border/70 dark:bg-background/80"
+              : "border-transparent bg-transparent shadow-none backdrop-blur-0",
+          )}
         >
           <span
             aria-hidden="true"
-            className="absolute left-0 top-1 h-10 rounded-full bg-secondary/45 shadow-sm transition-[transform,width,opacity] duration-300 ease-out motion-reduce:transition-none"
+            className={cn(
+              "absolute left-0 top-1 h-10 rounded-full bg-slate-100 shadow-sm transition-[transform,width,opacity] duration-200 ease-out motion-reduce:transition-none dark:bg-secondary/55",
+              !isScrolled && "shadow-none",
+            )}
             style={pillStyle}
           />
 
@@ -190,7 +214,7 @@ export function Navbar() {
                 cn(
                   "relative z-10 inline-flex h-10 items-center justify-center rounded-full px-3 text-center text-sm font-normal text-foreground/62 transition-colors duration-200 hover:text-foreground/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   desktopNavWidthClass[item.key],
-                  isActive && "text-foreground/82",
+                  isActive && "font-medium text-foreground/82",
                 )
               }
             >
@@ -237,9 +261,16 @@ export function Navbar() {
         </nav>
 
         <div className="hidden min-w-[310px] items-center justify-end gap-2 justify-self-end lg:flex">
-          <LanguageToggle />
+          <LanguageToggle quiet={!isScrolled} />
 
-          <div className="flex items-center gap-1 rounded-full border border-border/70 bg-background/58 p-1 shadow-sm shadow-foreground/5">
+          <div
+            className={cn(
+              "flex items-center gap-1 rounded-full border p-1 transition-all duration-200 ease-out",
+              isScrolled
+                ? "border-slate-200/70 bg-white/75 shadow-sm shadow-foreground/5 backdrop-blur-md dark:border-border/70 dark:bg-background/70"
+                : "border-transparent bg-transparent shadow-none backdrop-blur-0",
+            )}
+          >
             <Button
               variant="navIcon"
               size="icon"
@@ -247,16 +278,25 @@ export function Navbar() {
               onClick={() => setIsSearchOpen(true)}
               aria-label={t("searchCommand.open")}
               title={t("searchCommand.open")}
+              className={cn(
+                isScrolled
+                  ? "border-slate-200/70 bg-white/70 dark:border-border/70 dark:bg-background/70"
+                  : "border-transparent bg-transparent shadow-none hover:translate-y-0 hover:border-transparent hover:bg-secondary/35 hover:shadow-none",
+              )}
             >
               <Search className="h-4 w-4" />
             </Button>
-            <ThemeToggle />
+            <ThemeToggle quiet={!isScrolled} />
           </div>
 
           <Button
             asChild
             variant="primary"
             size="navCta"
+            className={cn(
+              "transition-all duration-200 ease-out hover:-translate-y-0.5",
+              isScrolled ? "shadow-md shadow-primary/15" : "shadow-none",
+            )}
           >
             <Link to="/cases">
               <Search className="h-4 w-4" />
@@ -266,13 +306,18 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-2 justify-self-end lg:hidden">
-          <LanguageToggle />
-          <ThemeToggle />
+          <LanguageToggle quiet={!isScrolled} />
+          <ThemeToggle quiet={!isScrolled} />
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button
                 variant="navIcon"
                 size="navMenuIcon"
+                className={cn(
+                  isScrolled
+                    ? "border-slate-200/70 bg-white/75 dark:border-border/70 dark:bg-background/70"
+                    : "border-transparent bg-transparent shadow-none hover:translate-y-0 hover:border-transparent hover:bg-secondary/35 hover:shadow-none",
+                )}
               >
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">{t("nav.menu")}</span>
