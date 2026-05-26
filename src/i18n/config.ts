@@ -1,29 +1,24 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector/cjs';
 import enTranslations from './locales/en.json';
 import neTranslations from './locales/ne.json';
 
 const isSSR = typeof window === 'undefined';
 
-// Language detection configuration
-const languageDetectorOptions = {
-  // Order of detection methods
-  order: ['localStorage', 'navigator'],
+const getBrowserLanguage = (): 'en' | 'ne' => {
+  if (isSSR) return 'ne';
 
-  // Keys to lookup language from
-  lookupLocalStorage: 'i18nextLng',
+  let storedLanguage: string | null = null;
+  try {
+    storedLanguage = window.localStorage.getItem('i18nextLng');
+  } catch {
+    // Storage blocked or unavailable
+  }
+  if (storedLanguage?.startsWith('en')) return 'en';
+  if (storedLanguage?.startsWith('ne')) return 'ne';
 
-  // Cache user language on
-  caches: ['localStorage'],
-
-  // Only detect from these sources
-  checkWhitelist: true,
+  return window.navigator.language.toLowerCase().startsWith('en') ? 'en' : 'ne';
 };
-
-if (!isSSR) {
-  i18n.use(LanguageDetector);
-}
 
 i18n
   .use(initReactI18next)
@@ -36,8 +31,8 @@ i18n
         translation: neTranslations,
       },
     },
-    fallbackLng: 'ne', // Nepali is the default language
-    ...(isSSR ? { lng: 'ne' } : { detection: languageDetectorOptions }),
+    fallbackLng: 'ne',
+    lng: 'ne',
     interpolation: {
       escapeValue: false, // React already escapes values
     },
@@ -53,6 +48,21 @@ if (!isSSR) {
 
   syncDocumentLanguage(i18n.language || i18n.resolvedLanguage || 'ne');
   i18n.on('languageChanged', syncDocumentLanguage);
+
+  i18n.on('languageChanged', (lng) => {
+    try {
+      window.localStorage.setItem('i18nextLng', lng);
+    } catch {
+      // Storage blocked or unavailable
+    }
+  });
+
+  const browserLanguage = getBrowserLanguage();
+  if (browserLanguage !== i18n.language) {
+    window.requestAnimationFrame(() => {
+      void i18n.changeLanguage(browserLanguage);
+    });
+  }
 }
 
 export default i18n;
