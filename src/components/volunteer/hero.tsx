@@ -34,17 +34,16 @@ export function VolunteerHero() {
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button asChild size="lg" className="font-semibold">
               <a href="https://github.com/Jawafdehi" target="_blank" rel="noopener noreferrer">
-                <Github className="mr-2 h-5 w-5" />
+                <Github className="h-5 w-5" aria-hidden="true" />
                 Find us on GitHub
               </a>
             </Button>
-            <a
-              href="mailto:cases@jawafdehi.org"
-              className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-            >
-              <Mail className="h-4 w-4" />
-              Email us at cases@jawafdehi.org
-            </a>
+            <Button asChild variant="secondary" size="lg" className="font-semibold">
+              <a href="mailto:cases@jawafdehi.org">
+                <Mail className="h-5 w-5" aria-hidden="true" />
+                Email us
+              </a>
+            </Button>
           </div>
         </div>
       </div>
