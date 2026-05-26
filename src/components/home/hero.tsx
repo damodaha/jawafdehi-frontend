@@ -68,7 +68,7 @@ export function Hero({
   ];
 
   return (
-    <section id="hero" className="relative isolate -mt-[76px] overflow-hidden border-b border-border bg-background pt-[76px]">
+    <section id="hero" className="relative isolate -mt-[76px] overflow-hidden bg-background pt-[76px]">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-20 left-[64%] z-0 h-[320px] w-[560px] max-w-none -translate-x-1/2 opacity-[0.34] blur-[124px] dark:hidden sm:-top-24 sm:left-[65%] sm:h-[400px] sm:w-[680px] sm:opacity-[0.38] sm:blur-[136px] lg:-top-28 lg:left-[66%] lg:h-[500px] lg:w-[820px] lg:opacity-[0.42] lg:blur-[152px]"
