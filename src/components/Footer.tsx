@@ -28,7 +28,7 @@ type FooterBadge = {
 };
 
 const linkClass =
-  "group inline-flex min-h-9 items-center justify-between gap-3 rounded-full px-3 text-sm text-[var(--footer-muted)] transition-all duration-200 hover:bg-[var(--footer-soft)] hover:text-[var(--footer-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
+  "group -mx-3 inline-flex min-h-9 items-center justify-between gap-3 rounded-full px-3 text-sm text-[var(--footer-muted)] transition-all duration-200 hover:bg-[var(--footer-soft)] hover:text-[var(--footer-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
 
 const footerBadges: FooterBadge[] = [
   {
@@ -207,7 +207,7 @@ export const Footer = () => {
 
           </div>
 
-          <div className="grid gap-8 sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:gap-x-8">
             <FooterLinkGroup title="Platform" links={platformLinks} />
             <FooterLinkGroup title={t("nav.about")} links={aboutLinks} />
             <FooterLinkGroup title={t("footer.resources")} links={resourceLinks} />
