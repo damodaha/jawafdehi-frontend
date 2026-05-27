@@ -52,12 +52,22 @@ const Cases = () => {
   const { t, i18n } = useTranslation();
   const currentLang = i18n.language;
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<'all' | 'ongoing' | 'closed' | 'others'>('all');
   const [page, setPage] = useState(1);
 
+  // Debounce search input and reset pagination atomically
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPage(1);
+      setDebouncedSearch(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   const { data: casesData, isLoading: loading, isFetching, isPlaceholderData, isError, refetch } = useQuery({
-    queryKey: ['cases', { page }],
-    queryFn: () => getCases({ page }),
+    queryKey: ['cases', { page, search: debouncedSearch }],
+    queryFn: () => getCases({ page, search: debouncedSearch || undefined }),
     staleTime: 5 * 60 * 1000,
     retry: 3,
     placeholderData: (prev) => prev,
@@ -90,16 +100,9 @@ const Cases = () => {
   );
 
   const filteredCases = allCases.filter((caseItem) => {
-    const query = searchQuery.toLowerCase();
-    const matchesSearch =
-      caseItem.title.toLowerCase().includes(query) ||
-      caseItem.description.toLowerCase().includes(query) ||
-      (caseItem.tags || []).some(tag => tag.toLowerCase().includes(query));
-    
     const caseStatus = getCaseStatus(caseItem);
     const matchesStatus = statusFilter === "all" || caseStatus === statusFilter;
-    
-    return matchesSearch && matchesStatus;
+    return matchesStatus;
   });
 
   return (
@@ -251,7 +254,7 @@ const Cases = () => {
                   );
                 })}
               </div>
-              {!searchQuery && !isError && casesData?.next && (
+              {!isError && casesData?.next && (
                 <div className="mt-8 flex justify-center">
                   <Button
                     onClick={() => setPage(p => p + 1)}
