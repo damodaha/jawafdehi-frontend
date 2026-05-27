@@ -56,18 +56,14 @@ const Cases = () => {
   const [statusFilter, setStatusFilter] = useState<'all' | 'ongoing' | 'closed' | 'others'>('all');
   const [page, setPage] = useState(1);
 
-  // Debounce search input to avoid excessive API calls
+  // Debounce search input and reset pagination atomically
   useEffect(() => {
     const timer = setTimeout(() => {
+      setPage(1);
       setDebouncedSearch(searchQuery);
     }, 300);
     return () => clearTimeout(timer);
   }, [searchQuery]);
-
-  // Reset page when search changes
-  useEffect(() => {
-    setPage(1);
-  }, [debouncedSearch]);
 
   const { data: casesData, isLoading: loading, isFetching, isPlaceholderData, isError, refetch } = useQuery({
     queryKey: ['cases', { page, search: debouncedSearch }],
