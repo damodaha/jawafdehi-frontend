@@ -86,7 +86,7 @@ const OurTeam = () => {
         {/* Team grid */}
         <section id="team-members" className="py-12 md:py-16">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {teamMembers.map((member) => (
                 <div
                   key={member.displayName.en}
