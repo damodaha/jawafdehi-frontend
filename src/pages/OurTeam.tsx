@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { teamMembers } from "@/data/team";
 import type { Contact } from "@/data/team";
 import { Cta } from "@/components/home/cta";
+import { TeamCard } from "@/components/ui/card";
 
 const ContactIcon = ({ contact }: { contact: Contact }) => {
   const href = contact.type === "email" ? `mailto:${contact.value}` : contact.value;
@@ -88,10 +89,7 @@ const OurTeam = () => {
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {teamMembers.map((member) => (
-                <div
-                  key={member.displayName.en}
-                  className="flex flex-col items-center text-center p-8 rounded-2xl border border-border bg-card hover:border-primary/30 transition-colors"
-                >
+                <TeamCard key={member.displayName.en}>
                   {/* Photo */}
                   <div className="mb-5">
                     {member.thumb ? (
@@ -128,7 +126,7 @@ const OurTeam = () => {
                       ))}
                     </div>
                   )}
-                </div>
+                </TeamCard>
               ))}
             </div>
           </div>
