@@ -33,6 +33,7 @@ import { CaseworkerAuthProvider } from "./context/CaseworkerAuthContext";
 import CaseworkerLogin from "./pages/CaseworkerLogin";
 import CaseworkerDashboard from "./pages/CaseworkerDashboard";
 import CaseworkerSettings from "./pages/CaseworkerSettings";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 const GuestChat = lazy(() => import("./pages/GuestChat"));
 
@@ -54,6 +55,7 @@ const App = () => (
         <Sonner />
       </ClientOnly>
       <Suspense fallback={<RouteLoadingFallback />}>
+        <ScrollToTop />
         <Routes>
           {/* Embed route for oEmbed iframe */}
           <Route path="/embed/case/:id" element={<EmbedCaseCard />} />
