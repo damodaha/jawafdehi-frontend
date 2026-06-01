@@ -20,15 +20,15 @@ import type {
 export function SearchResultCard({ result }: { result: ArchiveSearchResult }) {
   return (
     <Link
-      className="group block rounded-xl border bg-card p-5 transition-colors hover:border-primary/35 hover:bg-muted/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      className="group block rounded-xl border bg-card p-4 transition-colors hover:border-primary/35 hover:bg-muted/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       to={result.url}
     >
-      <article className="flex min-h-24 items-start gap-4">
-        <span className="mt-0.5 rounded-full bg-secondary/70 p-2.5 text-primary">
+      <article className="flex min-h-20 items-start gap-3">
+        <span className="mt-0.5 rounded-full bg-secondary/70 p-2 text-primary">
           <ResultIcon result={result} />
         </span>
         <div className="min-w-0 flex-1">
-          <div className="mb-2 flex flex-wrap items-center gap-2">
+          <div className="mb-1.5 flex flex-wrap items-center gap-2">
             <Badge className="capitalize" variant="outline">
               {result.result_type}
             </Badge>
@@ -38,13 +38,13 @@ export function SearchResultCard({ result }: { result: ArchiveSearchResult }) {
               </span>
             ) : null}
           </div>
-          <h2 className="text-base font-bold leading-6 text-foreground group-hover:text-primary">
+          <h2 className="truncate text-base font-bold leading-6 text-foreground group-hover:text-primary">
             {result.title}
           </h2>
-          <p className="mt-1 text-sm leading-6 text-muted-foreground">
+          <p className="mt-1 line-clamp-2 text-sm leading-5 text-muted-foreground">
             {result.description}
           </p>
-          <p className="mt-3 text-xs leading-5 text-muted-foreground">
+          <p className="mt-2 truncate text-xs leading-5 text-muted-foreground">
             {resultMetadata(result)}
           </p>
         </div>
@@ -105,4 +105,3 @@ function entityName(entity?: { display_name: string | null; nes_id: string | nul
 function humanize(value: string) {
   return value.replaceAll("_", " ").toLowerCase();
 }
-
