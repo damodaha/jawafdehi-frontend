@@ -28,6 +28,7 @@ import UpdateDetail from "./pages/UpdateDetail";
 import EmbedCaseCard from "./pages/EmbedCaseCard";
 import Privacy from "./pages/Privacy";
 import TermsOfService from "./pages/TermsOfService";
+import ArchiveSearch from "./pages/ArchiveSearch";
 import NotFound from "./pages/NotFound";
 import { CaseworkerAuthProvider } from "./context/CaseworkerAuthContext";
 import CaseworkerLogin from "./pages/CaseworkerLogin";
@@ -65,6 +66,7 @@ const App = () => (
             <Route path="/cases" element={<Cases />} />
             <Route path="/case/:id" element={<CaseDetail />} />
             <Route path="/entities" element={<Entities />} />
+            <Route path="/search" element={<ArchiveSearch />} />
             <Route path="/entity/:id" element={<EntityProfile />} />
             <Route path="/ask" element={<GuestChat />} />
             <Route path="/report" element={<ReportAllegation />} />

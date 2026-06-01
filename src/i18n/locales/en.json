@@ -38,6 +38,7 @@
     },
     "pageTitles": {
       "report": "Report Allegation",
+      "archiveSearch": "Archive Search",
       "feedback": "Submit Feedback",
       "privacy": "Privacy Policy",
       "terms": "Terms of Service"
@@ -45,6 +46,7 @@
     "descriptions": {
       "home": "Return to the Jawafdehi homepage.",
       "cases": "Open the dedicated case search and browsing page.",
+      "archiveSearch": "Search cases, entities, locations, and evidence documents in one archive.",
       "entities": "Find tracked people, offices, and organizations.",
       "information": "Read public information and resources.",
       "process": "See how records are reviewed and documented.",

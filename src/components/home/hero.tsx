@@ -1,7 +1,8 @@
-import { Link } from "react-router-dom";
+import { type FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import CountUp from "react-countup";
 
-import { Button, type ButtonProps } from "@/components/ui/button";
+import { SearchBar } from "@/components/ui/search-bar";
 import { cn } from "@/lib/utils";
 
 type HeroProps = {
@@ -12,15 +13,7 @@ type HeroProps = {
 
 type HeroStat = {
   label: string;
-  mobileLabel?: string[];
   value: string;
-};
-
-type HeroAction = {
-  label: string;
-  to: string;
-  variant: NonNullable<ButtonProps["variant"]>;
-  external?: boolean;
 };
 
 type HeroMapImage = {
@@ -34,13 +27,8 @@ const heroCopy = {
   titleHighlight: "Corruption Case",
   titleSuffix: "Archive",
   description:
-    "Reviewed, digestible case summaries, written for every Nepali, not just lawyers. Every CIAA case documented, simplified, and permanently accessible. Original filings, legal timelines, and verified facts,AI-assisted, human-reviewed, free forever.",
+    "Search Nepal's public accountability archive in one place. Find corruption cases, tracked people and offices, updates, and Jawafdehi resources.",
 };
-
-const heroActions: HeroAction[] = [
-  { label: "Try AI Research", to: "https://chat.jawafdehi.org", variant: "primary", external: true },
-  { label: "Learn More", to: "/our-process", variant: "secondary" },
-];
 
 const heroMapImages: HeroMapImage[] = [
   {
@@ -58,102 +46,99 @@ export function Hero({
   officialsAndEntitiesTracked,
   accessModel = "Free",
 }: HeroProps) {
+  const navigate = useNavigate();
+  const [archiveQuery, setArchiveQuery] = useState("");
+
   const heroStats: HeroStat[] = [
-    { value: casesDocumented, label: "Cases Documented", mobileLabel: ["Cases", "Documented"] },
+    { value: casesDocumented, label: "Cases documented" },
     {
       value: officialsAndEntitiesTracked,
-      label: "Officials & Entities Tracked",
+      label: "Officials & entities tracked",
     },
-    { value: accessModel, label: "Forever. No paywall. Ever.", mobileLabel: ["Forever."] },
+    { value: accessModel, label: "Forever. No paywall. Ever." },
   ];
 
+  const goToSearch = (query: string) => {
+    const trimmedQuery = query.trim();
+
+    if (!trimmedQuery) {
+      navigate("/search");
+      return;
+    }
+
+    const params = new URLSearchParams({ q: trimmedQuery });
+    navigate(`/search?${params.toString()}`);
+  };
+
+  const submitArchiveSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    goToSearch(archiveQuery);
+  };
+
   return (
-    <section id="hero" className="relative isolate -mt-[76px] overflow-hidden bg-background pt-[76px]">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-20 left-[64%] z-0 h-[320px] w-[560px] max-w-none -translate-x-1/2 opacity-[0.34] blur-[124px] dark:hidden sm:-top-24 sm:left-[65%] sm:h-[400px] sm:w-[680px] sm:opacity-[0.38] sm:blur-[136px] lg:-top-28 lg:left-[66%] lg:h-[500px] lg:w-[820px] lg:opacity-[0.42] lg:blur-[152px]"
-      >
-        <div className="absolute right-[4%] top-10 h-[66%] w-[54%] rounded-full bg-accent opacity-85" />
-        <div className="absolute left-[32%] top-24 h-[52%] w-[42%] rounded-full bg-accent opacity-55" />
-        <div className="absolute -left-[14%] top-[46%] h-[34%] w-[26%] rounded-full bg-primary opacity-35" />
-      </div>
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 z-[1] opacity-[0.22] [background-image:radial-gradient(hsl(var(--foreground)/0.14)_0.75px,transparent_0.75px)] [background-size:18px_18px]"
-      />
+    <section
+      id="hero"
+      className="relative isolate -mt-[76px] overflow-hidden border-b bg-background pt-[76px]"
+    >
+      <HeroBackdrop images={heroMapImages} />
 
-      <div className="container relative z-10 mx-auto flex min-h-[80svh] w-full flex-col items-center gap-10 py-14 md:py-18 lg:flex-row lg:gap-12 lg:py-20">
-        <div className="w-full space-y-6 lg:basis-[58%] lg:shrink-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
-            {heroCopy.eyebrow}
-          </p>
+      <div className="container relative z-10 mx-auto flex min-h-[72svh] flex-col items-start justify-center px-6 py-14 text-left sm:px-8 sm:py-16 md:min-h-[74svh] md:items-center md:px-6 md:py-20 md:text-center lg:min-h-[76svh] lg:py-24">
+        <p className="max-w-full text-[clamp(0.68rem,1.8vw,0.75rem)] font-bold uppercase tracking-[0.26em] text-accent sm:tracking-[0.28em]">
+          {heroCopy.eyebrow}
+        </p>
 
-          <h1 className="max-w-2xl text-[2.65rem] font-extrabold leading-[0.98] tracking-normal text-primary sm:text-5xl md:text-[3.35rem]">
-            {heroCopy.titlePrefix}{" "}
-            <span className="text-accent">{heroCopy.titleHighlight}</span>{" "}
-            {heroCopy.titleSuffix}
-          </h1>
+        <h1 className="mt-5 max-w-[min(100%,9.6em)] text-[clamp(2.35rem,10.6vw,3.55rem)] font-extrabold leading-[0.96] tracking-[-0.045em] text-primary sm:max-w-[min(100%,10.8em)] sm:text-[clamp(3rem,8vw,4rem)] md:max-w-4xl md:text-6xl md:leading-[1.02] lg:text-6xl">
+  {heroCopy.titlePrefix}{" "}
+  <span className="text-accent">{heroCopy.titleHighlight}</span>{" "}
+  {heroCopy.titleSuffix}
+</h1>
 
-          <p className="max-w-[510px] text-sm leading-6 text-muted-foreground md:text-base">
-            {heroCopy.description}
-          </p>
+        <p className="mt-6 max-w-[min(100%,34rem)] text-[clamp(0.95rem,2.8vw,1.05rem)] leading-8 text-muted-foreground md:max-w-2xl md:text-lg">
+          {heroCopy.description}
+        </p>
 
-          <HeroActions actions={heroActions} />
-          <HeroStats stats={heroStats} />
-        </div>
+        <form
+          className="mt-8 w-full max-w-[min(100%,42rem)] md:max-w-4xl"
+          onSubmit={submitArchiveSearch}
+        >
+          <label className="sr-only" htmlFor="hero-archive-search">
+            Search the Jawafdehi archive
+          </label>
 
-        <HeroMap images={heroMapImages} />
+          <SearchBar
+            id="hero-archive-search"
+            inputClassName="bg-background/95 shadow-lg shadow-primary/5"
+            onChange={(event) => setArchiveQuery(event.target.value)}
+            placeholder="Search cases, people, offices, locations, or allegations"
+            submitLabel="Search Jawafdehi"
+            value={archiveQuery}
+          />
+        </form>
+
+        <HeroStats stats={heroStats} />
       </div>
     </section>
   );
 }
 
-function HeroActions({ actions }: { actions: HeroAction[] }) {
-  return (
-    <div className="flex flex-col gap-3  sm:flex-row">
-      {actions.map(({ label, to, variant, external }) => (
-        <Button
-          asChild
-          key={to}
-          variant={variant}
-          size="lg"
-        >
-          {external ? (
-            <a href={to} target="_blank" rel="noopener noreferrer">
-              {label}
-            </a>
-          ) : (
-            <Link to={to}>{label}</Link>
-          )}
-        </Button>
-      ))}
-    </div>
-  );
-}
-
 function HeroStats({ stats }: { stats: HeroStat[] }) {
   return (
-    <div className="grid grid-cols-3 gap-3 pt-5 sm:grid-cols-[repeat(3,max-content)] sm:gap-8 lg:pt-7">
-      {stats.map(({ value, label, mobileLabel }) => (
-        <div key={label} className="min-w-0">
-          <p className="text-2xl font-bold leading-none text-primary tabular-nums">
+    <div className="mt-10 grid w-full max-w-[min(100%,42rem)] grid-cols-3 gap-4 sm:gap-5 md:max-w-2xl md:gap-0">
+      {stats.map(({ value, label }, index) => (
+        <div
+          key={label}
+          className={cn(
+            "min-w-0 text-left",
+            "md:px-6 md:text-center",
+            index > 0 && "md:border-l md:border-border",
+          )}
+        >
+          <p className="text-[clamp(1.35rem,5vw,1.75rem)] font-extrabold leading-none text-primary tabular-nums md:text-3xl">
             <HeroStatValue value={value} />
           </p>
-          <p className="mt-2 text-xs leading-4 text-muted-foreground sm:whitespace-nowrap sm:text-base sm:leading-normal">
-            {mobileLabel ? (
-              <>
-                <span className="sm:hidden">
-                  {mobileLabel.map((line) => (
-                    <span key={line} className="block">
-                      {line}
-                    </span>
-                  ))}
-                </span>
-                <span className="hidden sm:inline">{label}</span>
-              </>
-            ) : (
-              label
-            )}
+
+          <p className="mt-2 text-[clamp(0.72rem,2.6vw,0.9rem)] leading-5 text-muted-foreground">
+            {label}
           </p>
         </div>
       ))}
@@ -172,17 +157,52 @@ function HeroStatValue({ value }: { value: string }) {
   return <CountUp end={numericValue} duration={0.9} separator="," />;
 }
 
-function HeroMap({ images }: { images: HeroMapImage[] }) {
+function HeroBackdrop({ images }: { images: HeroMapImage[] }) {
   return (
-    <div className="relative hidden min-h-[520px] w-full items-center justify-center lg:flex lg:basis-[42%] lg:-translate-y-12">
-      {images.map(({ src, className }) => (
-        <img
-          key={src}
-          src={src}
-          alt="Dotted map of Nepal"
-          className={cn(className, "w-[124%] max-w-none object-contain sm:w-[136%] lg:w-[158%] xl:w-[164%]")}
-        />
-      ))}
-    </div>
+    <>
+      {/* Mobile: subtle red wash, no Nepal map */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 md:hidden"
+      >
+        <div className="absolute inset-0 bg-background" />
+
+        <div className="absolute inset-0 bg-[linear-gradient(115deg,hsl(var(--background))_0%,hsl(var(--background))_46%,hsl(var(--accent)/0.105)_100%)]" />
+
+        <div className="absolute right-[-20%] top-[-14%] h-[470px] w-[370px] rounded-full bg-accent/10 blur-[112px]" />
+
+        <div className="absolute right-[-34%] top-[18%] h-[380px] w-[320px] rounded-full bg-accent/8 blur-[100px]" />
+      </div>
+
+      {/* Desktop/tablet: warm glow behind map */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-[18%] z-0 hidden h-[440px] w-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_64%_46%,hsl(var(--accent)/0.28),hsl(var(--accent)/0.15)_30%,hsl(var(--primary)/0.08)_52%,transparent_76%)] opacity-70 blur-3xl md:block lg:h-[540px] lg:w-[1120px] lg:opacity-75 dark:opacity-40"
+      />
+
+      {/* Desktop/tablet only: responsive Nepal map */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-[48%] z-0 hidden h-[500px] w-[min(1280px,112vw)] -translate-x-1/2 -translate-y-1/2 -rotate-[8deg] opacity-[0.30] md:block lg:h-[620px] lg:w-[min(1680px,118vw)] lg:opacity-[0.34] xl:h-[660px] xl:w-[min(1780px,120vw)] dark:opacity-[0.20]"
+      >
+        {images.map(({ src, className }) => (
+          <img
+            key={src}
+            src={src}
+            alt=""
+            className={cn(
+              className,
+              "absolute inset-0 h-full w-full max-w-none object-contain saturate-[1.18] contrast-[1.03] mix-blend-multiply dark:mix-blend-screen",
+            )}
+          />
+        ))}
+      </div>
+
+      {/* Desktop/tablet readability wash */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 hidden bg-[radial-gradient(ellipse_at_50%_46%,hsl(var(--background)/0.86)_0%,hsl(var(--background)/0.70)_30%,hsl(var(--background)/0.38)_56%,transparent_84%)] md:block lg:bg-[radial-gradient(ellipse_at_50%_46%,hsl(var(--background)/0.84)_0%,hsl(var(--background)/0.66)_30%,hsl(var(--background)/0.34)_56%,transparent_84%)]"
+      />
+    </>
   );
 }
