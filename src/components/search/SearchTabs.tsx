@@ -19,12 +19,6 @@ const tabs: Array<{
 ];
 
 export function SearchTabs({ counts, activeType, onChange }: SearchTabsProps) {
-  const broadActiveType = ["person", "organization", "location"].includes(
-    activeType,
-  )
-    ? "entity"
-    : activeType;
-
   return (
     <div
       aria-label="Search result type"
@@ -32,7 +26,7 @@ export function SearchTabs({ counts, activeType, onChange }: SearchTabsProps) {
       role="tablist"
     >
       {tabs.map((tab) => {
-        const isActive = tab.type === broadActiveType;
+        const isActive = tab.type === activeType;
         return (
           <button
             aria-selected={isActive}
@@ -55,4 +49,3 @@ export function SearchTabs({ counts, activeType, onChange }: SearchTabsProps) {
     </div>
   );
 }
-
