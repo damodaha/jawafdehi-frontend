@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { cn } from "@/lib/utils";
 import type { ArchiveSearchFacets, SearchFacetItem } from "@/types/search";
 
-type FilterName = "entity_type" | "role" | "case_type" | "tags";
+type FilterName = "type" | "entity_type" | "role" | "case_type" | "tags";
 
 type SearchFiltersProps = {
   facets: ArchiveSearchFacets;
@@ -32,6 +31,13 @@ export function SearchFilters({
         </Button>
       </div>
 
+      <FilterGroup
+        items={facets.type}
+        name="type"
+        onToggle={onToggle}
+        selectedValues={selected.type}
+        title="Record type"
+      />
       <FilterGroup
         items={facets.entity_type}
         name="entity_type"
@@ -84,21 +90,14 @@ function FilterGroup({
       </legend>
       {items.map((item) => {
         const isChecked = selectedValues.includes(item.name);
-        const isDisabled = item.count === 0 && !isChecked;
         return (
           <label
-            className={cn(
-              "flex min-h-8 items-center gap-2 rounded-md px-1 text-sm text-muted-foreground transition-colors",
-              isDisabled
-                ? "cursor-not-allowed opacity-50"
-                : "cursor-pointer hover:bg-muted hover:text-foreground",
-            )}
+            className="flex min-h-8 cursor-pointer items-center gap-2 rounded-md px-1 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             key={item.name}
           >
             <Checkbox
               aria-label={`${item.display_name}: ${item.count} results`}
               checked={isChecked}
-              disabled={isDisabled}
               onCheckedChange={() => onToggle(name, item.name)}
             />
             <span className="min-w-0 flex-1 truncate">{item.display_name}</span>
