@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { AlertCircle, Search, X } from "lucide-react";
+import { AlertCircle, X } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { useSearchParams } from "react-router-dom";
 
@@ -8,7 +8,8 @@ import { SearchFilters } from "@/components/search/SearchFilters";
 import { SearchResultCard } from "@/components/search/SearchResultCard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { PaginationControls } from "@/components/ui/pagination";
+import { SearchBar } from "@/components/ui/search-bar";
 import {
   Select,
   SelectContent,
@@ -102,7 +103,6 @@ export default function ArchiveSearch() {
     (count, values) => count + values.length,
     0,
   );
-  const hasActiveFilters = activeRefinementCount > 0;
   const facets = data?.facets || emptyFacets;
   const selectedItems = getSelectedItems(facets, selectedRefinements);
   const searchFilters = (
@@ -140,30 +140,21 @@ export default function ArchiveSearch() {
         </header>
 
         <form
-          className="mt-7 grid max-w-6xl gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center"
+          className="mt-7 flex w-full flex-col gap-3 lg:flex-row lg:items-center"
           onSubmit={submitSearch}
         >
           <label className="sr-only" htmlFor="archive-search">
             Search the Jawafdehi archive
           </label>
-          <div className="relative flex-1">
-            <Search aria-hidden="true" className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              className="h-12 rounded-full pl-12 pr-14"
-              id="archive-search"
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search cases, people, offices, locations, or allegations"
-              value={query}
-            />
-            <Button
-              aria-label="Search archive"
-              className="absolute right-1.5 top-1/2 h-9 w-9 -translate-y-1/2 rounded-full p-0"
-              type="submit"
-            >
-              <Search aria-hidden="true" className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="flex items-center gap-3 lg:justify-end">
+          <SearchBar
+            className="lg:max-w-[min(64rem,calc(100%-16rem))]"
+            id="archive-search"
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search cases, people, offices, locations, or allegations"
+            submitLabel="Search archive"
+            value={query}
+          />
+          <div className="flex items-center gap-3 lg:ml-auto lg:justify-end">
             <label className="text-sm font-semibold text-muted-foreground" htmlFor="archive-sort">
               Sort
             </label>
@@ -184,21 +175,26 @@ export default function ArchiveSearch() {
           </div>
         </form>
 
-        {selectedItems.length ? (
-          <div className="mt-3 flex max-w-6xl flex-wrap gap-2" aria-label="Selected filters">
-            {selectedItems.map((item) => (
-              <button
-                className="inline-flex max-w-full items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                key={`${item.name}-${item.value}`}
-                onClick={() => toggleRefinement(item.name, item.value)}
-                type="button"
-              >
-                <span className="truncate">{item.label}</span>
-                <X aria-hidden="true" className="h-3 w-3 shrink-0" />
-              </button>
-            ))}
+        <div className="mt-3 flex min-h-8 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap gap-2" aria-label="Selected filters">
+            {selectedItems.length
+              ? selectedItems.map((item) => (
+                  <button
+                    className="inline-flex max-w-full items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    key={`${item.name}-${item.value}`}
+                    onClick={() => toggleRefinement(item.name, item.value)}
+                    type="button"
+                  >
+                    <span className="truncate">{item.label}</span>
+                    <X aria-hidden="true" className="h-3 w-3 shrink-0" />
+                  </button>
+                ))
+              : null}
           </div>
-        ) : null}
+          <p className="text-sm text-muted-foreground">
+            {isLoading ? "Searching archive..." : `${data?.count || 0} results`}
+          </p>
+        </div>
 
         <div className="mt-5 lg:hidden">
           <details className="rounded-xl border bg-card">
@@ -213,21 +209,6 @@ export default function ArchiveSearch() {
           <div className="hidden lg:block">{searchFilters}</div>
 
           <section aria-label="Archive search results">
-            <div className="mb-4 flex min-h-6 items-center justify-between gap-4">
-              <p className="text-sm text-muted-foreground">
-                {isLoading ? "Searching archive..." : `${data?.count || 0} results`}
-              </p>
-              {hasActiveFilters ? (
-                <Button
-                  className="h-9 px-3 text-xs lg:hidden"
-                  onClick={clearRefinements}
-                  variant="ghost"
-                >
-                  Clear filters
-                </Button>
-              ) : null}
-            </div>
-
             {isError ? (
               <Alert className="mb-5" variant="destructive">
                 <AlertCircle className="h-4 w-4" />
@@ -263,25 +244,12 @@ export default function ArchiveSearch() {
             )}
 
             {data && data.count > data.page_size ? (
-              <div className="mt-7 flex items-center justify-between gap-4">
-                <Button
-                  disabled={data.page <= 1}
-                  onClick={() => updateParams({ page: data.page - 1 })}
-                  variant="outline"
-                >
-                  Previous
-                </Button>
-                <span className="text-sm text-muted-foreground">
-                  Page <span className="tabular-nums">{data.page}</span>
-                </span>
-                <Button
-                  disabled={data.page * data.page_size >= data.count}
-                  onClick={() => updateParams({ page: data.page + 1 })}
-                  variant="outline"
-                >
-                  Next
-                </Button>
-              </div>
+              <PaginationControls
+                onPageChange={(page) => updateParams({ page })}
+                page={data.page}
+                pageSize={data.page_size}
+                totalItems={data.count}
+              />
             ) : null}
           </section>
         </div>
