@@ -1,7 +1,10 @@
-import { Link } from "react-router-dom";
+import { type FormEvent, useState } from "react";
+import { Search } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import CountUp from "react-countup";
 
 import { Button, type ButtonProps } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 type HeroProps = {
@@ -58,6 +61,8 @@ export function Hero({
   officialsAndEntitiesTracked,
   accessModel = "Free",
 }: HeroProps) {
+  const navigate = useNavigate();
+  const [archiveQuery, setArchiveQuery] = useState("");
   const heroStats: HeroStat[] = [
     { value: casesDocumented, label: "Cases Documented", mobileLabel: ["Cases", "Documented"] },
     {
@@ -66,6 +71,13 @@ export function Hero({
     },
     { value: accessModel, label: "Forever. No paywall. Ever.", mobileLabel: ["Forever."] },
   ];
+
+  const submitArchiveSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const params = new URLSearchParams({ type: "all" });
+    if (archiveQuery.trim()) params.set("q", archiveQuery.trim());
+    navigate(`/search?${params.toString()}`);
+  };
 
   return (
     <section id="hero" className="relative isolate -mt-[76px] overflow-hidden bg-background pt-[76px]">
@@ -97,6 +109,25 @@ export function Hero({
           <p className="max-w-[510px] text-sm leading-6 text-muted-foreground md:text-base">
             {heroCopy.description}
           </p>
+
+          <form className="max-w-xl" onSubmit={submitArchiveSearch}>
+            <label className="sr-only" htmlFor="hero-archive-search">
+              Search the Jawafdehi archive
+            </label>
+            <div className="relative">
+              <Search aria-hidden="true" className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                className="h-12 rounded-full bg-background/95 pl-12 pr-36 shadow-sm"
+                id="hero-archive-search"
+                onChange={(event) => setArchiveQuery(event.target.value)}
+                placeholder="Search the archive"
+                value={archiveQuery}
+              />
+              <Button className="absolute right-1 top-1 h-10 px-4" type="submit">
+                Search Archive
+              </Button>
+            </div>
+          </form>
 
           <HeroActions actions={heroActions} />
           <HeroStats stats={heroStats} />
