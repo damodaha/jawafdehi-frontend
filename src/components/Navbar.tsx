@@ -86,6 +86,16 @@ export function Navbar() {
     [t],
   );
 
+  const aboutNavItems = useMemo<NavItem[]>(
+    () => [
+      { key: "about", label: t("nav.about"), to: "/about", exact: true },
+      { key: "team", label: t("nav.team"), to: "/team" },
+      { key: "products", label: t("nav.products"), to: "/products" },
+      { key: "updates", label: t("nav.updates"), to: "/updates" },
+    ],
+    [t],
+  );
+
   const activeKey = useMemo(() => {
     const path = location.pathname;
 
@@ -170,7 +180,12 @@ export function Navbar() {
         <Link
           to="/"
           aria-label="Jawafdehi home"
-          className="flex min-w-0 items-center justify-self-start rounded-full pr-3 transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className={cn(
+            "flex h-11 min-w-0 items-center justify-self-start rounded-full border px-3 transition-all duration-200 ease-out hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            isScrolled
+              ? "border-slate-200/70 bg-white/75 shadow-sm shadow-foreground/5 backdrop-blur-md dark:border-border/70 dark:bg-background/70"
+              : "border-transparent bg-transparent shadow-none backdrop-blur-0",
+          )}
         >
           <img
             src="/assets/logo.png"
@@ -298,16 +313,30 @@ export function Navbar() {
               isScrolled ? "shadow-md shadow-primary/15" : "shadow-none",
             )}
           >
-            <Link to="/cases">
-              <Search className="h-4 w-4" />
-              {t("header.browseCases")}
-            </Link>
+            <a href="https://chat.jawafdehi.org" target="_blank" rel="noreferrer">
+              <MessageCircle className="h-4 w-4" />
+              {t("header.askAiAssistant")}
+            </a>
           </Button>
         </div>
 
         <div className="flex items-center gap-2 justify-self-end lg:hidden">
           <LanguageToggle quiet={!isScrolled} />
-          <ThemeToggle quiet={!isScrolled} />
+          <Button
+            variant="navIcon"
+            size="navMenuIcon"
+            type="button"
+            onClick={() => setIsSearchOpen(true)}
+            aria-label={t("searchCommand.open")}
+            title={t("searchCommand.open")}
+            className={cn(
+              isScrolled
+                ? "border-slate-200/70 bg-white/75 dark:border-border/70 dark:bg-background/70"
+                : "border-transparent bg-transparent shadow-none hover:translate-y-0 hover:border-transparent hover:bg-secondary/35 hover:shadow-none",
+            )}
+          >
+            <Search className="h-5 w-5" />
+          </Button>
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button
@@ -351,37 +380,33 @@ export function Navbar() {
                     {item.label}
                   </NavLink>
                 ))}
-                <NavLink to="/about" className={mobileNavLinkClass} onClick={() => setIsOpen(false)}>
-                  {t("nav.about")}
-                </NavLink>
-                <Link to="/team" className="rounded-2xl px-4 py-2 text-sm font-normal text-muted-foreground transition-colors hover:bg-secondary/70 hover:text-foreground" onClick={() => setIsOpen(false)}>
-                  {t("nav.team")}
-                </Link>
-                <Link to="/products" className="rounded-2xl px-4 py-2 text-sm font-normal text-muted-foreground transition-colors hover:bg-secondary/70 hover:text-foreground" onClick={() => setIsOpen(false)}>
-                  {t("nav.products")}
-                </Link>
-                <Link to="/updates" className="rounded-2xl px-4 py-2 text-sm font-normal text-muted-foreground transition-colors hover:bg-secondary/70 hover:text-foreground" onClick={() => setIsOpen(false)}>
-                  {t("nav.updates")}
-                </Link>
+                {aboutNavItems.map((item) => (
+                  <NavLink
+                    key={item.key}
+                    to={item.to}
+                    end={item.exact}
+                    className={mobileNavLinkClass}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {item.label}
+                  </NavLink>
+                ))}
               </nav>
 
-              <div className="mt-8 grid gap-3 rounded-[1.75rem] border border-border/70 bg-secondary/45 p-3">
+              <div className="mt-8 grid gap-3">
+                <div className="flex justify-end">
+                  <ThemeToggle />
+                </div>
                 <Button
                   asChild
                   variant="primary"
                   size="navSheet"
                   onClick={() => setIsOpen(false)}
                 >
-                  <Link to="/cases">
-                    <Search className="h-4 w-4" />
-                    {t("header.browseCases")}
-                  </Link>
-                </Button>
-                <Button asChild variant="secondary" size="navSheet" onClick={() => setIsOpen(false)}>
-                  <Link to="/ask">
+                  <a href="https://chat.jawafdehi.org" target="_blank" rel="noreferrer">
                     <MessageCircle className="h-4 w-4" />
-                    {t("header.askJawafdehi")}
-                  </Link>
+                    {t("header.askAiAssistant")}
+                  </a>
                 </Button>
               </div>
             </SheetContent>
