@@ -140,7 +140,7 @@ export default function ArchiveSearch() {
         </header>
 
         <form
-          className="mt-7 flex max-w-6xl flex-col gap-3 lg:flex-row lg:items-center"
+          className="mt-7 grid max-w-6xl gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center"
           onSubmit={submitSearch}
         >
           <label className="sr-only" htmlFor="archive-search">
@@ -149,17 +149,21 @@ export default function ArchiveSearch() {
           <div className="relative flex-1">
             <Search aria-hidden="true" className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
             <Input
-              className="h-12 rounded-full pl-12"
+              className="h-12 rounded-full pl-12 pr-14"
               id="archive-search"
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search cases, people, offices, locations, or allegations"
               value={query}
             />
+            <Button
+              aria-label="Search archive"
+              className="absolute right-1.5 top-1/2 h-9 w-9 -translate-y-1/2 rounded-full p-0"
+              type="submit"
+            >
+              <Search aria-hidden="true" className="h-4 w-4" />
+            </Button>
           </div>
-          <Button className="h-12 px-6" type="submit">
-            Search Archive
-          </Button>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 lg:justify-end">
             <label className="text-sm font-semibold text-muted-foreground" htmlFor="archive-sort">
               Sort
             </label>
@@ -167,7 +171,7 @@ export default function ArchiveSearch() {
               onValueChange={(sort) => updateFilter("sort", sort)}
               value={params.sort || "relevance"}
             >
-              <SelectTrigger className="h-11 w-[160px]" id="archive-sort">
+              <SelectTrigger className="h-11 w-[160px] rounded-full px-4" id="archive-sort">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
