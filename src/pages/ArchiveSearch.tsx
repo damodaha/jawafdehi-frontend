@@ -1,12 +1,11 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { AlertCircle, Search } from "lucide-react";
+import { AlertCircle, Search, X } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { useSearchParams } from "react-router-dom";
 
 import { SearchFilters } from "@/components/search/SearchFilters";
 import { SearchResultCard } from "@/components/search/SearchResultCard";
-import { SearchTabs } from "@/components/search/SearchTabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,17 +22,10 @@ import type {
   ArchiveSearchFacets,
   ArchiveSearchParams,
   ArchiveSearchSort,
-  ArchiveSearchType,
 } from "@/types/search";
 
-type RefinementName = "entity_type" | "role" | "case_type" | "tags";
+type RefinementName = "type" | "entity_type" | "role" | "case_type" | "tags";
 
-const validTypes = new Set<ArchiveSearchType>([
-  "all",
-  "case",
-  "entity",
-  "document",
-]);
 const validSorts = new Set<ArchiveSearchSort>([
   "relevance",
   "newest",
@@ -41,6 +33,7 @@ const validSorts = new Set<ArchiveSearchSort>([
   "title",
 ]);
 const emptyFacets: ArchiveSearchFacets = {
+  type: [],
   entity_type: [],
   role: [],
   case_type: [],
@@ -86,7 +79,7 @@ export default function ArchiveSearch() {
 
   const clearRefinements = () => {
     const next = new URLSearchParams(searchParams);
-    (["entity_type", "role", "case_type", "tags"] as RefinementName[]).forEach(
+    (["type", "entity_type", "role", "case_type", "tags"] as RefinementName[]).forEach(
       (name) => next.delete(name),
     );
     next.set("page", "1");
@@ -98,8 +91,8 @@ export default function ArchiveSearch() {
     updateParams({ q: query.trim() || undefined, page: 1 });
   };
 
-  const activeType = params.type || "all";
   const selectedRefinements = {
+    type: params.type || [],
     entity_type: params.entity_type || [],
     role: params.role || [],
     case_type: params.case_type || [],
@@ -110,9 +103,11 @@ export default function ArchiveSearch() {
     0,
   );
   const hasActiveFilters = activeRefinementCount > 0;
+  const facets = data?.facets || emptyFacets;
+  const selectedItems = getSelectedItems(facets, selectedRefinements);
   const searchFilters = (
     <SearchFilters
-      facets={data?.facets || emptyFacets}
+      facets={facets}
       onClear={clearRefinements}
       onToggle={toggleRefinement}
       selected={selectedRefinements}
@@ -144,7 +139,10 @@ export default function ArchiveSearch() {
           </p>
         </header>
 
-        <form className="mt-7 flex max-w-5xl flex-col gap-3 sm:flex-row" onSubmit={submitSearch}>
+        <form
+          className="mt-7 flex max-w-6xl flex-col gap-3 lg:flex-row lg:items-center"
+          onSubmit={submitSearch}
+        >
           <label className="sr-only" htmlFor="archive-search">
             Search the Jawafdehi archive
           </label>
@@ -161,14 +159,6 @@ export default function ArchiveSearch() {
           <Button className="h-12 px-6" type="submit">
             Search Archive
           </Button>
-        </form>
-
-        <div className="mt-7 flex flex-col gap-4 border-b pb-5 lg:flex-row lg:items-center lg:justify-between">
-          <SearchTabs
-            activeType={activeType}
-            counts={data?.counts || { all: 0, cases: 0, entities: 0, documents: 0 }}
-            onChange={(type) => updateFilter("type", type)}
-          />
           <div className="flex items-center gap-3">
             <label className="text-sm font-semibold text-muted-foreground" htmlFor="archive-sort">
               Sort
@@ -188,7 +178,23 @@ export default function ArchiveSearch() {
               </SelectContent>
             </Select>
           </div>
-        </div>
+        </form>
+
+        {selectedItems.length ? (
+          <div className="mt-3 flex max-w-6xl flex-wrap gap-2" aria-label="Selected filters">
+            {selectedItems.map((item) => (
+              <button
+                className="inline-flex max-w-full items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                key={`${item.name}-${item.value}`}
+                onClick={() => toggleRefinement(item.name, item.value)}
+                type="button"
+              >
+                <span className="truncate">{item.label}</span>
+                <X aria-hidden="true" className="h-3 w-3 shrink-0" />
+              </button>
+            ))}
+          </div>
+        ) : null}
 
         <div className="mt-5 lg:hidden">
           <details className="rounded-xl border bg-card">
@@ -281,12 +287,13 @@ export default function ArchiveSearch() {
 }
 
 function readParams(searchParams: URLSearchParams): ArchiveSearchParams {
-  const requestedType = searchParams.get("type") as ArchiveSearchType | null;
   const requestedSort = searchParams.get("sort") as ArchiveSearchSort | null;
   const page = Number.parseInt(searchParams.get("page") || "1", 10);
   return {
     q: searchParams.get("q") || undefined,
-    type: requestedType && validTypes.has(requestedType) ? requestedType : "all",
+    type: searchParams
+      .getAll("type")
+      .filter((type) => ["case", "entity", "document"].includes(type)),
     entity_type: searchParams.getAll("entity_type"),
     role: searchParams.getAll("role"),
     case_type: searchParams.getAll("case_type"),
@@ -295,4 +302,23 @@ function readParams(searchParams: URLSearchParams): ArchiveSearchParams {
     page: Number.isFinite(page) && page > 0 ? page : 1,
     page_size: 10,
   };
+}
+
+function getSelectedItems(
+  facets: ArchiveSearchFacets,
+  selected: Record<RefinementName, string[]>,
+) {
+  return (Object.keys(selected) as RefinementName[]).flatMap((name) =>
+    selected[name].map((value) => ({
+      name,
+      value,
+      label:
+        facets[name].find((item) => item.name === value)?.display_name ||
+        humanize(value),
+    })),
+  );
+}
+
+function humanize(value: string) {
+  return value.replaceAll("_", " ").replaceAll("-", " ");
 }
