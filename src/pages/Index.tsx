@@ -3,6 +3,7 @@ import { CaseCard } from "@/components/CaseCard";
 import { Hero } from "@/components/home/hero";
 import { Faq } from "@/components/home/faq";
 import { Cta } from "@/components/home/cta";
+import { SupportingPartner } from "@/components/home/supportingpartner";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -180,6 +181,7 @@ const Index = () => {
           officialsAndEntitiesTracked={getStatValue(stats?.entities_tracked)}
         />
 
+    
 
         {/* ── What we're building ── */}
         {/* <section id="archive-intro" className="py-12 bg-muted/30 border-b border-border">
@@ -234,6 +236,7 @@ const Index = () => {
         </section>
         <Cta />
         <Faq />
+            <SupportingPartner />
       </main>
 
     </div>
