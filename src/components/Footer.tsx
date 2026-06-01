@@ -112,6 +112,8 @@ export const Footer = () => {
   const year = new Date().getFullYear();
 
   const platformLinks: FooterLink[] = [
+    { label: "Search cases", to: "/search?type=case" },
+    { label: "Search entities", to: "/search?type=entity" },
     { label: t("nav.cases"), to: "/cases" },
     { label: t("nav.ourProcess"), to: "/our-process" },
     { label: t("nav.ourCommitment"), to: "/commitment" },
@@ -129,7 +131,7 @@ export const Footer = () => {
   const resourceLinks: FooterLink[] = [
     { label: t("footer.contributorPortal"), to: "https://portal.jawafdehi.org", external: true },
     { label: t("footer.githubRepo"), to: "https://github.com/Jawafdehi/Jawafdehi", external: true },
-    { label: t("footer.siteStatus"), to: "https://stats.uptimerobot.com/lwVRcc5suC", external: true },
+    { label: t("footer.siteStatus"), to: "https://status.jawafdehi.org/status/public", external: true },
     { label: "Let's Build Nepal", to: "https://LetsBuildNepal.com", external: true },
   ];
 
