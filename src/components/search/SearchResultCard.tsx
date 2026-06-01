@@ -1,0 +1,108 @@
+import {
+  ArrowRight,
+  Building2,
+  FileText,
+  Landmark,
+  MapPin,
+  Scale,
+  UserRound,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+
+import { Badge } from "@/components/ui/badge";
+import type {
+  ArchiveSearchResult,
+  CaseSearchResult,
+  DocumentSearchResult,
+  EntitySearchResult,
+} from "@/types/search";
+
+export function SearchResultCard({ result }: { result: ArchiveSearchResult }) {
+  return (
+    <Link
+      className="group block rounded-xl border bg-card p-5 transition-colors hover:border-primary/35 hover:bg-muted/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      to={result.url}
+    >
+      <article className="flex min-h-24 items-start gap-4">
+        <span className="mt-0.5 rounded-full bg-secondary/70 p-2.5 text-primary">
+          <ResultIcon result={result} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <Badge className="capitalize" variant="outline">
+              {result.result_type}
+            </Badge>
+            {result.result_type === "entity" ? (
+              <span className="text-xs capitalize text-muted-foreground">
+                {result.entity_type}
+              </span>
+            ) : null}
+          </div>
+          <h2 className="text-base font-bold leading-6 text-foreground group-hover:text-primary">
+            {result.title}
+          </h2>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">
+            {result.description}
+          </p>
+          <p className="mt-3 text-xs leading-5 text-muted-foreground">
+            {resultMetadata(result)}
+          </p>
+        </div>
+        <ArrowRight
+          aria-hidden="true"
+          className="mt-2 h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary"
+        />
+      </article>
+    </Link>
+  );
+}
+
+function ResultIcon({ result }: { result: ArchiveSearchResult }) {
+  if (result.result_type === "case") return <Scale aria-hidden="true" className="h-5 w-5" />;
+  if (result.result_type === "document") return <FileText aria-hidden="true" className="h-5 w-5" />;
+  if (result.entity_type === "person") return <UserRound aria-hidden="true" className="h-5 w-5" />;
+  if (result.entity_type === "organization") return <Building2 aria-hidden="true" className="h-5 w-5" />;
+  if (result.entity_type === "location") return <MapPin aria-hidden="true" className="h-5 w-5" />;
+  return <Landmark aria-hidden="true" className="h-5 w-5" />;
+}
+
+function resultMetadata(result: ArchiveSearchResult) {
+  if (result.result_type === "case") return caseMetadata(result);
+  if (result.result_type === "entity") return entityMetadata(result);
+  return documentMetadata(result);
+}
+
+function caseMetadata(result: CaseSearchResult) {
+  const primaryEntity = result.entities.find((entity) => entity.relationship_type === "accused");
+  const location = result.entities.find((entity) => entity.relationship_type === "location");
+  return [
+    humanize(result.state),
+    entityName(primaryEntity),
+    entityName(location),
+    result.date,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+function entityMetadata(result: EntitySearchResult) {
+  return [
+    humanize(result.entity_type),
+    `${result.role_counts.accused || 0} accused`,
+    `${result.related_case_count} related ${result.related_case_count === 1 ? "case" : "cases"}`,
+  ].join(" · ");
+}
+
+function documentMetadata(result: DocumentSearchResult) {
+  const names = result.related_entities.map(entityName).filter(Boolean).join(", ");
+  return [humanize(result.source_type || "Document"), names].filter(Boolean).join(" · ");
+}
+
+function entityName(entity?: { display_name: string | null; nes_id: string | null }) {
+  return entity?.display_name || entity?.nes_id || "";
+}
+
+function humanize(value: string) {
+  return value.replaceAll("_", " ").toLowerCase();
+}
+
