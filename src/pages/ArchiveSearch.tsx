@@ -20,19 +20,19 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { searchArchive } from "@/services/search-api";
 import type {
+  ArchiveSearchFacets,
   ArchiveSearchParams,
   ArchiveSearchSort,
   ArchiveSearchType,
 } from "@/types/search";
+
+type RefinementName = "entity_type" | "role" | "case_type" | "tags";
 
 const validTypes = new Set<ArchiveSearchType>([
   "all",
   "case",
   "entity",
   "document",
-  "person",
-  "organization",
-  "location",
 ]);
 const validSorts = new Set<ArchiveSearchSort>([
   "relevance",
@@ -40,6 +40,12 @@ const validSorts = new Set<ArchiveSearchSort>([
   "oldest",
   "title",
 ]);
+const emptyFacets: ArchiveSearchFacets = {
+  entity_type: [],
+  role: [],
+  case_type: [],
+  tags: [],
+};
 
 export default function ArchiveSearch() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -67,14 +73,50 @@ export default function ArchiveSearch() {
     updateParams({ [name]: value, page: 1 });
   };
 
+  const toggleRefinement = (name: RefinementName, value: string) => {
+    const next = new URLSearchParams(searchParams);
+    const selected = new Set(next.getAll(name));
+    if (selected.has(value)) selected.delete(value);
+    else selected.add(value);
+    next.delete(name);
+    selected.forEach((item) => next.append(name, item));
+    next.set("page", "1");
+    setSearchParams(next);
+  };
+
+  const clearRefinements = () => {
+    const next = new URLSearchParams(searchParams);
+    (["entity_type", "role", "case_type", "tags"] as RefinementName[]).forEach(
+      (name) => next.delete(name),
+    );
+    next.set("page", "1");
+    setSearchParams(next);
+  };
+
   const submitSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     updateParams({ q: query.trim() || undefined, page: 1 });
   };
 
   const activeType = params.type || "all";
-  const hasActiveFilters = Boolean(
-    params.type !== "all" || params.status || params.role || params.case_type,
+  const selectedRefinements = {
+    entity_type: params.entity_type || [],
+    role: params.role || [],
+    case_type: params.case_type || [],
+    tags: params.tags || [],
+  };
+  const activeRefinementCount = Object.values(selectedRefinements).reduce(
+    (count, values) => count + values.length,
+    0,
+  );
+  const hasActiveFilters = activeRefinementCount > 0;
+  const searchFilters = (
+    <SearchFilters
+      facets={data?.facets || emptyFacets}
+      onClear={clearRefinements}
+      onToggle={toggleRefinement}
+      selected={selectedRefinements}
+    />
   );
 
   return (
@@ -148,16 +190,17 @@ export default function ArchiveSearch() {
           </div>
         </div>
 
+        <div className="mt-5 lg:hidden">
+          <details className="rounded-xl border bg-card">
+            <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-foreground">
+              Filters{activeRefinementCount ? ` (${activeRefinementCount})` : ""}
+            </summary>
+            <div className="border-t p-3">{searchFilters}</div>
+          </details>
+        </div>
+
         <div className="mt-7 grid gap-7 lg:grid-cols-[250px_minmax(0,1fr)]">
-          <SearchFilters
-            activeType={activeType}
-            caseType={params.case_type}
-            facets={data?.facets || { type: [], status: [], role: [], case_type: [] }}
-            onChange={updateFilter}
-            onClear={() => updateParams({ type: "all", status: undefined, role: undefined, case_type: undefined, page: 1 })}
-            role={params.role}
-            status={params.status}
-          />
+          <div className="hidden lg:block">{searchFilters}</div>
 
           <section aria-label="Archive search results">
             <div className="mb-4 flex min-h-6 items-center justify-between gap-4">
@@ -167,7 +210,7 @@ export default function ArchiveSearch() {
               {hasActiveFilters ? (
                 <Button
                   className="h-9 px-3 text-xs lg:hidden"
-                  onClick={() => updateParams({ type: "all", status: undefined, role: undefined, case_type: undefined, page: 1 })}
+                  onClick={clearRefinements}
                   variant="ghost"
                 >
                   Clear filters
@@ -191,7 +234,7 @@ export default function ArchiveSearch() {
               <div aria-live="polite" className="space-y-3" role="status">
                 <span className="sr-only">Searching archive</span>
                 {[1, 2, 3, 4].map((item) => (
-                  <Skeleton className="h-40 rounded-xl" key={item} />
+                  <Skeleton className="h-32 rounded-xl" key={item} />
                 ))}
               </div>
             ) : data?.results.length ? (
@@ -244,13 +287,12 @@ function readParams(searchParams: URLSearchParams): ArchiveSearchParams {
   return {
     q: searchParams.get("q") || undefined,
     type: requestedType && validTypes.has(requestedType) ? requestedType : "all",
-    status: searchParams.get("status") || undefined,
-    role: searchParams.get("role") || undefined,
-    case_type: searchParams.get("case_type") || undefined,
-    tags: searchParams.get("tags") || undefined,
+    entity_type: searchParams.getAll("entity_type"),
+    role: searchParams.getAll("role"),
+    case_type: searchParams.getAll("case_type"),
+    tags: searchParams.getAll("tags"),
     sort: requestedSort && validSorts.has(requestedSort) ? requestedSort : "relevance",
     page: Number.isFinite(page) && page > 0 ? page : 1,
     page_size: 10,
   };
 }
-
