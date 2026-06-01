@@ -2,20 +2,17 @@ export type ArchiveSearchType =
   | "all"
   | "case"
   | "entity"
-  | "document"
-  | "person"
-  | "organization"
-  | "location";
+  | "document";
 
 export type ArchiveSearchSort = "relevance" | "newest" | "oldest" | "title";
 
 export interface ArchiveSearchParams {
   q?: string;
   type?: ArchiveSearchType;
-  status?: string;
-  role?: string;
-  case_type?: string;
-  tags?: string;
+  entity_type?: string[];
+  role?: string[];
+  case_type?: string[];
+  tags?: string[];
   sort?: ArchiveSearchSort;
   page?: number;
   page_size?: number;
@@ -25,6 +22,13 @@ export interface SearchFacetItem {
   name: string;
   display_name: string;
   count: number;
+}
+
+export interface ArchiveSearchFacets {
+  entity_type: SearchFacetItem[];
+  role: SearchFacetItem[];
+  case_type: SearchFacetItem[];
+  tags: SearchFacetItem[];
 }
 
 export interface SearchResultEntityPreview {
@@ -86,12 +90,6 @@ export interface ArchiveSearchResponse {
     entities: number;
     documents: number;
   };
-  facets: {
-    type: SearchFacetItem[];
-    status: SearchFacetItem[];
-    role: SearchFacetItem[];
-    case_type: SearchFacetItem[];
-  };
+  facets: ArchiveSearchFacets;
   results: ArchiveSearchResult[];
 }
-
