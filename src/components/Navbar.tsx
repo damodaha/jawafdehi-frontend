@@ -10,7 +10,7 @@ import {
 
 import { AppSearchCommand } from "@/components/AppSearchCommand";
 import { LanguageToggle } from "@/components/LanguageToggle";
-import { ThemeToggle } from "@/components/ThemeToggle";
+// import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -301,7 +301,7 @@ export function Navbar() {
             >
               <Search className="h-4 w-4" />
             </Button>
-            <ThemeToggle quiet={!isScrolled} />
+            {/* <ThemeToggle quiet={!isScrolled} /> */}
           </div>
 
           <Button
@@ -395,7 +395,7 @@ export function Navbar() {
 
               <div className="mt-8 grid gap-3">
                 <div className="flex justify-end">
-                  <ThemeToggle />
+                  {/* <ThemeToggle /> */}
                 </div>
                 <Button
                   asChild
