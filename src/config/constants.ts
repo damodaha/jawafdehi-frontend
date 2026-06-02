@@ -3,7 +3,7 @@ export const JAWAFDEHI_EMAIL = "inquiry@jawafdehi.org";
 
 export const JAWAFDEHI_SOCIALS = {
   facebook: "https://www.facebook.com/jawafdehi",
-  youtube: "https://www.youtube.com/@Jawafdehi_Initiative",
+  youtube: "https://www.youtube.com/@Jawafdehi",
   linkedin: "https://www.linkedin.com/company/jawafdehi-initiative",
   whatsapp: "https://api.whatsapp.com/send?phone=12065309098",
   linktree: "https://linktr.ee/jawafdehi",
