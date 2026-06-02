@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { CaseCardSkeleton } from "@/components/CaseCardSkeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Search, AlertCircle, Filter } from "lucide-react";
+import { Search, AlertCircle, Filter, LayoutGrid, List } from "lucide-react";
 import { getCases } from "@/services/jds-api";
 import { getEntityById } from "@/services/api";
 import { useQuery, useQueries } from "@tanstack/react-query";
@@ -53,6 +53,7 @@ const Cases = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<'all' | 'ongoing' | 'closed' | 'others'>('all');
   const [page, setPage] = useState(1);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   // Debounce search input and reset pagination atomically
   useEffect(() => {
@@ -170,6 +171,23 @@ const Cases = () => {
                 <Filter className="mr-2 h-4 w-4" />
                 {t("cases.clearFilters")}
               </Button>
+
+              <div className="flex border rounded-md">
+                <Button 
+                  variant={viewMode === "grid" ? "secondary" : "ghost"} 
+                  size="icon" 
+                  onClick={() => setViewMode("grid")}
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant={viewMode === "list" ? "secondary" : "ghost"} 
+                  size="icon" 
+                  onClick={() => setViewMode("list")}
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </section>
 
@@ -195,14 +213,16 @@ const Cases = () => {
 
           <section id="case-results">
           {isInitialLoading ? (
-            <div role="status" aria-label={t("cases.loading")} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div role="status" aria-label={t("cases.loading")} className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "flex flex-col gap-6"}>
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <CaseCardSkeleton key={i} />
+                <div key={i} className={viewMode === "list" ? "w-full" : ""}>
+                  <CaseCardSkeleton />
+                </div>
               ))}
             </div>
           ) : filteredCases.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "flex flex-col gap-6"}>
                 {/* NOTE: Dynamic case content (title, description, entity names) from Entity API
                     remains in English until API-side i18n is implemented. See GitHub issue for i18n. */}
                 {filteredCases.map((caseItem) => {
@@ -248,6 +268,7 @@ const Cases = () => {
                       entityIds={accusedEntities.map(e => e.id)}
                       locationIds={locationEntities.map(e => e.id)}
                       thumbnailUrl={caseItem.thumbnail_url ?? undefined}
+                      viewMode={viewMode}
                     />
                   );
                 })}

@@ -71,7 +71,7 @@ All colors MUST be HSL.
     --slate-800: 215 30% 20%;
   }
 
-  .dark {
+  /* .dark {
     --background: 235 16% 13%;
     --foreground: 215 28% 83%;
 
@@ -105,7 +105,7 @@ All colors MUST be HSL.
     
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
-  }
+  } */
 }
 
 @layer base {

@@ -24,6 +24,7 @@ interface CaseCardProps {
   entityIds?: number[]; // Jawaf entity IDs
   locationIds?: number[]; // Jawaf entity IDs
   thumbnailUrl?: string; //Thumbnail image
+  viewMode?: "grid" | "list";
 }
 
 function formatEntityCount(count: number, language: string) {
@@ -51,7 +52,7 @@ function getEntitySummary(entity: string, entityNames: string[] | undefined, lan
   return t("caseCard.entitySummary.withOthers", { count: remainingCount, name: firstName });
 }
 
-export const CaseCard = ({ id, slug, title, entity, entityNames, location, date, status, tags = [], description, allegations, entityIds, locationIds, thumbnailUrl }: CaseCardProps) => {
+export const CaseCard = ({ id, slug, title, entity, entityNames, location, date, status, tags = [], description, allegations, entityIds, locationIds, thumbnailUrl, viewMode = "grid" }: CaseCardProps) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const entitySummary = getEntitySummary(entity, entityNames, i18n.language, t);
@@ -88,11 +89,13 @@ export const CaseCard = ({ id, slug, title, entity, entityNames, location, date,
 
   return (
     <Card
-      className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-border/70 bg-card shadow-[0_10px_28px_-18px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-[0_24px_50px_-24px_rgba(15,23,42,0.35)] cursor-pointer"
+      className={`group relative flex overflow-hidden rounded-3xl border border-border/70 bg-card shadow-[0_10px_28px_-18px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-[0_24px_50px_-24px_rgba(15,23,42,0.35)] cursor-pointer ${
+        viewMode === "list" ? "flex-col sm:flex-row h-auto" : "flex-col h-full"
+      }`}
       onClick={handleCardClick}
     >
-      <article className="flex h-full flex-col">
-        <div className="relative h-52 overflow-hidden">
+      <article className={`flex h-full w-full ${viewMode === "list" ? "flex-col sm:flex-row" : "flex-col"}`}>
+        <div className={`relative overflow-hidden ${viewMode === "list" ? "h-48 sm:h-auto sm:w-1/3 shrink-0" : "h-52"}`}>
           {imageSrc ? (
             <>
               <img
@@ -117,7 +120,7 @@ export const CaseCard = ({ id, slug, title, entity, entityNames, location, date,
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col bg-card">
+        <div className="flex flex-1 flex-col bg-card min-w-0">
           <CardHeader className="space-y-2 px-4 pb-0 pt-4 sm:px-5 sm:pt-5">
             {tags && tags.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mb-1">

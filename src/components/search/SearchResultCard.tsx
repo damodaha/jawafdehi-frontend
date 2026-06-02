@@ -20,6 +20,7 @@ import type {
 export function SearchResultCard({ result }: { result: ArchiveSearchResult }) {
   return (
     <Link
+      draggable={false}
       className="group block rounded-xl border bg-card p-4 transition-colors hover:border-primary/35 hover:bg-muted/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       to={result.url}
     >
