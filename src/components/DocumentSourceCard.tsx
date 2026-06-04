@@ -94,7 +94,7 @@ export function DocumentSourceCard({
             </p>
           )}
 
-          {!source?.description && evidenceDescription && evidenceDescription.trim() !== '.' && evidenceDescription.trim() && (
+          {!(source?.description?.trim() && source.description.trim() !== '.') && evidenceDescription && evidenceDescription.trim() !== '.' && evidenceDescription.trim() && (
             <p className="mt-2 text-sm leading-6 text-muted-foreground break-words">
               {evidenceDescription}
             </p>
