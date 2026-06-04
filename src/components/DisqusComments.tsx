@@ -31,6 +31,7 @@ export function DisqusComments({ caseId, caseTitle, caseUrl }: DisqusCommentsPro
   const [isVisible, setIsVisible] = useState(false);
   const [shouldLoad, setShouldLoad] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout>>();
 
   // Lazy load: Start loading Disqus when section comes into view
   useEffect(() => {
@@ -46,11 +47,11 @@ export function DisqusComments({ caseId, caseTitle, caseUrl }: DisqusCommentsPro
         if (entry.isIntersecting) {
           setIsVisible(true);
           // Small delay to ensure smooth scroll experience
-          setTimeout(() => setShouldLoad(true), 100);
+          timerRef.current = setTimeout(() => setShouldLoad(true), 100);
           observer.disconnect();
         }
       },
-      { 
+      {
         rootMargin: "200px", // Start loading 200px before section is visible
         threshold: 0
       }
@@ -60,7 +61,10 @@ export function DisqusComments({ caseId, caseTitle, caseUrl }: DisqusCommentsPro
       observer.observe(sectionRef.current);
     }
 
-    return () => observer.disconnect();
+    return () => {
+      clearTimeout(timerRef.current);
+      observer.disconnect();
+    };
   }, []);
 
   // Map i18n language to Disqus language code (handles variants like "ne-NP")
