@@ -10,7 +10,6 @@ import {
 
 import { AppSearchCommand } from "@/components/AppSearchCommand";
 import { LanguageToggle } from "@/components/LanguageToggle";
-// import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -79,7 +78,7 @@ export function Navbar() {
     () => [
       { key: "home", label: t("nav.home"), to: "/", exact: true },
       { key: "process", label: t("nav.ourProcess"), to: "/our-process" },
-      { key: "cases", label: t("nav.cases"), to: "/cases" },
+      { key: "cases", label: t("nav.cases"), to: "/search" },
       { key: "volunteer", label: t("nav.volunteer"), to: "/volunteer" },
       { key: "commitment", label: t("nav.ourCommitment"), to: "/commitment" },
     ],
@@ -190,12 +189,7 @@ export function Navbar() {
           <img
             src="/assets/logo.png"
             alt="Jawafdehi"
-            className="h-8 w-auto object-contain dark:hidden"
-          />
-          <img
-            src="/assets/logo-dark.png"
-            alt="Jawafdehi"
-            className="hidden h-8 w-auto object-contain dark:block"
+            className="h-8 w-auto object-contain"
           />
         </Link>
 
@@ -301,7 +295,6 @@ export function Navbar() {
             >
               <Search className="h-4 w-4" />
             </Button>
-            {/* <ThemeToggle quiet={!isScrolled} /> */}
           </div>
 
           <Button
@@ -358,12 +351,7 @@ export function Navbar() {
                   <img
                     src="/assets/logo.png"
                     alt="Jawafdehi"
-                    className="h-8 w-auto object-contain dark:hidden"
-                  />
-                  <img
-                    src="/assets/logo-dark.png"
-                    alt="Jawafdehi"
-                    className="hidden h-8 w-auto object-contain dark:block"
+                    className="h-8 w-auto object-contain"
                   />
                 </SheetTitle>
               </SheetHeader>
@@ -394,9 +382,6 @@ export function Navbar() {
               </nav>
 
               <div className="mt-8 grid gap-3">
-                <div className="flex justify-end">
-                  {/* <ThemeToggle /> */}
-                </div>
                 <Button
                   asChild
                   variant="primary"
