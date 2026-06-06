@@ -1,4 +1,5 @@
-import { Github, Heart, Mail } from "lucide-react";
+import { Heart, Mail } from "lucide-react";
+import { FaDiscord } from "react-icons/fa";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -38,7 +39,7 @@ export function Cta({ className }: CtaProps) {
           </h2>
 
           <p className="mt-5 max-w-2xl text-sm leading-7 text-white/90 md:text-base">
-            Start by exploring the codebase on GitHub or send us an email to
+            Start by joining our Discord server or send us an email to
             introduce yourself and tell us which team interests you.
           </p>
 
@@ -50,12 +51,12 @@ export function Cta({ className }: CtaProps) {
               className="bg-white text-slate-950 shadow-lg shadow-black/10 hover:bg-white/90 dark:bg-white dark:text-slate-950 dark:hover:bg-white/90"
             >
               <a
-                href="https://github.com/Jawafdehi"
+                href="https://discord.gg/jawafdehi"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Github className="h-4 w-4" aria-hidden="true" />
-                GitHub
+                <FaDiscord className="mr-2 h-5 w-5 text-[#5865F2]" aria-hidden="true" />
+                Discord
               </a>
             </Button>
 
