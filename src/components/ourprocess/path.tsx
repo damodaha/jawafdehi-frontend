@@ -100,13 +100,13 @@ export function DottedProcessPath({
 
           <text
             x={node.x}
-            y={node.y}
+            y={node.y + nodeSize * 0.035}
             textAnchor="middle"
             dominantBaseline="central"
-            fill={stroke}
+            fill="hsl(var(--muted-foreground) / 0.38)"
             fontFamily="Helvetica, Arial, 'Noto Sans Devanagari', sans-serif"
-            fontSize="42"
-            fontWeight="800"
+            fontSize="164"
+            fontWeight="900"
           >
             {node.number}
           </text>

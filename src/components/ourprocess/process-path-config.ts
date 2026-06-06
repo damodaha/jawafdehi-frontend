@@ -28,3 +28,6 @@ export const PROCESS_PATH_NODES: ProcessNode[] = Array.from(
 );
 
 export const PROCESS_NODE_SIZE = PROCESS_ARC_RADIUS * 1.6;
+export const PROCESS_STEP_TEXT_WIDTH = 680;
+export const PROCESS_STEP_TEXT_RIGHT_COLUMN_X = PROCESS_PATH_VIEWBOX.width * 0.46;
+export const PROCESS_STEP_TEXT_LEFT_COLUMN_X = PROCESS_PATH_VIEWBOX.width * 0.14;
