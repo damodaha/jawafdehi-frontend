@@ -1,6 +1,7 @@
 import { Helmet } from "react-helmet-async";
 
 import { DataSources } from "@/components/data-sources";
+import { OurProcessHero } from "@/components/ourprocess/hero";
 import { ProcessPipeline } from "@/components/process";
 
 const OurProcess = () => (
@@ -22,22 +23,7 @@ const OurProcess = () => (
     </Helmet>
 
     <main id="main-content" className="flex-1">
-      {/* Hero */}
-      <section id="process-hero" className="bg-gradient-to-br from-primary via-navy-dark to-slate-800 py-16 md:py-24">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-widest text-primary-foreground/50 mb-4">
-              Our Process
-            </p>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-5 leading-tight">
-              How a corruption case goes from discovery to the public archive
-            </h1>
-            <p className="text-lg text-primary-foreground/70 leading-relaxed">
-              Every case on Jawafdehi passes through a structured pipeline — from raw government documents and media sources through research, AI-assisted drafting, human review, and permanent publication.
-            </p>
-          </div>
-        </div>
-      </section>
+      <OurProcessHero />
 
       <ProcessPipeline />
 
