@@ -16,7 +16,6 @@ interface CaseCardProps {
   entity: string;
   entityNames?: string[];
   location: string;
-  date: string;
   status: "ongoing" | "resolved" | "under-investigation";
   tags?: string[];
   description: string;
@@ -25,6 +24,7 @@ interface CaseCardProps {
   locationIds?: number[]; // Jawaf entity IDs
   thumbnailUrl?: string; //Thumbnail image
   viewMode?: "grid" | "list";
+  hideDescription?: boolean;
 }
 
 function formatEntityCount(count: number, language: string) {
@@ -52,7 +52,7 @@ function getEntitySummary(entity: string, entityNames: string[] | undefined, lan
   return t("caseCard.entitySummary.withOthers", { count: remainingCount, name: firstName });
 }
 
-export const CaseCard = ({ id, slug, title, entity, entityNames, location, date, status, tags = [], description, allegations, entityIds, locationIds, thumbnailUrl, viewMode = "grid" }: CaseCardProps) => {
+export const CaseCard = ({ id, slug, title, entity, entityNames, location, status, tags = [], description, allegations, entityIds, locationIds, thumbnailUrl, viewMode = "grid", hideDescription }: CaseCardProps) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const entitySummary = getEntitySummary(entity, entityNames, i18n.language, t);
@@ -161,15 +161,19 @@ export const CaseCard = ({ id, slug, title, entity, entityNames, location, date,
           </CardHeader>
 
           <CardContent className="flex flex-1 flex-col px-4 pb-0 pt-4 sm:px-5">
-            {allegations && allegations.length > 0 ? (
-              <p className="line-clamp-3 text-sm leading-7 text-muted-foreground">
-                {allegations[0]}
-              </p>
-            ) : (
-              <p className="line-clamp-3 text-sm leading-7 text-muted-foreground">{description}</p>
+            {!hideDescription && (
+              <>
+                {allegations && allegations.length > 0 ? (
+                  <p className="line-clamp-3 text-sm leading-7 text-muted-foreground">
+                    {allegations[0]}
+                  </p>
+                ) : (
+                  <p className="line-clamp-3 text-sm leading-7 text-muted-foreground">{description}</p>
+                )}
+              </>
             )}
 
-            <div className="mt-5 border-t border-border/70 pt-4">
+            <div className={hideDescription ? "mt-2 border-t border-border/70 pt-4" : "mt-5 border-t border-border/70 pt-4"}>
               <div className="space-y-2 text-sm leading-5 text-muted-foreground">
                 <div className="flex min-w-0 items-center">
                   <User className="mr-2 h-4 w-4 flex-shrink-0" aria-hidden="true" />
@@ -202,11 +206,6 @@ export const CaseCard = ({ id, slug, title, entity, entityNames, location, date,
                   ) : (
                     <span className="line-clamp-1">{location}</span>
                   )}
-                </div>
-
-                <div className="flex items-center">
-                  <Calendar className="mr-2 h-4 w-4 flex-shrink-0" aria-hidden="true" />
-                  <span>{date}</span>
                 </div>
               </div>
             </div>

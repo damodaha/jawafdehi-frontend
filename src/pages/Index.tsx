@@ -108,8 +108,6 @@ const Index = () => {
         return translateDynamicText(name, currentLang);
       }).join(', ') || translateDynamicText('Unknown Location', currentLang);
 
-      const formattedDate = formatDateWithBS(caseItem.created_at, 'PPP');
-
       return {
         id: caseItem.id.toString(),
         slug: caseItem.slug,
@@ -117,7 +115,6 @@ const Index = () => {
         entity: primaryEntity,
         entityNames,
         location: locationNames,
-        date: formattedDate,
         status: "ongoing" as const, // All published cases shown as ongoing
         description: caseItem.description.replace(/<[^>]*>/g, '').substring(0, 200),
         allegations: caseItem.key_allegations, // Pass key allegations to CaseCard
@@ -201,13 +198,13 @@ const Index = () => {
         {/* ── Recently Documented Cases ── */}
         <section id="recent-cases" className="py-12 md:py-16 bg-muted/20">
           <div className="container mx-auto px-4">
-            <div className="flex items-end justify-between mb-10">
+            <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-8">
               <div>
                 <h2 className="text-2xl font-bold text-foreground">Recently Documented Cases</h2>
                 <p className="text-muted-foreground mt-1">Latest cases added to the archive</p>
               </div>
               <Button variant="outline" asChild className="hidden sm:flex">
-                <Link to="/cases">
+                <Link to="/search">
                   View all cases <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -216,7 +213,7 @@ const Index = () => {
             {featuredCases.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 {featuredCases.map((caseItem) => (
-                  <CaseCard key={caseItem.id} {...caseItem} />
+                  <CaseCard key={caseItem.id} {...caseItem} hideDescription={true} />
                 ))}
               </div>
             ) : (
@@ -227,11 +224,27 @@ const Index = () => {
               </div>
             )}
 
-            <div className="text-center sm:hidden">
-              <Button variant="outline" asChild>
-                <Link to="/cases">View all cases →</Link>
+            <div className="text-center sm:hidden mt-8">
+              <Button variant="outline" asChild className="w-full">
+                <Link to="/search">View all cases <ArrowRight className="ml-2 h-4 w-4" /></Link>
               </Button>
             </div>
+          </div>
+        </section>
+
+        {/* Report a Case CTA */}
+        <section className="py-24 bg-primary/5 border-b border-border/40 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.08)_0%,transparent_70%)]" />
+          <div className="container relative z-10 mx-auto px-4 md:px-8 max-w-3xl text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">Know of an undocumented case?</h2>
+            <p className="text-lg text-muted-foreground mb-10 leading-relaxed max-w-2xl mx-auto">
+              Help us hold the powerful accountable. Submit information about missing corruption cases, officials, or entities to be added to the Jawafdehi archive.
+            </p>
+            <Button size="lg" asChild className="h-14 px-10 text-base shadow-lg shadow-primary/10 rounded-full hover:-translate-y-0.5 transition-transform">
+              <Link to="/report">
+                Report a Case
+              </Link>
+            </Button>
           </div>
         </section>
         <Cta />

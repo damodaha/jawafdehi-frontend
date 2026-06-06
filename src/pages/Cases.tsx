@@ -260,7 +260,6 @@ const Cases = () => {
                       entity={entityDisplayName}
                       entityNames={entityNames}
                       location={locationNames}
-                      date={formatDateWithBS(caseItem.created_at, 'PPP')}
                       status={mapCaseStatusToBadge(getCaseStatus(caseItem))}
                       tags={caseItem.tags || []}
                       description={caseItem.description.replace(/<[^>]*>/g, '').substring(0, 200)}

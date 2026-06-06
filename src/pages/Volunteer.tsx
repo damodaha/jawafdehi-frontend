@@ -149,7 +149,7 @@ const Volunteer = () => (
               A worldwide network of Nepali professionals
             </h2>
             <p className="text-base leading-8 text-foreground/75 md:text-[1.0625rem]">
-              Our volunteers are based across Nepal and around the world — in the US, UK, Australia, and beyond. When you join Jawafdehi, you become part of a global community of Nepali professionals united by a single goal: making sure Nepal remembers.
+              Our volunteers are based across Nepal and around the world — in the US, Thailand, India, and beyond. When you join Jawafdehi, you become part of a global community of Nepali professionals united by a single goal: making sure Nepal remembers.
             </p>
           </div>
         </div>
