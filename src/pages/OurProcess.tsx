@@ -2,7 +2,7 @@ import { Helmet } from "react-helmet-async";
 
 import { DataSources } from "@/components/data-sources";
 import { OurProcessHero } from "@/components/ourprocess/hero";
-import { ProcessPipeline } from "@/components/process";
+import { ProcessTimeline } from "@/components/ourprocess/timeline";
 
 const OurProcess = () => (
   <div className="min-h-screen flex flex-col bg-background">
@@ -25,11 +25,10 @@ const OurProcess = () => (
     <main id="main-content" className="flex-1">
       <OurProcessHero />
 
-      <ProcessPipeline />
+      <ProcessTimeline />
 
       <DataSources />
     </main>
-
   </div>
 );
 

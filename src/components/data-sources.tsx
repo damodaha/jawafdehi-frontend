@@ -62,28 +62,25 @@ export function DataSources() {
           {EXTERNAL_SOURCES.map(({ icon: Icon, imageSrc, label, desc }) => (
             <div
               key={label}
-              className="group grid min-h-[245px] grid-rows-[6rem_2.5rem_auto] items-start rounded-lg border border-border/55 bg-card p-8 text-center shadow-[0_16px_42px_rgba(15,23,42,0.055)] transition-[background-color,border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-1 hover:border-foreground/20 hover:bg-background hover:shadow-[0_22px_56px_rgba(15,23,42,0.08)] motion-reduce:transform-none motion-reduce:transition-none dark:border-white/10 dark:bg-secondary/45 dark:shadow-black/20 dark:hover:border-white/20 dark:hover:bg-secondary/60"
+              className="group flex flex-col items-center rounded-lg border border-border/55 bg-card px-6 py-8 text-center shadow-[0_16px_42px_rgba(15,23,42,0.055)] transition-[background-color,border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-1 hover:border-foreground/20 hover:bg-background hover:shadow-[0_22px_56px_rgba(15,23,42,0.08)] motion-reduce:transform-none motion-reduce:transition-none dark:border-white/10 dark:bg-secondary/45 dark:shadow-black/20 dark:hover:border-white/20 dark:hover:bg-secondary/60 sm:p-8"
             >
-              <div className="flex h-24 items-center justify-center">
+              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full border border-accent/15 bg-accent/10 text-primary shadow-[0_12px_28px_hsl(var(--primary)/0.08)] transition-transform duration-300 ease-out group-hover:-translate-y-0.5 group-hover:scale-110 motion-reduce:transition-none">
                 {imageSrc ? (
                   <img
                     src={imageSrc}
                     alt=""
                     aria-hidden="true"
-                    className="h-24 w-24 object-contain transition-transform duration-300 ease-out group-hover:-translate-y-0.5 group-hover:scale-105 motion-reduce:transition-none"
+                    className="h-8 w-8 object-contain mix-blend-multiply dark:mix-blend-normal"
                   />
                 ) : Icon ? (
-                  <Icon
-                    className="h-10 w-10 text-primary transition-transform duration-300 ease-out group-hover:-translate-y-0.5 group-hover:scale-110 motion-reduce:transition-none"
-                    aria-hidden="true"
-                  />
+                  <Icon className="h-7 w-7" aria-hidden="true" strokeWidth={1.8} />
                 ) : null}
               </div>
 
-              <div className="flex items-center justify-center text-xl font-semibold leading-tight text-foreground">
+              <h3 className="mb-2 text-xl font-extrabold leading-tight text-foreground">
                 {label}
-              </div>
-              <div className="text-sm leading-6 text-muted-foreground">{desc}</div>
+              </h3>
+              <p className="text-base leading-relaxed text-muted-foreground">{desc}</p>
             </div>
           ))}
         </div>
