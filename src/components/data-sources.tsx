@@ -1,7 +1,4 @@
-import {
-  Mic2,
-  Youtube,
-} from "lucide-react";
+import { Mic2, Youtube } from "lucide-react";
 import type { ElementType } from "react";
 import { BsCameraReelsFill } from "react-icons/bs";
 import { FaEye } from "react-icons/fa";
@@ -48,39 +45,48 @@ const EXTERNAL_SOURCES: ExternalSource[] = [
 
 export function DataSources() {
   return (
-    <section id="data-sources" className="bg-background py-12 md:py-16">
+    <section id="data-sources" className="bg-background py-14 md:py-20">
       <div className="container mx-auto px-4">
-        <div className="mb-10">
-          <h2 className="mb-2 text-2xl font-bold text-foreground">Where Our Data Comes From</h2>
-          <p className="max-w-2xl text-muted-foreground">
-            We draw from official government sources and independent civil society — always citing
-            the origin of every claim.
+        <div className="mx-auto mb-12 max-w-3xl text-center">
+          <h2 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+            Where Our Data Comes From
+          </h2>
+
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
+            We draw from official government sources, public records, media investigations,
+            and independent civil society and always trace every claim back to its origin.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:grid-cols-6">
           {EXTERNAL_SOURCES.map(({ icon: Icon, imageSrc, label, desc }) => (
             <div
               key={label}
-              className="group flex flex-col items-center rounded-lg border border-border/55 bg-card px-6 py-8 text-center shadow-[0_16px_42px_rgba(15,23,42,0.055)] transition-[background-color,border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-1 hover:border-foreground/20 hover:bg-background hover:shadow-[0_22px_56px_rgba(15,23,42,0.08)] motion-reduce:transform-none motion-reduce:transition-none dark:border-white/10 dark:bg-secondary/45 dark:shadow-black/20 dark:hover:border-white/20 dark:hover:bg-secondary/60 sm:p-8"
+              className="group flex flex-col items-center text-center"
             >
-              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full border border-accent/15 bg-accent/10 text-primary shadow-[0_12px_28px_hsl(var(--primary)/0.08)] transition-transform duration-300 ease-out group-hover:-translate-y-0.5 group-hover:scale-110 motion-reduce:transition-none">
+              <div className="mb-4 flex h-16 items-center justify-center">
                 {imageSrc ? (
                   <img
                     src={imageSrc}
                     alt=""
                     aria-hidden="true"
-                    className="h-8 w-8 object-contain mix-blend-multiply dark:mix-blend-normal"
+                    className="h-14 w-auto object-contain opacity-85 transition duration-300 group-hover:-translate-y-1 group-hover:opacity-100"
                   />
                 ) : Icon ? (
-                  <Icon className="h-7 w-7" aria-hidden="true" strokeWidth={1.8} />
+                  <Icon
+                    className="h-11 w-11 text-primary opacity-85 transition duration-300 group-hover:-translate-y-1 group-hover:opacity-100"
+                    aria-hidden="true"
+                  />
                 ) : null}
               </div>
 
-              <h3 className="mb-2 text-xl font-extrabold leading-tight text-foreground">
+              <h3 className="text-base font-bold leading-tight text-foreground">
                 {label}
               </h3>
-              <p className="text-base leading-relaxed text-muted-foreground">{desc}</p>
+
+              <p className="mt-2 max-w-[180px] text-sm leading-5 text-muted-foreground">
+                {desc}
+              </p>
             </div>
           ))}
         </div>
