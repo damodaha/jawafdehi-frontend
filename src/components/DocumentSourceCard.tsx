@@ -1,9 +1,14 @@
 import { ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
-import type { DocumentSource, DocumentSourceType } from "@/types/jds";
+import type { DocumentSource, DocumentSourceType, SourceUrlEntry, SourceLinkRole } from "@/types/jds";
 import { DocumentSourceTypeKeys } from "@/types/jds";
 import { getSourceTypeBadgeClass } from "@/utils/source-type-badge";
+
+interface NormalizedUrl {
+  href: string;
+  role: SourceLinkRole | null;
+}
 
 interface DocumentSourceCardProps {
   source: DocumentSource | null;
@@ -12,15 +17,31 @@ interface DocumentSourceCardProps {
   evidenceDescription?: string;
 }
 
-const normalizeUrls = (url: string[] | string | null | undefined): string[] => {
+const ROLE_LABELS: Record<SourceLinkRole, string> = {
+  RAW: 'RAW',
+  MARKDOWN: 'Markdown',
+  PERMALINK: 'Permalink',
+};
+
+const normalizeUrls = (url: SourceUrlEntry[] | string | null | undefined): NormalizedUrl[] => {
   if (!url) return [];
-  
-  // URL scheme validation - only allow http/https
+
   const isAllowedScheme = (u: string) => /^https?:\/\//i.test(u.trim());
-  
-  if (Array.isArray(url)) return url.filter(u => u && isAllowedScheme(u));
-  if (typeof url === 'string' && isAllowedScheme(url)) return [url];
-  return [];
+
+  const arr = Array.isArray(url) ? url : [url];
+  return arr
+    .map((entry): NormalizedUrl | null => {
+      if (!entry) return null;
+      if (typeof entry === 'string') {
+        if (!isAllowedScheme(entry)) return null;
+        return { href: entry, role: null };
+      }
+      // dict format {link, role}
+      const href = entry.link?.trim();
+      if (!href || !isAllowedScheme(href)) return null;
+      return { href, role: entry.role ?? null };
+    })
+    .filter((u): u is NormalizedUrl => u !== null);
 };
 
 export function DocumentSourceCard({ 
@@ -64,24 +85,30 @@ export function DocumentSourceCard({
 
             {hasUrls && (
               <div className="flex flex-shrink-0 flex-wrap items-center gap-x-4 gap-y-1 md:justify-end">
-                {urls.map((url, index) => {
-                  const linkText = urls.length > 1 
+                {urls.map((item, index) => {
+                  const linkText = urls.length > 1
                     ? t("documentSource.viewSourceN", { n: index + 1 })
                     : t("documentSource.viewSource");
                   const ariaLabel = `${linkText} ${t("documentSource.opensInNewTab")}`;
-                  
+
                   return (
-                    <a
-                      key={`${index}-${url}`}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={ariaLabel}
-                      className="inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
-                    >
-                      <ExternalLink className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
-                      {linkText}
-                    </a>
+                    <div key={`${index}-${item.href}`} className="inline-flex items-center gap-1.5">
+                      {item.role && (
+                        <Badge variant="secondary" className="rounded px-1.5 py-0 text-[10px] font-medium">
+                          {ROLE_LABELS[item.role] ?? item.role}
+                        </Badge>
+                      )}
+                      <a
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={ariaLabel}
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
+                        {linkText}
+                      </a>
+                    </div>
                   );
                 })}
               </div>
