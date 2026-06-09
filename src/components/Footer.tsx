@@ -21,7 +21,7 @@ type FooterSocialLink = {
 };
 
 type FooterBadge = {
-  label: string;
+  labelKey: string;
   icon?: ComponentType<{ className?: string }>;
   marker?: string;
   iconClassName: string;
@@ -32,17 +32,17 @@ const linkClass =
 
 const footerBadges: FooterBadge[] = [
   {
-    label: "Built by Nepali",
+    labelKey: "footer.builtByNepali",
     marker: "🇳🇵",
     iconClassName: "",
   },
   {
-    label: "Public domain",
+    labelKey: "footer.publicDomain",
     icon: Unlock,
     iconClassName: "text-emerald-500 dark:text-emerald-300",
   },
   {
-    label: "Open source",
+    labelKey: "footer.openSource",
     icon: OpenSourceFilledIcon,
     iconClassName: "text-emerald-500 dark:text-emerald-300",
   },
@@ -112,8 +112,8 @@ export const Footer = () => {
   const year = new Date().getFullYear();
 
   const platformLinks: FooterLink[] = [
-    { label: "Search cases", to: "/search?type=case" },
-    { label: "Search entities", to: "/search?type=entity" },
+    { label: t("footer.searchCases"), to: "/search?type=case" },
+    { label: t("footer.searchEntities"), to: "/search?type=entity" },
     { label: t("nav.cases"), to: "/cases" },
     { label: t("nav.ourProcess"), to: "/our-process" },
     { label: t("nav.ourCommitment"), to: "/commitment" },
@@ -125,14 +125,14 @@ export const Footer = () => {
     { label: t("nav.team"), to: "/team" },
     { label: t("nav.products"), to: "/products" },
     { label: t("nav.updates"), to: "/updates" },
-    { label: "Feedback", to: "/feedback" },
+    { label: t("footer.feedback"), to: "/feedback" },
   ];
 
   const resourceLinks: FooterLink[] = [
     { label: t("footer.contributorPortal"), to: "https://portal.jawafdehi.org", external: true },
     { label: t("footer.githubRepo"), to: "https://github.com/Jawafdehi/Jawafdehi", external: true },
     { label: t("footer.siteStatus"), to: "https://status.jawafdehi.org/status/public", external: true },
-    { label: "Let's Build Nepal", to: "https://LetsBuildNepal.com", external: true },
+    { label: t("footer.letsBuildNepal"), to: "https://LetsBuildNepal.com", external: true },
   ];
 
   const socialLinks: FooterSocialLink[] = [
@@ -179,17 +179,17 @@ export const Footer = () => {
 
             <div className="max-w-sm space-y-3">
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--footer-title)]">
-                Accountability has no expiry
+                {t("footer.accountabilityNoExpiry")}
               </p>
               <p className="text-sm leading-6 text-[var(--footer-muted)]">
-                Nepal's permanent public archive of CIAA corruption cases, free forever, built by Nepali volunteers.
+                {t("footer.permanentArchive")}
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-medium text-[var(--footer-muted)]">
-              {footerBadges.map(({ label, icon: Icon, marker, iconClassName }, index) => (
+              {footerBadges.map(({ labelKey, icon: Icon, marker, iconClassName }, index) => (
                 <span
-                  key={label}
+                  key={labelKey}
                   className="inline-flex items-center gap-1.5"
                 >
                   {index > 0 && (
@@ -202,7 +202,7 @@ export const Footer = () => {
                   ) : Icon ? (
                     <Icon className={cn("h-3.5 w-3.5", iconClassName)} />
                   ) : null}
-                  {label}
+                  {t(labelKey)}
                 </span>
               ))}
             </div>
@@ -210,7 +210,7 @@ export const Footer = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:gap-x-8">
-            <FooterLinkGroup title="Platform" links={platformLinks} />
+            <FooterLinkGroup title={t("footer.platform")} links={platformLinks} />
             <FooterLinkGroup title={t("nav.about")} links={aboutLinks} />
             <FooterLinkGroup title={t("footer.resources")} links={resourceLinks} />
           </div>
@@ -243,14 +243,14 @@ export const Footer = () => {
 
         <div className="mt-6 flex flex-col gap-2 text-xs text-[var(--footer-muted)] sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {year} Jawafdehi. All data is in the public domain.
+            {t("footer.allDataPublicDomain")}
           </p>
           <div className="flex gap-4">
             <Link to="/privacy" className="transition-colors hover:text-[var(--footer-fg)]">
-              Privacy
+              {t("footer.privacy")}
             </Link>
             <Link to="/terms" className="transition-colors hover:text-[var(--footer-fg)]">
-              Terms
+              {t("footer.terms")}
             </Link>
           </div>
         </div>

@@ -82,35 +82,53 @@ export function Faq({ className }: FaqProps) {
           </p>
         </div>
 
-        <div className="flex flex-col gap-2.5" role="list">
+        <ul className="flex flex-col gap-2.5">
           {faqItems.map((item) => {
             const questionId = `faq-${item.id}-question`;
             const answerId = `faq-${item.id}-answer`;
 
             return (
-              <article
+              <li
                 key={item.id}
                 className={faqCardClassName}
-                role="listitem"
-                tabIndex={0}
-                aria-labelledby={questionId}
-                aria-describedby={answerId}
               >
-                <div className="flex min-h-12 items-center justify-between gap-4 px-4 py-3.5">
-                  <h3
-                    id={questionId}
-                    className="text-left text-sm font-semibold leading-6 text-foreground transition-colors duration-200 group-hover:text-primary group-focus-visible:text-primary group-focus-within:text-primary md:text-base"
-                  >
-                    {t(item.questionKey)}
-                  </h3>
-                  <span
-                    className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border/70 bg-background/70 text-foreground/50 shadow-sm shadow-foreground/5 transition-[background-color,border-color,color] duration-200 group-hover:border-accent/20 group-hover:bg-accent/10 group-hover:text-accent group-focus-visible:border-accent/20 group-focus-visible:bg-accent/10 group-focus-visible:text-accent group-focus-within:border-accent/20 group-focus-within:bg-accent/10 group-focus-within:text-accent motion-reduce:transition-none"
-                    aria-hidden="true"
-                  >
-                    <Plus className="absolute h-3.5 w-3.5 transition-all duration-300 ease-out group-hover:rotate-90 group-hover:scale-[0.82] group-hover:opacity-0 group-focus-visible:rotate-90 group-focus-visible:scale-[0.82] group-focus-visible:opacity-0 group-focus-within:rotate-90 group-focus-within:scale-[0.82] group-focus-within:opacity-0 motion-reduce:transition-none" />
-                    <Minus className="absolute h-3.5 w-3.5 -rotate-90 scale-[0.82] opacity-0 transition-all duration-300 ease-out group-hover:rotate-0 group-hover:scale-100 group-hover:opacity-100 group-focus-visible:rotate-0 group-focus-visible:scale-100 group-focus-visible:opacity-100 group-focus-within:rotate-0 group-focus-within:scale-100 group-focus-within:opacity-100 motion-reduce:transition-none" />
-                  </span>
-                </div>
+                <button
+                  type="button"
+                  className="w-full text-left"
+                  aria-expanded={false}
+                  aria-controls={answerId}
+                  onClick={(e) => {
+                    const btn = e.currentTarget;
+                    const isExpanded = btn.getAttribute("aria-expanded") === "true";
+                    btn.setAttribute("aria-expanded", String(!isExpanded));
+                    const answer = document.getElementById(answerId);
+                    if (answer) {
+                      if (isExpanded) {
+                        answer.classList.add("max-h-0", "-translate-y-1", "overflow-hidden", "opacity-0");
+                        answer.classList.remove("max-h-96", "translate-y-0", "opacity-100");
+                      } else {
+                        answer.classList.remove("max-h-0", "-translate-y-1", "overflow-hidden", "opacity-0");
+                        answer.classList.add("max-h-96", "translate-y-0", "opacity-100");
+                      }
+                    }
+                  }}
+                >
+                  <div className="flex min-h-12 items-center justify-between gap-4 px-4 py-3.5">
+                    <h3
+                      id={questionId}
+                      className="text-left text-sm font-semibold leading-6 text-foreground transition-colors duration-200 group-hover:text-primary group-focus-visible:text-primary group-focus-within:text-primary md:text-base"
+                    >
+                      {t(item.questionKey)}
+                    </h3>
+                    <span
+                      className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border/70 bg-background/70 text-foreground/50 shadow-sm shadow-foreground/5 transition-[background-color,border-color,color] duration-200 group-hover:border-accent/20 group-hover:bg-accent/10 group-hover:text-accent group-focus-visible:border-accent/20 group-focus-visible:bg-accent/10 group-focus-within:border-accent/20 group-focus-within:bg-accent/10 group-focus-within:text-accent motion-reduce:transition-none"
+                      aria-hidden="true"
+                    >
+                      <Plus className="absolute h-3.5 w-3.5 transition-all duration-300 ease-out group-hover:rotate-90 group-hover:scale-[0.82] group-hover:opacity-0 group-focus-visible:rotate-90 group-focus-visible:scale-[0.82] group-focus-visible:opacity-0 group-focus-within:rotate-90 group-focus-within:scale-[0.82] group-focus-within:opacity-0 motion-reduce:transition-none" />
+                      <Minus className="absolute h-3.5 w-3.5 -rotate-90 scale-[0.82] opacity-0 transition-all duration-300 ease-out group-hover:rotate-0 group-hover:scale-100 group-hover:opacity-100 group-focus-visible:rotate-0 group-focus-visible:scale-100 group-focus-visible:opacity-100 group-focus-within:rotate-0 group-focus-within:scale-100 group-focus-within:opacity-100 motion-reduce:transition-none" />
+                    </span>
+                  </div>
+                </button>
 
                 <div id={answerId} className={faqAnswerClassName}>
                   <div className="space-y-3 px-4 pb-4 pr-12 text-sm leading-6 text-muted-foreground md:text-base">
@@ -119,10 +137,10 @@ export function Faq({ className }: FaqProps) {
                     ))}
                   </div>
                 </div>
-              </article>
+              </li>
             );
           })}
-        </div>
+        </ul>
       </div>
     </section>
   );

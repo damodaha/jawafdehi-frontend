@@ -72,14 +72,14 @@ const OurTeam = () => {
             <div className="mx-auto max-w-5xl">
               
               <h1 className="text-[2.65rem] font-extrabold leading-[0.98] tracking-normal text-primary sm:text-5xl md:text-[3.35rem]">
-                Built by{" "}
+                {t("team.hero.builtBy")}{" "}
                 <span className="text-accent sm:whitespace-nowrap">
-                  Nepali volunteers
+                  {t("team.hero.nepaliVolunteers")}
                 </span>
-                <span className="block text-primary">for Nepal</span>
+                <span className="block text-primary">{t("team.hero.forNepal")}</span>
               </h1>
               <p className="mx-auto mt-6 max-w-3xl text-base leading-8 text-muted-foreground md:text-lg">
-                Jawafdehi runs entirely on volunteer effort from Nepali citizens across technology, research, journalism, and public policy. No corporate interests. No government funding. Just people who believe accountability matters.
+                {t("team.hero.description")}
               </p>
             </div>
           </div>
