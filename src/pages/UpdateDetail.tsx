@@ -137,8 +137,7 @@ const UpdateDetail = () => {
                             </div>
 
                             <div className="markdown-content">
-                                <Markdown
-                                    components={markdownComponents}
+                                <Markdown components={markdownComponents}>
                                     {update.content}
                                 </Markdown>
                             </div>

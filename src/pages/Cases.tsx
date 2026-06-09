@@ -322,7 +322,7 @@ function CaseResults({
   );
 }
 
-function getEntityNames(caseItem: Case, resolvedEntities: Record<string, any>, currentLang: string): string[] {
+function getEntityNames(caseItem: Case, resolvedEntities: Record<string, unknown>, currentLang: string): string[] {
   const accusedEntities = caseItem.entities?.filter(e => e.type === 'accused') || [];
   return accusedEntities.map(e => {
     if (e.nes_id && resolvedEntities[e.nes_id]) {
@@ -333,11 +333,11 @@ function getEntityNames(caseItem: Case, resolvedEntities: Record<string, any>, c
   });
 }
 
-function getEntityDisplayName(caseItem: Case, resolvedEntities: Record<string, any>, currentLang: string): string {
+function getEntityDisplayName(caseItem: Case, resolvedEntities: Record<string, unknown>, currentLang: string): string {
   return getEntityNames(caseItem, resolvedEntities, currentLang).join(', ') || translateDynamicText('Unknown Entity', currentLang);
 }
 
-function getLocationNames(caseItem: Case, resolvedEntities: Record<string, any>, currentLang: string): string {
+function getLocationNames(caseItem: Case, resolvedEntities: Record<string, unknown>, currentLang: string): string {
   const locationEntities = caseItem.entities?.filter(e => e.type === 'location') || [];
   return locationEntities.map(e => {
     if (e.nes_id && resolvedEntities[e.nes_id]) {
