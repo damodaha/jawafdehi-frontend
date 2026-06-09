@@ -10,8 +10,18 @@ import { useTranslation } from "react-i18next";
 import { stripMarkdown } from "@/utils/markdown";
 import { cn } from "@/lib/utils";
 
+const extractText = (node: ReactNode): string => {
+    if (!node && node !== 0) return "";
+    if (typeof node === "string" || typeof node === "number") return String(node);
+    if (Array.isArray(node)) return node.map(extractText).join("");
+    if (typeof node === "object" && "props" in node && (node as { props?: { children?: ReactNode } }).props?.children) {
+        return extractText((node as { props: { children: ReactNode } }).props.children);
+    }
+    return "";
+};
+
 const headingId = (children: ReactNode) =>
-    String(children)
+    extractText(children)
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "");

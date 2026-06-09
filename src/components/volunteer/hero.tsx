@@ -1,7 +1,9 @@
 import { Github, Mail } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 
 export function VolunteerHero() {
+  const { t } = useTranslation();
   return (
     <section id="volunteer-hero" className="relative isolate -mt-[76px] overflow-hidden bg-background pt-[76px]">
       <div
@@ -20,28 +22,26 @@ export function VolunteerHero() {
       <div className="container relative z-10 mx-auto flex min-h-[52svh] w-full items-center justify-center py-14 text-center md:py-[4.5rem] lg:py-20">
         <div className="mx-auto max-w-5xl">
           <h1 className="text-[2.65rem] font-extrabold leading-[0.98] tracking-normal text-primary sm:text-5xl md:text-[3.35rem]">
-            Help build Nepal's{" "}
+            {t("volunteer.hero.helpBuild")}{" "}
             <span className="text-accent sm:whitespace-nowrap">
-              permanent accountability
+              {t("volunteer.hero.permanentAccountability")}
             </span>
-            <span className="block text-primary">record</span>
+            <span className="block text-primary">{t("volunteer.hero.record")}</span>
           </h1>
           <p className="mx-auto mt-6 max-w-3xl text-base leading-8 text-muted-foreground md:text-lg">
-            Jawafdehi runs entirely on volunteer effort. Whether you are a technology enthusiast,
-            a working professional, a legal expert, or a student, if you believe corruption should
-            not be forgotten, there is a place for you here.
+            {t("volunteer.hero.description")}
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button asChild size="lg" className="font-semibold">
               <a href="https://github.com/Jawafdehi" target="_blank" rel="noopener noreferrer">
                 <Github className="h-5 w-5" aria-hidden="true" />
-                Find us on GitHub
+                {t("volunteer.hero.github")}
               </a>
             </Button>
             <Button asChild variant="secondary" size="lg" className="font-semibold">
               <a href="mailto:cases@jawafdehi.org">
                 <Mail className="h-5 w-5" aria-hidden="true" />
-                Email us
+                {t("volunteer.hero.email")}
               </a>
             </Button>
           </div>

@@ -263,9 +263,7 @@ function readParams(searchParams: URLSearchParams): ArchiveSearchParams {
   const page = Number.parseInt(searchParams.get("page") || "1", 10);
   return {
     q: searchParams.get("q") || undefined,
-    type: searchParams
-      .getAll("type")
-      .filter((type) => ["case", "entity", "document"].includes(type)),
+    type: (["case", "entity", "document"].includes(searchParams.get("type") || "") ? searchParams.get("type") as ArchiveSearchType : undefined),
     entity_type: searchParams.getAll("entity_type"),
     role: searchParams.getAll("role"),
     case_type: searchParams.getAll("case_type"),

@@ -1,4 +1,7 @@
+import { useTranslation } from "react-i18next";
+
 export function CommitmentHero() {
+  const { t } = useTranslation();
   return (
     <section id="commitment-hero" className="relative isolate -mt-[76px] overflow-hidden bg-background pt-[76px]">
       <div
@@ -17,16 +20,14 @@ export function CommitmentHero() {
       <div className="container relative z-10 mx-auto flex min-h-[52svh] w-full items-center justify-center py-14 text-center md:py-[4.5rem] lg:py-20">
         <div className="mx-auto max-w-5xl">
           <h1 className="text-[2.65rem] font-extrabold leading-[0.98] tracking-normal text-primary sm:text-5xl md:text-[3.35rem]">
-            Nepal deserves a{" "}
+            {t("commitment.hero.nepalDeserves")}{" "}
             <span className="text-accent sm:whitespace-nowrap">
-              permanent memory
+              {t("commitment.hero.permanentMemory")}
             </span>
-            <span className="block text-primary">of accountability</span>
+            <span className="block text-primary">{t("commitment.hero.ofAccountability")}</span>
           </h1>
           <p className="mx-auto mt-6 max-w-4xl text-base leading-8 text-muted-foreground md:text-lg">
-            Corruption cases disappear from public consciousness. Officials retire, change
-            portfolios, or simply wait for people to forget. We are building the infrastructure
-            to make sure that never happens again.
+            {t("commitment.hero.description")}
           </p>
         </div>
       </div>

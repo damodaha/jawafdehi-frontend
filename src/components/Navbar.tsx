@@ -98,8 +98,11 @@ export function Navbar() {
   const activeKey = useMemo(() => {
     const path = location.pathname;
 
-    if (["/about", "/team", "/products", "/updates"].includes(path)) {
+    if (["/about", "/team", "/products", "/updates"].includes(path) || path.startsWith("/updates/")) {
       return "about";
+    }
+    if (path === "/cases" || path === "/search" || path.startsWith("/case/")) {
+      return "cases";
     }
 
     return navItems.find((item) => path === item.to || path.startsWith(`${item.to}/`))?.key ?? null;
@@ -178,7 +181,7 @@ export function Navbar() {
       <div className="container mx-auto grid h-[76px] grid-cols-[1fr_auto] items-center gap-3 px-4 lg:grid-cols-[minmax(150px,1fr)_auto_minmax(310px,1fr)]">
         <Link
           to="/"
-          aria-label="Jawafdehi home"
+          aria-label={t("nav.homeAria")}
           className={cn(
             "flex h-11 min-w-0 items-center justify-self-start rounded-full border px-3 transition-all duration-200 ease-out hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             isScrolled

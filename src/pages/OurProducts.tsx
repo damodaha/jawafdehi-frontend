@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { useTranslation } from "react-i18next";
 import { Bot, Database, Code2, LayoutDashboard, Github, ExternalLink, SquareDashedBottomCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -53,7 +54,9 @@ const PRODUCTS = [
   },
 ];
 
-const OurProducts = () => (
+const OurProducts = () => {
+  const { t } = useTranslation();
+  return (
   <div className="min-h-screen flex flex-col bg-background">
     <Helmet>
       <title>Our Products — Jawafdehi</title>
@@ -90,22 +93,22 @@ const OurProducts = () => (
         <div className="container relative z-10 mx-auto flex min-h-[52svh] w-full items-center justify-center py-14 text-center md:py-[4.5rem] lg:py-20">
           <div className="mx-auto max-w-5xl">
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-              Our Products
+              {t("products.hero.eyebrow")}
             </p>
             <h1 className="text-[2.65rem] font-extrabold leading-[0.98] tracking-normal text-primary sm:text-5xl md:text-[3.35rem]">
-              Open source,{" "}
+              {t("products.hero.openSource")}{" "}
               <span className="text-accent sm:whitespace-nowrap">
-                free to use
+                {t("products.hero.freeToUse")}
               </span>
-              <span className="block text-primary">built for civic good</span>
+              <span className="block text-primary">{t("products.hero.builtForCivicGood")}</span>
             </h1>
             <p className="mx-auto mt-6 max-w-3xl text-base leading-8 text-muted-foreground md:text-lg">
-              Every component we build is open source and free to use. The full stack is public on GitHub — built by Nepali volunteers and made available to anyone who wants to build on top of it.
+              {t("products.hero.description")}
             </p>
             <Button asChild className="mt-8 font-semibold">
               <a href="https://github.com/Jawafdehi" target="_blank" rel="noopener noreferrer">
                 <Github className="h-4 w-4" aria-hidden="true" />
-                GitHub
+                {t("products.hero.github")}
               </a>
             </Button>
           </div>
@@ -154,5 +157,7 @@ const OurProducts = () => (
 
   </div>
 );
+
+};
 
 export default OurProducts;
