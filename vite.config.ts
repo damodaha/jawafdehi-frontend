@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import fs from "fs";
+import fs from "node:fs";
 import { componentTagger } from "lovable-tagger";
 import { VitePluginRadar } from "vite-plugin-radar";
 import { JAWAFDEHI_GA_MEASUREMENT_ID } from "./src/config/analytics-config";

@@ -20,8 +20,7 @@ export async function searchArchive(
     }
   });
   const suffix = query.toString();
-  const response = await axios.get<ArchiveSearchResponse>(
-    `${JDS_API_BASE_URL}/search/${suffix ? `?${suffix}` : ""}`,
-  );
+  const url = suffix ? `${JDS_API_BASE_URL}/search/?${suffix}` : `${JDS_API_BASE_URL}/search/`;
+  const response = await axios.get<ArchiveSearchResponse>(url);
   return response.data;
 }

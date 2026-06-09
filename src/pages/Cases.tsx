@@ -12,7 +12,7 @@ import { Search, AlertCircle, Filter, LayoutGrid, List } from "lucide-react";
 import { getCases } from "@/services/jds-api";
 import { getEntityById } from "@/services/api";
 import { useQuery, useQueries } from "@tanstack/react-query";
-import { formatDateWithBS } from "@/utils/date";
+
 import { translateDynamicText } from "@/lib/translate-dynamic-content";
 import type { Case } from "@/types/jds";
 
@@ -213,13 +213,13 @@ const Cases = () => {
 
           <section id="case-results">
           {isInitialLoading ? (
-            <div role="status" aria-label={t("cases.loading")} className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "flex flex-col gap-6"}>
+            <output aria-label={t("cases.loading")} className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "flex flex-col gap-6"}>
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className={viewMode === "list" ? "w-full" : ""}>
                   <CaseCardSkeleton />
                 </div>
               ))}
-            </div>
+            </output>
           ) : filteredCases.length > 0 ? (
             <>
               <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "flex flex-col gap-6"}>

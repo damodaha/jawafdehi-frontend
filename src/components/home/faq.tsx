@@ -60,7 +60,7 @@ const faqCardClassName =
 const faqAnswerClassName =
   "max-h-0 -translate-y-1 overflow-hidden opacity-0 transition-[max-height,opacity,transform] duration-300 ease-out group-hover:max-h-96 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:max-h-96 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 group-focus-within:max-h-96 group-focus-within:translate-y-0 group-focus-within:opacity-100 motion-reduce:transform-none motion-reduce:transition-none";
 
-export function Faq({ className }: FaqProps) {
+export function Faq({ className }: Readonly<FaqProps>) {
   const { t } = useTranslation();
 
   return (

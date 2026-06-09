@@ -50,7 +50,7 @@ type SearchItem = {
 };
 
 const MIN_DYNAMIC_SEARCH_TERM_LENGTH = 2;
-const DEFAULT_VISIBLE_GROUPS: SearchIndexGroup[] = ["pages", "updates"];
+const DEFAULT_VISIBLE_GROUPS = new Set<SearchIndexGroup>(["pages", "updates"]);
 const MAX_VISIBLE_RESULTS = 24;
 
 let cachedSearchIndexEntries: SearchIndexEntry[] | null = null;
@@ -228,7 +228,7 @@ type AppSearchCommandProps = {
   onOpenChange: (open: boolean) => void;
 };
 
-export function AppSearchCommand({ open, onOpenChange }: AppSearchCommandProps) {
+export function AppSearchCommand({ open, onOpenChange }: Readonly<AppSearchCommandProps>) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const fallbackEntries = useMemo(() => buildFallbackSearchIndexEntries(), []);
@@ -284,7 +284,7 @@ export function AppSearchCommand({ open, onOpenChange }: AppSearchCommandProps) 
     () => {
       const searchableItems = isDynamicSearchEnabled
         ? searchItems
-        : searchItems.filter((item) => DEFAULT_VISIBLE_GROUPS.includes(item.group));
+        : searchItems.filter((item) => DEFAULT_VISIBLE_GROUPS.has(item.group));
       const scoringTerms = searchTerms.length > 0 ? searchTerms : [];
 
       return searchableItems

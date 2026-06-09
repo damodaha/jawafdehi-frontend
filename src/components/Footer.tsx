@@ -48,7 +48,7 @@ const footerBadges: FooterBadge[] = [
   },
 ];
 
-function OpenSourceFilledIcon({ className }: { className?: string }) {
+function OpenSourceFilledIcon({ className }: Readonly<{ className?: string }>) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -65,7 +65,7 @@ function OpenSourceFilledIcon({ className }: { className?: string }) {
   );
 }
 
-function FooterNavLink({ label, to, external }: FooterLink) {
+function FooterNavLink({ label, to, external }: Readonly<FooterLink>) {
   const content = (
     <>
       <span>{label}</span>
@@ -90,7 +90,7 @@ function FooterNavLink({ label, to, external }: FooterLink) {
   );
 }
 
-function FooterLinkGroup({ title, links }: { title: string; links: FooterLink[] }) {
+function FooterLinkGroup({ title, links }: Readonly<{ title: string; links: FooterLink[] }>) {
   return (
     <nav aria-label={title}>
       <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--footer-title)]">
@@ -109,7 +109,6 @@ function FooterLinkGroup({ title, links }: { title: string; links: FooterLink[] 
 
 export const Footer = () => {
   const { t } = useTranslation();
-  const year = new Date().getFullYear();
 
   const platformLinks: FooterLink[] = [
     { label: t("footer.searchCases"), to: "/search?type=case" },
@@ -195,13 +194,11 @@ export const Footer = () => {
                   {index > 0 && (
                     <span aria-hidden="true" className="mr-1 h-1 w-1 rounded-full bg-[var(--footer-dot)]" />
                   )}
-                  {marker ? (
-                    <span aria-hidden="true" className="text-sm leading-none">
-                      {marker}
-                    </span>
-                  ) : Icon ? (
-                    <Icon className={cn("h-3.5 w-3.5", iconClassName)} />
-                  ) : null}
+                  {marker
+                    ? (<span aria-hidden="true" className="text-sm leading-none">{marker}</span>)
+                    : Icon
+                      ? (<Icon className={cn("h-3.5 w-3.5", iconClassName)} />)
+                      : null}
                   {t(labelKey)}
                 </span>
               ))}

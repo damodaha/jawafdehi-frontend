@@ -50,7 +50,7 @@ export function Features() {
   const activeFeature = features.find((feature) => feature.id === activeFeatureId);
 
   return (
-    <div onMouseLeave={() => setActiveFeatureId(null)}>
+    <div onMouseLeave={() => setActiveFeatureId(null)} role="presentation">
       <section id="features" className="py-12 md:py-20 bg-background border-b border-border">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-10">
@@ -71,7 +71,7 @@ export function Features() {
   );
 }
 
-function FeatureDetail({ feature }: { feature: Feature }) {
+function FeatureDetail({ feature }: Readonly<{ feature: Feature }>) {
   const Icon = feature.icon;
 
   return (
@@ -112,11 +112,11 @@ function FeatureCard({
   feature,
   isActive,
   onActivate,
-}: {
+}: Readonly<{
   feature: Feature;
   isActive: boolean;
   onActivate: () => void;
-}) {
+}>) {
   const Icon = feature.icon;
 
   return (

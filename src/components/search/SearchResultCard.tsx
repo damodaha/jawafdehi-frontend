@@ -17,7 +17,7 @@ import type {
   EntitySearchResult,
 } from "@/types/search";
 
-export function SearchResultCard({ result }: { result: ArchiveSearchResult }) {
+export function SearchResultCard({ result }: Readonly<{ result: ArchiveSearchResult }>) {
   return (
     <Link
       draggable={false}
@@ -58,7 +58,7 @@ export function SearchResultCard({ result }: { result: ArchiveSearchResult }) {
   );
 }
 
-function ResultIcon({ result }: { result: ArchiveSearchResult }) {
+function ResultIcon({ result }: Readonly<{ result: ArchiveSearchResult }>) {
   if (result.result_type === "case") return <Scale aria-hidden="true" className="h-5 w-5" />;
   if (result.result_type === "document") return <FileText aria-hidden="true" className="h-5 w-5" />;
   if (result.entity_type === "person") return <UserRound aria-hidden="true" className="h-5 w-5" />;

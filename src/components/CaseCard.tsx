@@ -5,7 +5,7 @@ import type { TFunction } from "i18next";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, User } from "lucide-react";
+import { MapPin, User } from "lucide-react";
 
 const nepaliDigits = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 

@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getCases, getStatistics } from "@/services/jds-api";
 import { getEntityById } from "@/services/api";
 import { useEffect, useMemo, useState } from "react";
-import { formatDateWithBS } from "@/utils/date";
+
 import type { Entity } from "@/types/nes";
 import { translateDynamicText } from "@/lib/translate-dynamic-content";
 import { useTranslation } from "react-i18next";

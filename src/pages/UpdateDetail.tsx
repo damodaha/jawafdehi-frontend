@@ -138,31 +138,7 @@ const UpdateDetail = () => {
 
                             <div className="markdown-content">
                                 <Markdown
-                                    // remarkPlugins={[remarkGfm]}
-                                    components={{
-                                        h2: ({ node, children, ...props }) => (
-                                            <h2 id={headingId(children)} className="text-2xl font-bold mt-10 mb-4" {...props}>{children}</h2>
-                                        ),
-                                        h3: ({ node, children, ...props }) => (
-                                            <h3 id={headingId(children)} className="text-xl font-semibold mt-8 mb-3" {...props}>{children}</h3>
-                                        ),
-                                        p: ({ node, ...props }) => (
-                                            <p className="my-6 leading-relaxed" {...props} />
-                                        ),
-                                        li: ({ node, ...props }) => (
-                                            <li className="ml-5 my-2 list-disc" {...props} />
-                                        ),
-                                        a: ({ node, ...props }) => (
-                                            <a className="text-primary underline hover:text-primary/80 transition-colors" {...props} />
-                                        ),
-                                        img: ({ node, ...props }) => (
-                                            <img
-                                                {...props}
-                                                className="rounded-lg border shadow-sm my-8 w-full max-h-[500px] object-cover"
-                                            />
-                                        ),
-                                    }}
-                                >
+                                    components={markdownComponents}
                                     {update.content}
                                 </Markdown>
                             </div>

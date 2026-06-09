@@ -45,7 +45,7 @@ export function Hero({
   casesDocumented,
   officialsAndEntitiesTracked,
   accessModel = "Free",
-}: HeroProps) {
+}: Readonly<HeroProps>) {
   const navigate = useNavigate();
   const [archiveQuery, setArchiveQuery] = useState("");
 
@@ -121,7 +121,7 @@ export function Hero({
   );
 }
 
-function HeroStats({ stats }: { stats: HeroStat[] }) {
+function HeroStats({ stats }: Readonly<{ stats: HeroStat[] }>) {
   return (
     <div className="mt-10 grid w-full max-w-[min(100%,42rem)] grid-cols-3 gap-4 sm:gap-5 md:max-w-2xl md:gap-0">
       {stats.map(({ value, label }, index) => (
@@ -146,7 +146,7 @@ function HeroStats({ stats }: { stats: HeroStat[] }) {
   );
 }
 
-function HeroStatValue({ value }: { value: string }) {
+function HeroStatValue({ value }: Readonly<{ value: string }>) {
   const normalizedValue = value.replace(/,/g, "");
   const numericValue = Number(normalizedValue);
 
@@ -157,7 +157,7 @@ function HeroStatValue({ value }: { value: string }) {
   return <CountUp end={numericValue} duration={0.9} separator="," />;
 }
 
-function HeroBackdrop({ images }: { images: HeroMapImage[] }) {
+function HeroBackdrop({ images }: Readonly<{ images: HeroMapImage[] }>) {
   return (
     <>
       {/* Mobile: subtle red wash, no Nepal map */}

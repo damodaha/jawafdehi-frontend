@@ -9,7 +9,7 @@ type CtaProps = {
   className?: string;
 };
 
-export function Cta({ className }: CtaProps) {
+export function Cta({ className }: Readonly<CtaProps>) {
   const { t } = useTranslation();
   return (
     <section

@@ -49,7 +49,7 @@ const desktopNavWidthClass: Record<string, string> = {
 };
 
 const useIsomorphicLayoutEffect =
-  typeof window === "undefined" ? useEffect : useLayoutEffect;
+  typeof globalThis.window === "undefined" ? useEffect : useLayoutEffect;
 
 const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
   cn(
@@ -164,8 +164,8 @@ export function Navbar() {
       }
     };
 
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    globalThis.window.addEventListener("keydown", onKeyDown);
+    return () => globalThis.window.removeEventListener("keydown", onKeyDown);
   }, []);
 
   return (

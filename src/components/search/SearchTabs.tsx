@@ -18,7 +18,7 @@ const tabs: Array<{
   { type: "document", label: "Documents", countKey: "documents" },
 ];
 
-export function SearchTabs({ counts, activeType, onChange }: SearchTabsProps) {
+export function SearchTabs({ counts, activeType, onChange }: Readonly<SearchTabsProps>) {
   return (
     <div
       aria-label="Search result type"

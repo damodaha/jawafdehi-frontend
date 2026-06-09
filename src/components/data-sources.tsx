@@ -65,19 +65,20 @@ export function DataSources() {
               className="group flex flex-col items-center text-center"
             >
               <div className="mb-4 flex h-16 items-center justify-center">
-                {imageSrc ? (
+                {imageSrc && (
                   <img
                     src={imageSrc}
                     alt=""
                     aria-hidden="true"
                     className="h-14 w-auto object-contain opacity-85 transition duration-300 group-hover:-translate-y-1 group-hover:opacity-100"
                   />
-                ) : Icon ? (
+                )}
+                {!imageSrc && Icon && (
                   <Icon
                     className="h-11 w-11 text-primary opacity-85 transition duration-300 group-hover:-translate-y-1 group-hover:opacity-100"
                     aria-hidden="true"
                   />
-                ) : null}
+                )}
               </div>
 
               <h3 className="text-base font-bold leading-tight text-foreground">
