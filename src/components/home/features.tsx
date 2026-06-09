@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Archive, Scale, Sparkles } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -6,46 +7,47 @@ import { cn } from "@/lib/utils";
 
 type Feature = {
   id: string;
-  title: string;
-  detail: string;
+  titleKey: string;
+  detailKey: string;
   icon: LucideIcon;
   iconClassName: string;
   iconWrapClassName: string;
-  badge?: string;
+  badgeKey?: string;
 };
 
-const features: Feature[] = [
-  {
-    id: "case-archive",
-    title: "CIAA Case Archive",
-    detail:
-      "We index every case the Commission for the Investigation of Abuse of Authority files — including supporting documents, court orders, and legal filings, all in one place. Each record is structured so citizens, journalists, researchers, and volunteers can follow the full trail of a case: accused parties, alleged misconduct, locations, dates, official sources, and related documents.",
-    icon: Archive,
-    iconClassName: "text-primary",
-    iconWrapClassName: "bg-primary/10",
-  },
-  {
-    id: "plain-language",
-    title: "Plain-Language Summaries",
-    detail:
-      "Complex legal filings rewritten so any citizen can understand them — not just lawyers. Every summary is reviewed by human volunteers for factual accuracy before it is published. Summaries explain what happened, who is involved, what law or public duty is at issue, and where the case stands now.",
-    icon: Scale,
-    iconClassName: "text-primary",
-    iconWrapClassName: "bg-primary/10",
-  },
-  {
-    id: "ai-research",
-    title: "AI Case Research",
-    detail:
-      "Ask any question about a case or corruption trend in Nepali or English. Natural language queries against the full case archive will return instant, sourced answers. This research layer will help people compare cases, surface patterns across agencies or districts, and trace claims back to official documents.",
-    icon: Sparkles,
-    iconClassName: "text-amber-600",
-    iconWrapClassName: "bg-amber-500/10",
-    badge: "Coming Soon",
-  },
-];
+function useFeatures(): Feature[] {
+  const { t } = useTranslation();
+  return [
+    {
+      id: "case-archive",
+      titleKey: t("home.features.caseArchive.title"),
+      detailKey: t("home.features.caseArchive.detail"),
+      icon: Archive,
+      iconClassName: "text-primary",
+      iconWrapClassName: "bg-primary/10",
+    },
+    {
+      id: "plain-language",
+      titleKey: t("home.features.plainLanguage.title"),
+      detailKey: t("home.features.plainLanguage.detail"),
+      icon: Scale,
+      iconClassName: "text-primary",
+      iconWrapClassName: "bg-primary/10",
+    },
+    {
+      id: "ai-research",
+      titleKey: t("home.features.aiResearch.title"),
+      detailKey: t("home.features.aiResearch.detail"),
+      icon: Sparkles,
+      iconClassName: "text-amber-600",
+      iconWrapClassName: "bg-amber-500/10",
+      badgeKey: t("home.features.aiResearch.badge"),
+    },
+  ];
+}
 
 export function Features() {
+  const features = useFeatures();
   const [activeFeatureId, setActiveFeatureId] = useState<string | null>(null);
   const activeFeature = features.find((feature) => feature.id === activeFeatureId);
 
@@ -93,14 +95,14 @@ function FeatureDetail({ feature }: Readonly<{ feature: Feature }>) {
 
           <div className="max-w-4xl">
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-xl font-bold text-foreground">{feature.title}</h3>
-              {feature.badge ? (
+              <h3 className="text-xl font-bold text-foreground">{feature.titleKey}</h3>
+              {feature.badgeKey ? (
                 <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
-                  {feature.badge}
+                  {feature.badgeKey}
                 </span>
               ) : null}
             </div>
-            <p className="mt-3 text-muted-foreground leading-relaxed">{feature.detail}</p>
+            <p className="mt-3 text-muted-foreground leading-relaxed">{feature.detailKey}</p>
           </div>
         </div>
       </div>
@@ -142,10 +144,10 @@ function FeatureCard({
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <h3 className="text-xl font-bold text-foreground">{feature.title}</h3>
-        {feature.badge ? (
+        <h3 className="text-xl font-bold text-foreground">{feature.titleKey}</h3>
+        {feature.badgeKey ? (
           <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
-            {feature.badge}
+            {feature.badgeKey}
           </span>
         ) : null}
       </div>

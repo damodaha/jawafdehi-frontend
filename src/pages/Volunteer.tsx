@@ -18,57 +18,15 @@ import {
 type TeamEntry = {
   icon: LucideIcon;
   nameKey: string;
-  responsibilities: string[];
+  responsibilityKeys: string[];
 };
 
-const getTeams = (): TeamEntry[] => [
-  {
-    icon: Search,
-    nameKey: "volunteer.teams.dataScraping",
-    responsibilities: [
-      "Archive government documents into digital text for large-scale analysis",
-      "Scrape Nepali media sources — existing and newly identified",
-      "Leverage AI to bootstrap case drafts and update them as new information emerges",
-      "Maintain the Nepal Entity Service data pipeline",
-    ],
-  },
-  {
-    icon: Megaphone,
-    nameKey: "volunteer.teams.outreach",
-    responsibilities: [
-      "Build relationships with investigative journalists, corruption watchdogs, and YouTubers",
-      "Source evidence and case leads from civil society organisations",
-      "Coordinate with CIAA, CIB, and media for primary source access",
-    ],
-  },
-  {
-    icon: Globe,
-    nameKey: "volunteer.teams.platformDevelopment",
-    responsibilities: [
-      "Keep the platform accessible and performant for all stakeholders",
-      "Maintain open APIs for public data access",
-      "Build monitoring dashboards and run load testing",
-      "Ship website improvements based on user feedback",
-    ],
-  },
-  {
-    icon: BookOpen,
-    nameKey: "volunteer.teams.corruptionCompilation",
-    responsibilities: [
-      "Compile, structure, and publish corruption cases",
-      "Maintain case accuracy with ongoing updates and corrections",
-      "Ensure every published case meets verification standards",
-    ],
-  },
-  {
-    icon: FlaskConical,
-    nameKey: "volunteer.teams.corruptionResearch",
-    responsibilities: [
-      "Investigate what legally and ethically constitutes corruption in each context",
-      "Analyse the role of corruption in Nepali governance structures",
-      "Evaluate the effectiveness of anti-corruption policy and institutional frameworks",
-    ],
-  },
+const teamConfigs: Array<{ icon: LucideIcon; nameKey: string; respKey: string }> = [
+  { icon: Search, nameKey: "volunteer.teams.dataScraping", respKey: "volunteer.teams.dataScrapingResponsibilities" },
+  { icon: Megaphone, nameKey: "volunteer.teams.outreach", respKey: "volunteer.teams.outreachResponsibilities" },
+  { icon: Globe, nameKey: "volunteer.teams.platformDevelopment", respKey: "volunteer.teams.platformDevelopmentResponsibilities" },
+  { icon: BookOpen, nameKey: "volunteer.teams.corruptionCompilation", respKey: "volunteer.teams.corruptionCompilationResponsibilities" },
+  { icon: FlaskConical, nameKey: "volunteer.teams.corruptionResearch", respKey: "volunteer.teams.corruptionResearchResponsibilities" },
 ];
 
 type VolunteerProfile = {
@@ -102,7 +60,11 @@ const getProfiles = (): VolunteerProfile[] => [
 
 const Volunteer = () => {
   const { t } = useTranslation();
-  const teams = getTeams();
+  const teams: TeamEntry[] = teamConfigs.map((cfg) => ({
+    icon: cfg.icon,
+    nameKey: cfg.nameKey,
+    responsibilityKeys: t(cfg.respKey, { returnObjects: true }) as string[],
+  }));
   const profiles = getProfiles();
   return (
   <div className="min-h-screen flex flex-col bg-background">
@@ -182,7 +144,7 @@ const Volunteer = () => {
           </div>
 
           <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {teams.map(({ icon: Icon, nameKey, responsibilities }) => (
+            {teams.map(({ icon: Icon, nameKey, responsibilityKeys }) => (
               <div key={nameKey} className="rounded-lg border border-primary/10 bg-background/70 p-6 shadow-sm shadow-primary/5">
                 <div className="mb-5 flex items-center gap-3">
                   <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/[0.07] text-primary">
@@ -191,7 +153,7 @@ const Volunteer = () => {
                   <h3 className="text-lg font-bold leading-tight text-foreground">{t(nameKey)}</h3>
                 </div>
                 <ul className="space-y-3">
-                  {responsibilities.map((item) => (
+                  {responsibilityKeys.map((item) => (
                     <li key={item} className="flex items-start gap-3 text-sm leading-6 text-foreground/70">
                       <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent" />
                       <span>{item}</span>

@@ -24,6 +24,7 @@ import type {
   ArchiveSearchParams,
   ArchiveSearchResponse,
   ArchiveSearchSort,
+  ArchiveSearchType,
 } from "@/types/search";
 
 type RefinementName = "type" | "entity_type" | "role" | "case_type" | "tags";

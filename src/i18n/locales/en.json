@@ -119,11 +119,31 @@
       "description": "Jawafdehi is an open-source civic‑tech platform for Nepal built by Nepali to document allegations of corruption. Grounded in a Gen‑Z mandate for transparency and action, we aim to become the Nepali accountability system—holding corrupt politicians and others accountable through independent, evidence‑first, and citizen‑powered means.",
       "aboutPlatform": "About the Platform"
     },
+    "features": {
+      "caseArchive": {
+        "title": "CIAA Case Archive",
+        "detail": "We index every case the Commission for the Investigation of Abuse of Authority files — including supporting documents, court orders, and legal filings, all in one place. Each record is structured so citizens, journalists, researchers, and volunteers can follow the full trail of a case: accused parties, alleged misconduct, locations, dates, official sources, and related documents."
+      },
+      "plainLanguage": {
+        "title": "Plain-Language Summaries",
+        "detail": "Complex legal filings rewritten so any citizen can understand them — not just lawyers. Every summary is reviewed by human volunteers for factual accuracy before it is published. Summaries explain what happened, who is involved, what law or public duty is at issue, and where the case stands now."
+      },
+      "aiResearch": {
+        "title": "AI Case Research",
+        "detail": "Ask any question about a case or corruption trend in Nepali or English. Natural language queries against the full case archive will return instant, sourced answers. This research layer will help people compare cases, surface patterns across agencies or districts, and trace claims back to official documents.",
+        "badge": "Coming Soon"
+      }
+    },
     "cta": {
       "title": "Know About a Case of Corruption?",
       "description": "Help us hold public entities accountable. Report allegations of misconduct and contribute to transparency in governance.",
       "reportAllegation": "Report an Allegation",
       "submitFeedback": "Submit Feedback"
+    }
+  },
+  "ourProcess": {
+    "hero": {
+      "heading": "How a <1>corruption</1> case goes from discovery to the <3>public archive</3>"
     }
   },
   "commitment": {
@@ -222,10 +242,37 @@
       "title": "Our Volunteer Teams",
       "description": "Each team owns a distinct part of the pipeline. Find the one that matches your skills.",
       "dataScraping": "Data Scraping Team",
+      "dataScrapingResponsibilities": [
+        "Archive government documents into digital text for large-scale analysis",
+        "Scrape Nepali media sources — existing and newly identified",
+        "Leverage AI to bootstrap case drafts and update them as new information emerges",
+        "Maintain the Nepal Entity Service data pipeline"
+      ],
       "outreach": "Outreach Team",
+      "outreachResponsibilities": [
+        "Build relationships with investigative journalists, corruption watchdogs, and YouTubers",
+        "Source evidence and case leads from civil society organisations",
+        "Coordinate with CIAA, CIB, and media for primary source access"
+      ],
       "platformDevelopment": "Platform Development",
+      "platformDevelopmentResponsibilities": [
+        "Keep the platform accessible and performant for all stakeholders",
+        "Maintain open APIs for public data access",
+        "Build monitoring dashboards and run load testing",
+        "Ship website improvements based on user feedback"
+      ],
       "corruptionCompilation": "Corruption Compilation Team",
-      "corruptionResearch": "Corruption Research"
+      "corruptionCompilationResponsibilities": [
+        "Compile, structure, and publish corruption cases",
+        "Maintain case accuracy with ongoing updates and corrections",
+        "Ensure every published case meets verification standards"
+      ],
+      "corruptionResearch": "Corruption Research",
+      "corruptionResearchResponsibilities": [
+        "Investigate what legally and ethically constitutes corruption in each context",
+        "Analyse the role of corruption in Nepali governance structures",
+        "Evaluate the effectiveness of anti-corruption policy and institutional frameworks"
+      ]
     }
   },
   "products": {
@@ -281,6 +328,8 @@
       "closed": "Closed",
       "others": "Others"
     },
+    "gridView": "Grid view",
+    "listView": "List view",
     "type": {
       "corruption": "Corruption",
       "misconduct": "Misconduct",

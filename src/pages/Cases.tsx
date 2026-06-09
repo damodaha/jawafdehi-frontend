@@ -173,17 +173,19 @@ const Cases = () => {
               </Button>
 
               <div className="flex border rounded-md">
-                <Button 
-                  variant={viewMode === "grid" ? "secondary" : "ghost"} 
-                  size="icon" 
+                <Button
+                  variant={viewMode === "grid" ? "secondary" : "ghost"}
+                  size="icon"
                   onClick={() => setViewMode("grid")}
+                  aria-label={t("cases.gridView")}
                 >
                   <LayoutGrid className="h-4 w-4" />
                 </Button>
-                <Button 
-                  variant={viewMode === "list" ? "secondary" : "ghost"} 
-                  size="icon" 
+                <Button
+                  variant={viewMode === "list" ? "secondary" : "ghost"}
+                  size="icon"
                   onClick={() => setViewMode("list")}
+                  aria-label={t("cases.listView")}
                 >
                   <List className="h-4 w-4" />
                 </Button>
