@@ -1,9 +1,7 @@
-import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
-import { Header } from "@/components/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Faq } from "@/components/home/faq";
 import { AlertCircle, Shield, Search, FileCheck, Lock, Users, TrendingUp } from "lucide-react";
 
 const Information = () => {
@@ -27,11 +25,10 @@ const Information = () => {
         <meta name="twitter:description" content="Learn how Jawafdehi verifies corruption cases, what constitutes corruption in Nepal, and how you can report or use information from the platform." />
         <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
       </Helmet>
-      <Header />
 
       <main id="main-content" className="flex-1">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-primary via-navy-dark to-slate-800 py-16 md:py-20">
+        <section id="information-hero" className="bg-gradient-to-br from-primary via-navy-dark to-slate-800 py-16 md:py-20">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl">
               <h1 className="text-4xl md:text-5xl font-bold text-primary-foreground mb-6">
@@ -45,7 +42,7 @@ const Information = () => {
         </section>
 
         {/* What is Corruption Section */}
-        <section className="py-12 md:py-16">
+        <section id="corruption" className="py-12 md:py-16">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <div className="flex items-center gap-3 mb-6">
@@ -98,7 +95,7 @@ const Information = () => {
         </section>
 
         {/* Our Vetting Process */}
-        <section className="py-12 md:py-16 bg-muted/30">
+        <section id="verification" className="py-12 md:py-16 bg-muted/30">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <div className="flex items-center gap-3 mb-6">
@@ -202,100 +199,8 @@ const Information = () => {
           </div>
         </section>
 
-        {/* FAQ Section */}
-        <section className="py-12 md:py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold text-foreground mb-8">{t("information.faq.title")}</h2>
-
-              <Accordion type="single" collapsible className="space-y-4">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger className="text-left">
-                    {t("information.faq.howToReport.question")}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <p className="text-muted-foreground mb-3">
-                      {t("information.faq.howToReport.answer1")}
-                    </p>
-                    <p className="text-muted-foreground">
-                      {t("information.faq.howToReport.answer2")}
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-2">
-                  <AccordionTrigger className="text-left">
-                    {t("information.faq.afterSubmit.question")}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <p className="text-muted-foreground">
-                      {t("information.faq.afterSubmit.answer")}
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-3">
-                  <AccordionTrigger className="text-left">
-                    {t("information.faq.anonymous.question")}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <p className="text-muted-foreground">
-                      {t("information.faq.anonymous.answer")}
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-4">
-                  <AccordionTrigger className="text-left">
-                    {t("information.faq.entityResponse.question")}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <p className="text-muted-foreground">
-                      {t("information.faq.entityResponse.answer")}
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-5">
-                  <AccordionTrigger className="text-left">
-                    {t("information.faq.inaccurate.question")}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <p className="text-muted-foreground">
-                      {t("information.faq.inaccurate.answer")}
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-6">
-                  <AccordionTrigger className="text-left">
-                    {t("information.faq.funding.question")}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <p className="text-muted-foreground">
-                      {t("information.faq.funding.answer")}
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-7">
-                  <AccordionTrigger className="text-left">
-                    {t("information.faq.useInfo.question")}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <p className="text-muted-foreground">
-                      {t("information.faq.useInfo.answer")}
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </div>
-          </div>
-        </section>
+        <Faq />
       </main>
-
-      <Footer />
-
 
     </div>
   );

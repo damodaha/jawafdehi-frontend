@@ -1,4 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;500;700;900&display=swap');
+@font-face {
+  font-family: 'Noto Sans Devanagari';
+  src: url('/font/Noto_Sans_Devanagari/NotoSansDevanagari-VariableFont_wdth,wght.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
 
 @tailwind base;
 @tailwind components;
@@ -15,28 +21,28 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 215 25% 15%;
+    --background: 36 100% 99%;
+    --foreground: 215 28% 17%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card: 36 100% 99%;
+    --card-foreground: 215 28% 17%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover: 36 100% 99%;
+    --popover-foreground: 215 28% 17%;
 
     /* Navy blue - trust and authority */
-    --primary: 215 85% 25%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 209 61% 16%;
+    --primary-foreground: 36 100% 99%;
 
     /* Light slate - secondary surfaces */
-    --secondary: 215 20% 95%;
-    --secondary-foreground: 215 25% 15%;
+    --secondary: 215 28% 83%;
+    --secondary-foreground: 215 28% 17%;
 
     --muted: 215 20% 96%;
     --muted-foreground: 215 15% 45%;
 
-    --accent: 215 20% 92%;
-    --accent-foreground: 215 25% 15%;
+    --accent: 354 66% 47%;
+    --accent-foreground: 36 100% 99%;
 
     /* Amber - urgent/corruption indicator */
     --destructive: 25 95% 53%;
@@ -44,7 +50,7 @@ All colors MUST be HSL.
 
     --border: 215 20% 88%;
     --input: 215 20% 88%;
-    --ring: 215 85% 25%;
+    --ring: 209 61% 16%;
 
     --radius: 0.5rem;
 
@@ -65,41 +71,6 @@ All colors MUST be HSL.
     --slate-800: 215 30% 20%;
   }
 
-  .dark {
-    --background: 215 30% 8%;
-    --foreground: 215 20% 95%;
-
-    --card: 215 30% 10%;
-    --card-foreground: 215 20% 95%;
-
-    --popover: 215 30% 10%;
-    --popover-foreground: 215 20% 95%;
-
-    --primary: 215 85% 50%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 215 25% 15%;
-    --secondary-foreground: 215 20% 95%;
-
-    --muted: 215 25% 15%;
-    --muted-foreground: 215 15% 60%;
-
-    --accent: 215 25% 18%;
-    --accent-foreground: 215 20% 95%;
-
-    --destructive: 25 95% 53%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 215 25% 18%;
-    --input: 215 25% 18%;
-    --ring: 215 85% 50%;
-
-    --alert: 25 95% 53%;
-    --alert-foreground: 0 0% 100%;
-    
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 100%;
-  }
 }
 
 @layer base {
@@ -109,6 +80,6 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Noto Serif Devanagari', serif;
+    font-family: Helvetica, Arial, 'Noto Sans Devanagari', sans-serif;
   }
 }

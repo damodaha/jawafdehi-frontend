@@ -1,8 +1,9 @@
 import * as React from "react";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
-import { ButtonProps, buttonVariants } from "@/components/ui/button";
+import { Button, ButtonProps, buttonVariants } from "@/components/ui/button";
 
 const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
   <nav
@@ -46,20 +47,26 @@ const PaginationLink = ({ className, isActive, size = "icon", ...props }: Pagina
 );
 PaginationLink.displayName = "PaginationLink";
 
-const PaginationPrevious = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink aria-label="Go to previous page" size="default" className={cn("gap-1 pl-2.5", className)} {...props}>
+const PaginationPrevious = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => {
+  const { t } = useTranslation();
+  return (
+  <PaginationLink aria-label={t("pagination.goToPrevPage")} size="default" className={cn("gap-1 pl-2.5", className)} {...props}>
     <ChevronLeft className="h-4 w-4" />
-    <span>Previous</span>
+    <span>{t("pagination.previous")}</span>
   </PaginationLink>
-);
+  );
+};
 PaginationPrevious.displayName = "PaginationPrevious";
 
-const PaginationNext = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink aria-label="Go to next page" size="default" className={cn("gap-1 pr-2.5", className)} {...props}>
-    <span>Next</span>
+const PaginationNext = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => {
+  const { t } = useTranslation();
+  return (
+  <PaginationLink aria-label={t("pagination.goToNextPage")} size="default" className={cn("gap-1 pr-2.5", className)} {...props}>
+    <span>{t("pagination.next")}</span>
     <ChevronRight className="h-4 w-4" />
   </PaginationLink>
-);
+  );
+};
 PaginationNext.displayName = "PaginationNext";
 
 const PaginationEllipsis = ({ className, ...props }: React.ComponentProps<"span">) => (
@@ -70,8 +77,113 @@ const PaginationEllipsis = ({ className, ...props }: React.ComponentProps<"span"
 );
 PaginationEllipsis.displayName = "PaginationEllipsis";
 
+type PaginationControlsProps = {
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  onPageChange: (page: number) => void;
+  className?: string;
+};
+
+const PaginationControls = ({
+  page,
+  pageSize,
+  totalItems,
+  onPageChange,
+  className,
+}: PaginationControlsProps) => {
+  const { t } = useTranslation();
+  const safePageSize = Math.max(1, pageSize);
+  const totalPages = Math.max(1, Math.ceil(totalItems / safePageSize));
+  if (totalPages <= 1) return null;
+
+  const pageItems = getPageItems(page, totalPages);
+  return (
+    <Pagination className={cn("mt-8", className)}>
+      <PaginationContent className="w-full justify-between gap-2 sm:w-auto sm:justify-center sm:gap-1">
+        <PaginationItem>
+          <Button
+            aria-label={t("pagination.goToPrevPage")}
+            className="h-10 rounded-full px-4"
+            disabled={page <= 1}
+            onClick={() => onPageChange(page - 1)}
+            type="button"
+            variant="outline"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            <span className="hidden sm:inline">{t("pagination.previous")}</span>
+          </Button>
+        </PaginationItem>
+
+        <div className="hidden items-center gap-1 sm:flex">
+          {pageItems.map((item, index) => (
+            <PaginationItem key={`${item}-${index}`}>
+              {item === "ellipsis" ? (
+                <PaginationEllipsis />
+              ) : (
+                <Button
+                  aria-current={item === page ? "page" : undefined}
+                  aria-label={t("pagination.goToPage", { page: item })}
+                  className={cn(
+                    "h-10 w-10 rounded-full p-0",
+                    item === page && "pointer-events-none",
+                  )}
+                  onClick={() => onPageChange(item)}
+                  type="button"
+                  variant={item === page ? "default" : "ghost"}
+                >
+                  {item}
+                </Button>
+              )}
+            </PaginationItem>
+          ))}
+        </div>
+
+        <PaginationItem className="sm:hidden">
+          <span className="text-sm text-muted-foreground">
+            {t("pagination.pageOf", { page, totalPages })}
+          </span>
+        </PaginationItem>
+
+        <PaginationItem>
+          <Button
+            aria-label={t("pagination.goToNextPage")}
+            className="h-10 rounded-full px-4"
+            disabled={page >= totalPages}
+            onClick={() => onPageChange(page + 1)}
+            type="button"
+            variant="outline"
+          >
+            <span className="hidden sm:inline">{t("pagination.next")}</span>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  );
+};
+PaginationControls.displayName = "PaginationControls";
+
+function getPageItems(currentPage: number, totalPages: number) {
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+  }
+
+  const items: Array<number | "ellipsis"> = [1];
+  const start = Math.max(2, currentPage - 1);
+  const end = Math.min(totalPages - 1, currentPage + 1);
+
+  if (start > 2) items.push("ellipsis");
+  for (let page = start; page <= end; page += 1) items.push(page);
+  if (end < totalPages - 1) items.push("ellipsis");
+  items.push(totalPages);
+
+  return items;
+}
+
 export {
   Pagination,
+  PaginationControls,
   PaginationContent,
   PaginationEllipsis,
   PaginationItem,

@@ -5,7 +5,7 @@ import type { TFunction } from "i18next";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, User } from "lucide-react";
+import { MapPin, User } from "lucide-react";
 
 const nepaliDigits = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -16,7 +16,6 @@ interface CaseCardProps {
   entity: string;
   entityNames?: string[];
   location: string;
-  date: string;
   status: "ongoing" | "resolved" | "under-investigation";
   tags?: string[];
   description: string;
@@ -24,6 +23,8 @@ interface CaseCardProps {
   entityIds?: number[]; // Jawaf entity IDs
   locationIds?: number[]; // Jawaf entity IDs
   thumbnailUrl?: string; //Thumbnail image
+  viewMode?: "grid" | "list";
+  hideDescription?: boolean;
 }
 
 function formatEntityCount(count: number, language: string) {
@@ -51,7 +52,7 @@ function getEntitySummary(entity: string, entityNames: string[] | undefined, lan
   return t("caseCard.entitySummary.withOthers", { count: remainingCount, name: firstName });
 }
 
-export const CaseCard = ({ id, slug, title, entity, entityNames, location, date, status, tags = [], description, allegations, entityIds, locationIds, thumbnailUrl }: CaseCardProps) => {
+export const CaseCard = ({ id, slug, title, entity, entityNames, location, status, tags = [], description, allegations, entityIds, locationIds, thumbnailUrl, viewMode = "grid", hideDescription }: CaseCardProps) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const entitySummary = getEntitySummary(entity, entityNames, i18n.language, t);
@@ -86,13 +87,17 @@ export const CaseCard = ({ id, slug, title, entity, entityNames, location, date,
     }
   };
 
+  const cardLayout = viewMode === "list" ? "flex-col sm:flex-row h-auto" : "flex-col h-full";
+  const articleLayout = viewMode === "list" ? "flex-col sm:flex-row" : "flex-col";
+  const imageContainerClass = viewMode === "list" ? "h-48 sm:h-auto sm:w-1/3 shrink-0" : "h-52";
+
   return (
     <Card
-      className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-border/70 bg-card shadow-[0_10px_28px_-18px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-[0_24px_50px_-24px_rgba(15,23,42,0.35)] cursor-pointer"
+      className={`group relative flex overflow-hidden rounded-3xl border border-border/70 bg-card shadow-[0_10px_28px_-18px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-[0_24px_50px_-24px_rgba(15,23,42,0.35)] cursor-pointer ${cardLayout}`}
       onClick={handleCardClick}
     >
-      <article className="flex h-full flex-col">
-        <div className="relative h-52 overflow-hidden">
+      <article className={`flex h-full w-full ${articleLayout}`}>
+        <div className={`relative overflow-hidden ${imageContainerClass}`}>
           {imageSrc ? (
             <>
               <img
@@ -117,29 +122,9 @@ export const CaseCard = ({ id, slug, title, entity, entityNames, location, date,
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col bg-card">
+        <div className="flex flex-1 flex-col bg-card min-w-0">
           <CardHeader className="space-y-2 px-4 pb-0 pt-4 sm:px-5 sm:pt-5">
-            {tags && tags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mb-1">
-                {tags.slice(0, 2).map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant="secondary"
-                    className="bg-secondary text-secondary-foreground border border-border/50 px-2.5 py-0.5 text-xs shadow-sm hover:bg-secondary/80"
-                  >
-                    {tag}
-                  </Badge>
-                ))}
-                {tags.length > 2 && (
-                  <Badge
-                    variant="secondary"
-                    className="bg-secondary text-secondary-foreground border border-border/50 px-2 py-0.5 text-xs shadow-sm"
-                  >
-                    +{tags.length - 2}
-                  </Badge>
-                )}
-              </div>
-            )}
+            <CaseCardTags tags={tags} />
             {/* NOTE: Dynamic case content (title, description, entity names) from Entity API
                 remains in English until API-side i18n is implemented. See GitHub issue for i18n. */}
             <h3 className="line-clamp-2 text-lg font-semibold leading-8 text-foreground">
@@ -158,53 +143,16 @@ export const CaseCard = ({ id, slug, title, entity, entityNames, location, date,
           </CardHeader>
 
           <CardContent className="flex flex-1 flex-col px-4 pb-0 pt-4 sm:px-5">
-            {allegations && allegations.length > 0 ? (
+            {!hideDescription && (
               <p className="line-clamp-3 text-sm leading-7 text-muted-foreground">
-                {allegations[0]}
+                {allegations && allegations.length > 0 ? allegations[0] : description}
               </p>
-            ) : (
-              <p className="line-clamp-3 text-sm leading-7 text-muted-foreground">{description}</p>
             )}
 
-            <div className="mt-5 border-t border-border/70 pt-4">
+            <div className={hideDescription ? "mt-2 border-t border-border/70 pt-4" : "mt-5 border-t border-border/70 pt-4"}>
               <div className="space-y-2 text-sm leading-5 text-muted-foreground">
-                <div className="flex min-w-0 items-center">
-                  <User className="mr-2 h-4 w-4 flex-shrink-0" aria-hidden="true" />
-                  {entityIds && entityIds.length > 0 ? (
-                    <Link
-                      to={`/entity/${entityIds[0]}`}
-                      className="block min-w-0 truncate rounded-sm transition-colors hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                      title={entity}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {entitySummary}
-                    </Link>
-                  ) : (
-                    <span className="block min-w-0 truncate" title={entity}>
-                      {entitySummary}
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex items-center">
-                  <MapPin className="mr-2 h-4 w-4 flex-shrink-0" aria-hidden="true" />
-                  {locationIds && locationIds.length > 0 ? (
-                    <Link
-                      to={`/entity/${locationIds[0]}`}
-                      className="line-clamp-1 rounded-sm transition-colors hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {location}
-                    </Link>
-                  ) : (
-                    <span className="line-clamp-1">{location}</span>
-                  )}
-                </div>
-
-                <div className="flex items-center">
-                  <Calendar className="mr-2 h-4 w-4 flex-shrink-0" aria-hidden="true" />
-                  <span>{date}</span>
-                </div>
+                <EntityRow icon={User} label={entitySummary} title={entity} ids={entityIds} />
+                <EntityRow icon={MapPin} label={location} ids={locationIds} />
               </div>
             </div>
           </CardContent>
@@ -223,3 +171,50 @@ export const CaseCard = ({ id, slug, title, entity, entityNames, location, date,
     </Card>
   );
 };
+
+function CaseCardTags({ tags }: Readonly<{ tags: string[] }>) {
+  if (!tags || tags.length === 0) return null;
+  return (
+    <div className="flex flex-wrap gap-1.5 mb-1">
+      {tags.slice(0, 2).map((tag) => (
+        <Badge
+          key={tag}
+          variant="secondary"
+          className="bg-secondary text-secondary-foreground border border-border/50 px-2.5 py-0.5 text-xs shadow-sm hover:bg-secondary/80"
+        >
+          {tag}
+        </Badge>
+      ))}
+      {tags.length > 2 && (
+        <Badge
+          variant="secondary"
+          className="bg-secondary text-secondary-foreground border border-border/50 px-2 py-0.5 text-xs shadow-sm"
+        >
+          +{tags.length - 2}
+        </Badge>
+      )}
+    </div>
+  );
+}
+
+function EntityRow({ icon: Icon, label, title, ids }: Readonly<{ icon: typeof User; label: string; title?: string; ids?: number[] }>) {
+  return (
+    <div className="flex min-w-0 items-center">
+      <Icon className="mr-2 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+      {ids && ids.length > 0 ? (
+        <Link
+          to={`/entity/${ids[0]}`}
+          className="block min-w-0 truncate rounded-sm transition-colors hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          title={title}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {label}
+        </Link>
+      ) : (
+        <span className="block min-w-0 truncate" title={title}>
+          {label}
+        </span>
+      )}
+    </div>
+  );
+}

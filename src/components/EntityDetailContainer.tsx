@@ -166,7 +166,7 @@ export function EntityDetailContainer({
             {/* Basic Info */}
             <div className="flex-1">
               <div className="mb-4">
-                <h1 className="text-3xl font-bold mb-2">
+                <h1 id="entity-summary" className="text-3xl font-bold mb-2">
                   {primaryName}{' '}
                   {jawafEntityId && (
                     <span className="text-muted-foreground font-mono text-xl">#{jawafEntityId}</span>
@@ -244,7 +244,7 @@ export function EntityDetailContainer({
           {/* Description */}
           {description && (
             <div className="mt-6 pt-6 border-t">
-              <h3 className="font-semibold mb-2">{t('entityDetail.about')}</h3>
+              <h3 id="about" className="font-semibold mb-2">{t('entityDetail.about')}</h3>
               <p className="text-muted-foreground leading-relaxed">
                 {description}
               </p>
@@ -280,7 +280,7 @@ export function EntityDetailContainer({
           {/* Alleged Cases */}
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>{t("entityDetail.allegedCases")} ({accusedCaseRelations.length})</CardTitle>
+              <CardTitle id="alleged-cases">{t("entityDetail.allegedCases")} ({accusedCaseRelations.length})</CardTitle>
               <p className="text-sm text-muted-foreground">{t('entityDetail.allegedCasesDescription')}</p>
             </CardHeader>
             <CardContent>
@@ -336,7 +336,7 @@ export function EntityDetailContainer({
           {/* Related Cases */}
           <Card>
             <CardHeader>
-              <CardTitle>{t("entityDetail.relatedCases")} ({nonAccusedCaseRelations.length})</CardTitle>
+              <CardTitle id="related-cases">{t("entityDetail.relatedCases")} ({nonAccusedCaseRelations.length})</CardTitle>
               <p className="text-sm text-muted-foreground">{t('entityDetail.relatedCasesDescription')}</p>
             </CardHeader>
             <CardContent>

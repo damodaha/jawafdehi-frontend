@@ -1,8 +1,6 @@
-import { Footer } from "@/components/Footer";
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -29,7 +27,6 @@ export default function EntityResponse() {
       <Helmet>
         <title>Submit Response | Jawafdehi</title>
       </Helmet>
-      <Header />
 
       <main id="main-content" className="flex-1">
         <div className="container mx-auto px-4 py-8 md:py-12 max-w-3xl">
@@ -229,9 +226,6 @@ export default function EntityResponse() {
           </Card>
         </div>
       </main>
-
-      <Footer />
-
 
     </div>
   );

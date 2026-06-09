@@ -1,6 +1,7 @@
 import { writeFile, mkdir } from 'fs/promises';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
+import { PRE_RENDERED_STATIC_ROUTES, UPDATE_ROUTE_ENTRIES } from '../src/data/site-routes.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -24,33 +25,6 @@ interface PaginatedCaseList {
   next: string | null;
   results: CaseSummary[];
 }
-
-const STATIC_ROUTES: Array<{ path: string; title: string }> = [
-  { path: '/', title: 'Jawafdehi — Nepal Open Corruption Database' },
-  { path: '/about', title: 'About — Jawafdehi' },
-  { path: '/cases', title: 'Cases — Jawafdehi' },
-  { path: '/entities', title: 'Entities — Jawafdehi' },
-  { path: '/updates', title: 'Updates — Jawafdehi' },
-  { path: '/information', title: 'Information — Jawafdehi' },
-  { path: '/feedback', title: 'Feedback — Jawafdehi' },
-  { path: '/report', title: 'Report a Case — Jawafdehi' },
-  { path: '/team', title: 'Our Team — Jawafdehi' },
-  { path: '/products', title: 'Products — Jawafdehi' },
-  { path: '/commitment', title: 'Our Commitment — Jawafdehi' },
-  { path: '/our-process', title: 'Our Process — Jawafdehi' },
-  { path: '/volunteer', title: 'Volunteer — Jawafdehi' },
-];
-
-const UPDATE_ENTRIES: Array<{ id: string; title: string }> = [
-  {
-    id: '2026-01-26-job-postings',
-    title: "We're Hiring! Case Documentation Intern and Software Engineer Interns — Jawafdehi",
-  },
-  {
-    id: '2026-01-04-second-national-strategy-feedback',
-    title: "Jawafdehi Submits Feedback on Nepal's Second National Anti-Corruption Strategy — Jawafdehi",
-  },
-];
 
 function toYMD(isoDate: string): string {
   return isoDate.substring(0, 10);
@@ -114,8 +88,8 @@ async function main() {
   )];
 
   const entries: string[] = [
-    ...STATIC_ROUTES.map(r => urlEntry(`${CANONICAL}${r.path}`, today, r.title)),
-    ...UPDATE_ENTRIES.map(u => urlEntry(`${CANONICAL}/updates/${u.id}`, today, u.title)),
+    ...PRE_RENDERED_STATIC_ROUTES.map(r => urlEntry(`${CANONICAL}${r.path}`, today, r.sitemapTitle)),
+    ...UPDATE_ROUTE_ENTRIES.map(u => urlEntry(`${CANONICAL}/updates/${u.id}`, today, u.title)),
     ...cases.map(c => urlEntry(`${CANONICAL}/case/${c.id}`, toYMD(c.updated_at), c.title ? `${c.title} — Jawafdehi` : undefined)),
     ...entityIds.map(id => {
       const name = entityMap.get(id);

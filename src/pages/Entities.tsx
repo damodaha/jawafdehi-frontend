@@ -1,9 +1,7 @@
-import { Footer } from "@/components/Footer";
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
-import { Header } from "@/components/Header";
 import EntityCard from "@/components/EntityCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -141,16 +139,15 @@ const Entities = () => {
         <meta name="twitter:description" content="Explore profiles of Nepali public officials, politicians, and organizations tracked on Jawafdehi. View their associated corruption and misconduct cases." />
         <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
       </Helmet>
-      <Header />
 
       <main id="main-content" className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-8">
+          <section id="entities-intro" className="mb-8">
             <h1 className="text-4xl font-bold mb-2">{t("entities.title")}</h1>
             <p className="text-muted-foreground">{t("entities.description")}</p>
-          </div>
+          </section>
 
-          <Card className="mb-8">
+          <Card id="entity-search-section" className="mb-8">
             <CardContent className="p-6">
               <div className="space-y-4">
                 <div className="relative flex-1">
@@ -187,6 +184,7 @@ const Entities = () => {
             </p>
           </div>
 
+          <section id="entity-results">
           {loading && page === 1 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -232,11 +230,9 @@ const Entities = () => {
               )}
             </>
           )}
+          </section>
         </div>
       </main>
-
-      <Footer />
-
 
     </div>
   );

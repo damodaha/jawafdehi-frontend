@@ -3,7 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { useCaseworkerAuth } from "@/context/CaseworkerAuthContext";
 import { listSkills, listDrafts, generateSummary } from "@/services/caseworker-api";
 import type { Skill, Draft, ChatMessage, ChatTab } from "@/types/caseworker";
-import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { SendHorizonal, Plus, X, Settings, LogOut } from "lucide-react";
@@ -172,7 +171,6 @@ const CaseworkerDashboard = () => {
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col">
-      <Header />
 
       <div className="flex-1 container mx-auto px-4 py-6 max-w-7xl">
         {/* top bar */}
@@ -207,7 +205,7 @@ const CaseworkerDashboard = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Chat panel */}
-          <div className="lg:col-span-3 bg-white rounded-xl shadow-sm border border-border flex flex-col" style={{ minHeight: "600px" }}>
+          <div className="lg:col-span-3 rounded-xl border border-border bg-card text-card-foreground shadow-sm flex flex-col" style={{ minHeight: "600px" }}>
             {/* tabs */}
             <div className="flex items-center gap-1 px-4 pt-3 border-b border-border overflow-x-auto" role="tablist" aria-label="Caseworker chats">
               {chatTabs.map((tab) => (
@@ -292,11 +290,11 @@ const CaseworkerDashboard = () => {
                         msg.isUser
                           ? "bg-primary text-primary-foreground rounded-tr-sm"
                           : msg.type === "error"
-                          ? "bg-red-50 text-red-800 border border-red-200 rounded-tl-sm"
+                          ? "border border-red-200 bg-red-50 text-red-800 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200 rounded-tl-sm"
                           : msg.type === "success"
-                          ? "bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-tl-sm"
+                          ? "border border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-200 rounded-tl-sm"
                           : msg.type === "info"
-                          ? "bg-blue-50 text-blue-800 border border-blue-200 rounded-tl-sm"
+                          ? "border border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-blue-200 rounded-tl-sm"
                           : "bg-muted text-foreground rounded-tl-sm"
                       }`}
                     >
@@ -334,7 +332,7 @@ const CaseworkerDashboard = () => {
           <div className="space-y-4">
             {/* selected skill */}
             {selectedSkill && (
-              <div className="bg-white rounded-xl border border-border p-4 shadow-sm">
+              <div className="rounded-xl border border-border bg-card p-4 text-card-foreground shadow-sm">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Active Skill</p>
                 <p className="font-medium text-sm">{selectedSkill.display_name ?? selectedSkill.name}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">{selectedSkill.description}</p>
@@ -342,7 +340,7 @@ const CaseworkerDashboard = () => {
             )}
 
             {/* recent drafts */}
-            <div className="bg-white rounded-xl border border-border p-4 shadow-sm">
+            <div className="rounded-xl border border-border bg-card p-4 text-card-foreground shadow-sm">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Recent Drafts</p>
               {recentDrafts.length === 0 ? (
                 <p className="text-xs text-muted-foreground">No drafts yet</p>

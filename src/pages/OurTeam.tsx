@@ -1,10 +1,10 @@
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import { Helmet } from "react-helmet-async";
 import { Mail, Linkedin, Facebook, Github, Globe, Users, Instagram } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { teamMembers } from "@/data/team";
 import type { Contact } from "@/data/team";
+import { Cta } from "@/components/home/cta";
+import { TeamCard } from "@/components/ui/card";
 
 const ContactIcon = ({ contact }: { contact: Contact }) => {
   const href = contact.type === "email" ? `mailto:${contact.value}` : contact.value;
@@ -51,35 +51,46 @@ const OurTeam = () => {
         <meta name="twitter:description" content="Meet the Nepali volunteers building Jawafdehi — Nepal's permanent corruption case archive." />
         <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
       </Helmet>
-      <Header />
 
       <main id="main-content" className="flex-1">
         {/* Hero */}
-        <section className="bg-gradient-to-br from-primary via-navy-dark to-slate-800 py-16 md:py-24">
-          <div className="container mx-auto px-4">
-            <div className="max-w-2xl">
-              <p className="text-sm font-semibold uppercase tracking-widest text-primary-foreground/50 mb-4">
-                Our Team
-              </p>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-5 leading-tight">
-                Built by Nepali volunteers, for Nepal
+        <section id="team-hero" className="relative isolate -mt-[76px] overflow-hidden bg-background pt-[76px]">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-20 left-[64%] z-0 h-[320px] w-[560px] max-w-none -translate-x-1/2 opacity-[0.34] blur-[124px] dark:hidden sm:-top-24 sm:left-[65%] sm:h-[400px] sm:w-[680px] sm:opacity-[0.38] sm:blur-[136px] lg:-top-28 lg:left-[66%] lg:h-[500px] lg:w-[820px] lg:opacity-[0.42] lg:blur-[152px]"
+          >
+            <div className="absolute right-[4%] top-10 h-[66%] w-[54%] rounded-full bg-accent opacity-85" />
+            <div className="absolute left-[32%] top-24 h-[52%] w-[42%] rounded-full bg-accent opacity-55" />
+            <div className="absolute -left-[14%] top-[46%] h-[34%] w-[26%] rounded-full bg-primary opacity-35" />
+          </div>
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 z-[1] opacity-[0.22] [background-image:radial-gradient(hsl(var(--foreground)/0.14)_0.75px,transparent_0.75px)] [background-size:18px_18px]"
+          />
+
+          <div className="container relative z-10 mx-auto flex min-h-[52svh] w-full items-center justify-center py-14 text-center md:py-[4.5rem] lg:py-20">
+            <div className="mx-auto max-w-5xl">
+              
+              <h1 className="text-[2.65rem] font-extrabold leading-[0.98] tracking-normal text-primary sm:text-5xl md:text-[3.35rem]">
+                {t("team.hero.builtBy")}{" "}
+                <span className="text-accent sm:whitespace-nowrap">
+                  {t("team.hero.nepaliVolunteers")}
+                </span>
+                <span className="block text-primary">{t("team.hero.forNepal")}</span>
               </h1>
-              <p className="text-lg text-primary-foreground/70 leading-relaxed">
-                Jawafdehi runs entirely on volunteer effort from Nepali citizens across technology, research, journalism, and public policy. No corporate interests. No government funding. Just people who believe accountability matters.
+              <p className="mx-auto mt-6 max-w-3xl text-base leading-8 text-muted-foreground md:text-lg">
+                {t("team.hero.description")}
               </p>
             </div>
           </div>
         </section>
 
         {/* Team grid */}
-        <section className="py-12 md:py-16">
+        <section id="team-members" className="py-12 md:py-16">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {teamMembers.map((member) => (
-                <div
-                  key={member.displayName.en}
-                  className="flex flex-col items-center text-center p-8 rounded-2xl border border-border bg-card hover:border-primary/30 transition-colors"
-                >
+                <TeamCard key={member.displayName.en}>
                   {/* Photo */}
                   <div className="mb-5">
                     {member.thumb ? (
@@ -116,34 +127,14 @@ const OurTeam = () => {
                       ))}
                     </div>
                   )}
-                </div>
+                </TeamCard>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Join CTA */}
-        <section className="py-12 md:py-14 bg-muted/30 border-t border-border">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-2xl font-bold text-foreground mb-3">Want to contribute?</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto mb-6">
-              We're always looking for volunteers — engineers, researchers, journalists, and translators who care about accountability in Nepal.
-            </p>
-            <a
-              href="https://github.com/Jawafdehi"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
-            >
-              <Github className="h-4 w-4" />
-              Find us on GitHub
-            </a>
-          </div>
-        </section>
+       <Cta/>
       </main>
-
-      <Footer />
-
 
     </div>
   );

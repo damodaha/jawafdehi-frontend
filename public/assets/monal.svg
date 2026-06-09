@@ -1,0 +1,41 @@
+<svg width="640" height="240" viewBox="0 0 640 240" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="circleNight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#091226"/>
+      <stop offset="100%" stop-color="#1A2748"/>
+    </linearGradient>
+    <clipPath id="badgeClip">
+      <circle cx="74" cy="80" r="66"/>
+    </clipPath>
+  </defs>
+
+  <g transform="translate(62 40) translate(74 80) scale(1.5) translate(-74 -80)">
+    <circle cx="74" cy="80" r="66" fill="url(#circleNight)"/>
+
+    <g clip-path="url(#badgeClip)">
+      <path d="M-8 136L38 96L60 68L76 84L106 42L154 136Z" fill="#EAF1FF"/>
+      <path d="M2 136L42 104L62 78L74 92L102 56L140 136Z" fill="#FFFFFF"/>
+      <path d="M30 136L56 112L66 96L78 108L98 84L120 136Z" fill="#D7E4FF"/>
+      <path d="M-10 140H158V156H-10Z" fill="#0E1831"/>
+
+      <path d="M68 112L54 136L76 130L94 146L96 122Z" fill="#C96A2D"/>
+      <path d="M78 104L64 126L86 122L102 138L104 114Z" fill="#00A58A"/>
+      <path d="M88 98L76 118L96 116L112 130L112 108Z" fill="#0077C8"/>
+
+      <path d="M94 94C104 80 120 76 134 82C140 85 144 90 146 96C136 97 128 101 122 106C112 106 102 102 94 94Z" fill="#1EB980"/>
+      <path d="M100 90C112 76 130 72 144 80C139 83 135 89 132 95C122 96 111 95 100 90Z" fill="#6A3FB0"/>
+      <path d="M132 84C138 78 145 79 150 84C147 87 145 91 142 95C137 94 134 90 132 84Z" fill="#00A58A"/>
+
+      <circle cx="145" cy="85" r="2.2" fill="#0F172A"/>
+      <path d="M149 86L157 83L150 91Z" fill="#E7B339"/>
+      <path d="M140 76L146 70L148 78Z" fill="#E7B339"/>
+    </g>
+
+    <circle cx="74" cy="80" r="66" fill="none" stroke="#32456F" stroke-width="2"/>
+  </g>
+
+  <g transform="translate(575 0)">
+    <text x="0" y="122" text-anchor="end" font-family="Avenir Next, Poppins, Arial, sans-serif" font-size="110" font-weight="600" fill="#0A2140">monal</text>
+    <text x="-4" y="176" text-anchor="end" font-family="Avenir Next, Poppins, Arial, sans-serif" font-size="55" font-weight="600" fill="#0A2140" fill-opacity="0.5">.cloud</text>
+  </g>
+</svg>

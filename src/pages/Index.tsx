@@ -1,16 +1,17 @@
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { CaseCard } from "@/components/CaseCard";
-import { HeroChatDemo } from "@/components/home/HeroChatDemo";
-import { Archive, Scale, Sparkles, ArrowRight, Search } from "lucide-react";
+import { Hero } from "@/components/home/hero";
+import { Faq } from "@/components/home/faq";
+import { ReportCaseCta } from "@/components/home/report-case-cta";
+import { SupportingPartner } from "@/components/home/supportingpartner";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
 import { getCases, getStatistics } from "@/services/jds-api";
 import { getEntityById } from "@/services/api";
 import { useEffect, useMemo, useState } from "react";
-import { formatDateWithBS } from "@/utils/date";
+
 import type { Entity } from "@/types/nes";
 import { translateDynamicText } from "@/lib/translate-dynamic-content";
 import { useTranslation } from "react-i18next";
@@ -107,8 +108,6 @@ const Index = () => {
         return translateDynamicText(name, currentLang);
       }).join(', ') || translateDynamicText('Unknown Location', currentLang);
 
-      const formattedDate = formatDateWithBS(caseItem.created_at, 'PPP');
-
       return {
         id: caseItem.id.toString(),
         slug: caseItem.slug,
@@ -116,7 +115,6 @@ const Index = () => {
         entity: primaryEntity,
         entityNames,
         location: locationNames,
-        date: formattedDate,
         status: "ongoing" as const, // All published cases shown as ongoing
         description: caseItem.description.replace(/<[^>]*>/g, '').substring(0, 200),
         allegations: caseItem.key_allegations, // Pass key allegations to CaseCard
@@ -173,95 +171,17 @@ const Index = () => {
           ]
         })}</script>
       </Helmet>
-      <Header />
 
       <main id="main-content" className="flex-1">
-        {/* ── Hero ── */}
-        <section className="relative bg-gradient-to-br from-primary via-navy-dark to-slate-800 py-16 md:py-28 overflow-hidden">
-          <div className="absolute inset-0 bg-grid-white/[0.04] bg-[size:24px_24px]" />
+        <Hero
+          casesDocumented={getStatValue(stats?.published_cases)}
+          officialsAndEntitiesTracked={getStatValue(stats?.entities_tracked)}
+        />
 
-          <div className="container mx-auto px-4 relative">
-            <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.12fr)] lg:items-stretch">
-
-              {/* Left — headline + stats + CTAs */}
-              <div className="flex h-full flex-col justify-center">
-                <div className="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm text-white/80">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
-                  CIAA Cases &nbsp;·&nbsp; Official Documents &nbsp;·&nbsp; Verified Facts
-                </div>
-
-                <h1 className="text-4xl md:text-5xl font-bold text-white mb-3 leading-tight tracking-tight">
-                  Nepal's Permanent<br />
-                  <span className="text-amber-400">Corruption Case</span> Archive
-                </h1>
-
-                <p className="text-xl text-white/90 font-medium mb-3 leading-snug">
-                  Reviewed, digestible case summaries —<br className="hidden sm:block" /> written for every Nepali, not just lawyers.
-                </p>
-
-                <p className="text-amber-300/90 font-semibold tracking-wide mb-6 text-base italic">
-                  Accountability has no expiry.
-                </p>
-
-                <p className="text-base text-white/65 mb-5 leading-relaxed">
-                  Every CIAA case documented, simplified, and permanently accessible. Original filings, legal timelines, and verified facts — AI-assisted, human-reviewed, free forever.
-                </p>
-
-                {/* Inline stats */}
-                <div className="flex flex-wrap gap-8 mb-6">
-                  <div>
-                    <div className="text-3xl font-bold text-white tabular-nums">{getStatValue(stats?.published_cases)}</div>
-                    <div className="text-sm text-white/65 mt-0.5">Cases Documented</div>
-                  </div>
-                  <div className="border-l border-white/20 pl-8">
-                    <div className="text-3xl font-bold text-white tabular-nums">{getStatValue(stats?.entities_tracked)}</div>
-                    <div className="text-sm text-white/65 mt-0.5">Officials &amp; Entities Tracked</div>
-                  </div>
-                  <div className="border-l border-white/20 pl-8">
-                    <div className="text-3xl font-bold text-amber-400">Free</div>
-                    <div className="text-sm text-white/65 mt-0.5">Forever. No paywall. Ever.</div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-3">
-                    <Button variant="default" asChild className="font-semibold">
-                    <Link to="/cases">
-                      <Search className="mr-2 h-5 w-5" />
-                      Browse Cases
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-
-              <HeroChatDemo />
-            </div>
-          </div>
-        </section>
-
-        {/* ── Trust strip ── */}
-        <section className="bg-primary/5 border-b border-border py-5">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:justify-center gap-y-3 gap-x-8 text-sm">
-              {[
-                { icon: "🇳🇵", text: "Built by Nepali, for Nepali" },
-                { icon: "∞", text: "Free forever — no paywall", iconClass: "text-emerald-600 font-bold" },
-                { icon: "🔓", text: "All data in the public domain" },
-                { icon: "📜", text: "Records are never deleted" },
-                { icon: "✅", text: "Human-reviewed summaries" },
-                { icon: "⚙️", text: "All technology is open source" },
-                { icon: "🤝", text: "100% volunteer-powered" },
-              ].map(({ icon, text, iconClass }) => (
-                <div key={text} className="flex items-center gap-2 text-foreground/70">
-                  <span className={`text-base flex-shrink-0 ${iconClass ?? ""}`}>{icon}</span>
-                  <span>{text}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+    
 
         {/* ── What we're building ── */}
-        <section className="py-12 bg-muted/30 border-b border-border">
+        {/* <section id="archive-intro" className="py-12 bg-muted/30 border-b border-border">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center">
               <p className="text-base md:text-lg text-foreground/80 leading-relaxed">
@@ -271,60 +191,20 @@ const Index = () => {
               </p>
             </div>
           </div>
-        </section>
+        </section>  */}
 
-        {/* ── Three Pillars ── */}
-        <section className="py-12 md:py-20 bg-background border-b border-border">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-              <div className="space-y-4">
-                <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Archive className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold text-foreground">CIAA Case Archive</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  We index every case the Commission for the Investigation of Abuse of Authority files — including supporting documents, court orders, and legal filings, all in one place.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Scale className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold text-foreground">Plain-Language Summaries</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Complex legal filings rewritten so any citizen can understand them — not just lawyers. Every summary is reviewed by human volunteers for factual accuracy before it is published.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="h-12 w-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                  <Sparkles className="h-6 w-6 text-amber-600" />
-                </div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="text-xl font-bold text-foreground">AI Case Research</h3>
-                  <span className="text-xs font-semibold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
-                    Coming Soon
-                  </span>
-                </div>
-                <p className="text-muted-foreground leading-relaxed">
-                  Ask any question about a case or corruption trend in Nepali or English. Natural language queries against the full case archive — instant, sourced answers.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* <Features /> */}
 
         {/* ── Recently Documented Cases ── */}
-        <section className="py-12 md:py-16 bg-muted/20">
+        <section id="recent-cases" className="py-12 md:py-16 bg-muted/20">
           <div className="container mx-auto px-4">
-            <div className="flex items-end justify-between mb-10">
+            <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-8">
               <div>
                 <h2 className="text-2xl font-bold text-foreground">Recently Documented Cases</h2>
                 <p className="text-muted-foreground mt-1">Latest cases added to the archive</p>
               </div>
               <Button variant="outline" asChild className="hidden sm:flex">
-                <Link to="/cases">
+                <Link to="/search">
                   View all cases <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -333,7 +213,7 @@ const Index = () => {
             {featuredCases.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 {featuredCases.map((caseItem) => (
-                  <CaseCard key={caseItem.id} {...caseItem} />
+                  <CaseCard key={caseItem.id} {...caseItem} hideDescription={true} />
                 ))}
               </div>
             ) : (
@@ -344,18 +224,18 @@ const Index = () => {
               </div>
             )}
 
-            <div className="text-center sm:hidden">
-              <Button variant="outline" asChild>
-                <Link to="/cases">View all cases →</Link>
+            <div className="text-center sm:hidden mt-8">
+              <Button variant="outline" asChild className="w-full">
+                <Link to="/search">View all cases <ArrowRight className="ml-2 h-4 w-4" /></Link>
               </Button>
             </div>
           </div>
         </section>
 
+        <ReportCaseCta />
+        <Faq />
+            <SupportingPartner />
       </main>
-
-      <Footer />
-
 
     </div>
   );

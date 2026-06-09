@@ -1,7 +1,5 @@
-import { Footer } from "@/components/Footer";
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -94,7 +92,6 @@ export default function ModerationDashboard() {
       <Helmet>
         <title>Moderation Dashboard | Jawafdehi</title>
       </Helmet>
-      <Header />
 
       <main id="main-content" className="flex-1">
         <div className="container mx-auto px-4 py-8">
@@ -343,9 +340,6 @@ export default function ModerationDashboard() {
           </Tabs>
         </div>
       </main>
-
-      <Footer />
-
 
     </div>
   );

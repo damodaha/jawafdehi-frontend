@@ -1,8 +1,6 @@
-import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
-import { Header } from "@/components/Header";
-import { Card, CardContent } from "@/components/ui/card";
-import { Shield, Eye, Target, Users } from "lucide-react";
+import { CoreValues } from "@/components/about/core-values";
+import { AboutHero } from "@/components/about/hero";
 import { Helmet } from "react-helmet-async";
 
 const About = () => {
@@ -26,30 +24,20 @@ const About = () => {
         <meta name="twitter:description" content="Learn about Jawafdehi — Nepal's open corruption accountability platform. Meet the team behind Let's Build Nepal and NewNepal.org working to promote transparency." />
         <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
       </Helmet>
-      <Header />
 
       <main id="main-content" className="flex-1">
-        {/* Hero Section */}
-        <section className="bg-gradient-to-br from-primary via-navy-dark to-slate-800 py-16 md:py-20">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl">
-              <h1 className="text-4xl md:text-5xl font-bold text-primary-foreground mb-6">
-                {t("about.title")}
-              </h1>
-              <p className="text-xl text-primary-foreground/80 leading-relaxed">
-                {t("about.subtitle")}
-              </p>
-            </div>
-          </div>
-        </section>
+        <AboutHero />
 
         {/* About Us Section */}
-        <section className="py-12 md:py-16">
+        <section id="about-us" className="bg-muted/10 pt-12 pb-8 md:pt-14 md:pb-10 lg:pt-16 lg:pb-10">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-              <div>
-                <h2 className="text-3xl font-bold text-foreground mb-6">{t("about.aboutUs.title")}</h2>
-                <p className="text-lg text-muted-foreground leading-relaxed">
+            <div className="grid gap-9 md:grid-cols-2 md:gap-12 lg:gap-16">
+              <div className="max-w-[44rem]">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+                  {t("about.aboutUs.eyebrow", "Who we are")}
+                </p>
+                <h2 className="mb-4 text-2xl font-bold tracking-normal text-foreground md:text-3xl">{t("about.aboutUs.title")}</h2>
+                <p className="text-justify text-base leading-8 text-foreground/75 md:text-[1.0625rem]">
                   {t("about.aboutUs.description").split(t("about.aboutUs.openSource")).map((part, index, array) => (
                     index < array.length - 1 ? (
                       <span key={index}>
@@ -58,7 +46,7 @@ const About = () => {
                           href="https://github.com/Jawafdehi"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-primary hover:underline"
+                          className="font-medium text-primary underline-offset-4 hover:underline"
                         >
                           {t("about.aboutUs.openSource")}
                         </a>
@@ -68,97 +56,25 @@ const About = () => {
                 </p>
               </div>
 
-              <div>
-                <h2 className="text-3xl font-bold text-foreground mb-6">What We're Building</h2>
-                <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                  Corruption-related records are scattered across dozens of government portals, court systems, and public databases — inaccessible to most citizens. We are building the technology and the volunteer network to bring it all into one permanent, publicly searchable knowledge base.
+              <div className="ml-auto max-w-[44rem] text-left md:mr-8 lg:mr-16">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+                  {t("about.building.eyebrow", "What we do")}
                 </p>
-                <p className="text-lg text-muted-foreground leading-relaxed">
-                  Free to use. Open source. Built entirely by Nepali volunteers who believe accountability has no expiry date.
+                <h2 className="mb-4 text-2xl font-bold tracking-normal text-foreground md:text-3xl">{t("about.building.title")}</h2>
+                <p className="text-justify text-base leading-8 text-foreground/75 md:text-[1.0625rem]">
+                  {t("about.building.description1")}
+                </p>
+                <p className="mt-5 text-justify text-base leading-8 text-foreground/75 md:text-[1.0625rem]">
+                  {t("about.building.description2")}
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Core Values Section */}
-        <section className="py-12 md:py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold text-foreground mb-10 text-center">{t("about.values.title")}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="rounded-lg bg-primary/10 p-3">
-                        <Shield className="h-6 w-6 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-foreground mb-2">{t("about.values.integrity.title")}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {t("about.values.integrity.description")}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="rounded-lg bg-primary/10 p-3">
-                        <Eye className="h-6 w-6 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-foreground mb-2">{t("about.values.transparency.title")}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {t("about.values.transparency.description")}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="rounded-lg bg-primary/10 p-3">
-                        <Target className="h-6 w-6 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-foreground mb-2">{t("about.values.accuracy.title")}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {t("about.values.accuracy.description")}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="rounded-lg bg-primary/10 p-3">
-                        <Users className="h-6 w-6 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-foreground mb-2">{t("about.values.publicService.title")}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {t("about.values.publicService.description")}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </div>
-        </section>
+        <CoreValues />
 
       </main>
-
-      <Footer />
-
 
     </div>
   );

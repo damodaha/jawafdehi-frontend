@@ -1,21 +1,26 @@
-import { Footer } from "@/components/Footer";
 import { useState } from "react";
-import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
-import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
-import { AlertCircle, Upload, Download, FileText, Mail } from "lucide-react";
+import { AlertCircle, Upload, Download, FileText, FilePlus2, Mail } from "lucide-react";
 import { trackEvent } from "@/utils/analytics";
 
-export default function ReportAllegation() {
+export function ReportAllegationDialog() {
   const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
 
   // Check feature flag for case submission form
@@ -28,110 +33,35 @@ export default function ReportAllegation() {
       title: t("report.submitted.title"),
       description: t("report.submitted.description"),
     });
+    setOpen(false);
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Helmet>
-        <title>Report Allegation | Jawafdehi</title>
-        <meta name="description" content={t("report.description")} />
-      </Helmet>
-      <Header />
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          size="lg"
+          className="mt-8 bg-white font-semibold text-slate-950 shadow-lg shadow-black/10 hover:bg-white/90 dark:bg-white dark:text-slate-950 dark:hover:bg-white/90"
+        >
+          <FilePlus2 className="h-5 w-5" aria-hidden="true" />
+          Report a Case
+        </Button>
+      </DialogTrigger>
+      <DialogContent
+        overlayClassName="bg-black/65 backdrop-blur-[2px]"
+        className="flex h-[calc(100dvh-1.5rem)] w-[calc(100vw-1.25rem)] max-w-[calc(100vw-1.25rem)] flex-col gap-0 overflow-hidden rounded-[2rem] border-border/60 bg-background/95 p-0 shadow-2xl shadow-black/25 backdrop-blur-xl sm:h-auto sm:max-h-[90vh] sm:w-full sm:max-w-3xl sm:rounded-[2rem] [&>button]:right-5 [&>button]:top-5 [&>button]:flex [&>button]:h-9 [&>button]:w-9 [&>button]:items-center [&>button]:justify-center [&>button]:!rounded-full [&>button]:bg-muted [&>button]:text-muted-foreground [&>button]:opacity-100 [&>button]:transition-colors [&>button:hover]:bg-accent/15 [&>button:hover]:text-accent"
+      >
+        <DialogHeader className="shrink-0 border-b border-border/60 bg-muted/20 px-6 pb-5 pt-7 text-left sm:px-8 sm:pb-6 sm:pt-8">
+          <DialogTitle className="pr-10 text-2xl font-extrabold tracking-normal text-primary sm:text-3xl">
+            {t("report.title")}
+          </DialogTitle>
+          <DialogDescription className="max-w-2xl text-sm leading-6 text-foreground/65 sm:text-base sm:leading-7">
+            {t("report.description")}
+          </DialogDescription>
+        </DialogHeader>
 
-      <main id="main-content" className="flex-1">
-        <div className="container mx-auto px-4 py-8 md:py-12 max-w-3xl">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-3xl">{t("report.title")}</CardTitle>
-              <CardDescription className="text-base">
-                {t("report.description")}
-              </CardDescription>
-            </CardHeader>
-
-            <CardContent>
-              {!isFormEnabled ? (
-                // Template Download Section
-                <div className="space-y-6">
-                  <div className="space-y-4">
-                    <p className="text-muted-foreground">
-                      {t("report.templateDownload.description")}
-                    </p>
-
-                    <div className="p-4 bg-muted/50 rounded-lg space-y-3">
-                      <p className="text-sm font-medium">{t("report.templateDownload.instructions")}</p>
-                      <div className="flex items-center gap-2 p-3 bg-background rounded border">
-                        <Mail className="h-4 w-4 text-primary" />
-                        <a
-                          href="mailto:cases@jawafdehi.org"
-                          className="text-primary hover:underline font-medium"
-                        >
-                          {t("report.templateDownload.email")}
-                        </a>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        {t("report.templateDownload.emailSubject")}
-                      </p>
-                    </div>
-
-                    <div className="space-y-3">
-                      <h3 className="font-semibold text-foreground">
-                        {t("report.templateDownload.availableFormats")}
-                      </h3>
-
-                      <div className="grid gap-3">
-                        {/* DOCX Download */}
-                        <a
-                          href="/case-entry-template/case-entry-template.docx"
-                          download
-                          className="flex items-center justify-between p-4 border rounded-lg hover:border-primary hover:bg-accent transition-colors group"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 bg-blue-100 dark:bg-blue-950 rounded">
-                              <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                            </div>
-                            <div>
-                              <p className="font-medium group-hover:text-primary transition-colors">
-                                {t("report.templateDownload.downloadDocx")}
-                              </p>
-                              <p className="text-xs text-muted-foreground">Microsoft Word format</p>
-                            </div>
-                          </div>
-                          <Download className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                        </a>
-
-                        {/* Markdown Download */}
-                        <a
-                          href="/case-entry-template/case-entry-template.md"
-                          download
-                          className="flex items-center justify-between p-4 border rounded-lg hover:border-primary hover:bg-accent transition-colors group"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 bg-green-100 dark:bg-green-950 rounded">
-                              <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
-                            </div>
-                            <div>
-                              <p className="font-medium group-hover:text-primary transition-colors">
-                                {t("report.templateDownload.downloadMd")}
-                              </p>
-                              <p className="text-xs text-muted-foreground">Plain text format</p>
-                            </div>
-                          </div>
-                          <Download className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                        </a>
-                      </div>
-                    </div>
-
-                    {/* Important Notice */}
-                    <div className="flex items-start gap-3 p-4 bg-warning/10 border border-warning/20 rounded-lg">
-                      <AlertCircle className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
-                      <div className="text-sm text-muted-foreground">
-                        <p className="font-semibold text-foreground mb-1">{t("report.importantNotice")}</p>
-                        <p>{t("report.importantNoticeText")}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6 sm:px-8 sm:py-7">
+              {isFormEnabled ? (
                 // Original Form
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Entity Type */}
@@ -244,7 +174,7 @@ export default function ReportAllegation() {
                     </p>
                     <label
                       htmlFor="evidence"
-                      className="block cursor-pointer rounded-lg border-2 border-dashed border-border p-6 text-center transition-colors hover:border-primary has-[:focus-visible]:border-primary has-[:focus-visible]:outline-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2"
+                      className="block cursor-pointer rounded-2xl border-2 border-dashed border-border/80 bg-muted/20 p-6 text-center transition-colors hover:border-primary/60 hover:bg-primary/[0.03] has-[:focus-visible]:border-primary has-[:focus-visible]:outline-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2"
                     >
                       <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                       <p className="text-sm text-muted-foreground mb-1">{t("report.evidenceUpload")}</p>
@@ -260,7 +190,7 @@ export default function ReportAllegation() {
                   </div>
 
                   {/* Contributor Information */}
-                  <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
+                  <div className="space-y-4 rounded-2xl border border-border/60 bg-muted/35 p-5">
                     <h3 className="font-semibold text-foreground text-sm">{t("report.contributorInfo")}</h3>
                     <p className="text-xs text-muted-foreground">{t("report.contributorInfoDesc")}</p>
                     <div className="flex items-center space-x-2">
@@ -299,10 +229,10 @@ export default function ReportAllegation() {
                   </div>
 
                   {/* Disclaimer */}
-                  <div className="flex items-start gap-3 p-4 bg-warning/10 border border-warning/20 rounded-lg">
-                    <AlertCircle className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-muted-foreground">
-                      <p className="font-semibold text-foreground mb-1">{t("report.importantNotice")}</p>
+                  <div className="flex items-start gap-3 rounded-2xl border border-warning/20 bg-warning/[0.07] p-5">
+                    <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-warning" />
+                    <div className="text-sm leading-6 text-foreground/65">
+                      <p className="mb-1 font-bold text-foreground">{t("report.importantNotice")}</p>
                       <p>{t("report.importantNoticeText")}</p>
                     </div>
                   </div>
@@ -316,24 +246,102 @@ export default function ReportAllegation() {
                   </div>
 
                   {/* Submit Button */}
-                  <div className="flex gap-4">
-                    <Button type="submit" className="flex-1">
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <Button type="submit" size="lg" className="flex-1">
                       {t("report.submitReport")}
                     </Button>
-                    <Button type="button" variant="outline" className="flex-1">
+                    <Button type="button" variant="outline" size="lg" className="flex-1">
                       {t("report.saveDraft")}
                     </Button>
                   </div>
                 </form>
+              ) : (
+                // Template Download Section
+                <div className="space-y-7">
+                  <div className="space-y-5">
+                    <p className="text-base leading-7 text-foreground/70">
+                      {t("report.templateDownload.description")}
+                    </p>
+
+                    <div className="space-y-3 rounded-2xl border border-border/60 bg-muted/35 p-5">
+                      <p className="text-sm font-medium leading-6 text-foreground/80">
+                        {t("report.templateDownload.instructions")}
+                      </p>
+                      <div className="flex items-center gap-3 rounded-xl border border-border/70 bg-background px-4 py-3.5 shadow-sm">
+                        <Mail className="h-5 w-5 text-primary" />
+                        <a
+                          href="mailto:cases@jawafdehi.org"
+                          className="font-semibold text-primary underline-offset-4 hover:underline"
+                        >
+                          {t("report.templateDownload.email")}
+                        </a>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {t("report.templateDownload.emailSubject")}
+                      </p>
+                    </div>
+
+                    <div className="space-y-3">
+                      <h3 className="text-base font-bold text-foreground">
+                        {t("report.templateDownload.availableFormats")}
+                      </h3>
+
+                      <div className="grid gap-3">
+                        {/* DOCX Download */}
+                        <a
+                          href="/case-entry-template/case-entry-template.docx"
+                          download
+                          className="group flex items-center justify-between rounded-2xl border border-border/70 bg-background p-4 shadow-sm transition-[border-color,background-color,transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/[0.03] hover:shadow-md"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="rounded-xl bg-blue-100 p-2.5 dark:bg-blue-950">
+                              <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                            </div>
+                            <div>
+                              <p className="font-semibold text-foreground transition-colors group-hover:text-primary">
+                                {t("report.templateDownload.downloadDocx")}
+                              </p>
+                              <p className="text-xs text-muted-foreground">Microsoft Word format</p>
+                            </div>
+                          </div>
+                          <Download className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                        </a>
+
+                        {/* Markdown Download */}
+                        <a
+                          href="/case-entry-template/case-entry-template.md"
+                          download
+                          className="group flex items-center justify-between rounded-2xl border border-border/70 bg-background p-4 shadow-sm transition-[border-color,background-color,transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/[0.03] hover:shadow-md"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="rounded-xl bg-green-100 p-2.5 dark:bg-green-950">
+                              <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
+                            </div>
+                            <div>
+                              <p className="font-semibold text-foreground transition-colors group-hover:text-primary">
+                                {t("report.templateDownload.downloadMd")}
+                              </p>
+                              <p className="text-xs text-muted-foreground">Plain text format</p>
+                            </div>
+                          </div>
+                          <Download className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                        </a>
+                      </div>
+                    </div>
+
+                    {/* Important Notice */}
+                    <div className="flex items-start gap-3 rounded-2xl border border-warning/20 bg-warning/[0.07] p-5">
+                      <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-warning" />
+                      <div className="text-sm leading-6 text-foreground/65">
+                        <p className="mb-1 font-bold text-foreground">{t("report.importantNotice")}</p>
+                        <p>{t("report.importantNoticeText")}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
-            </CardContent>
-          </Card>
         </div>
-      </main>
-
-      <Footer />
-
-
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
