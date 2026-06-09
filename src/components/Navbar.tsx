@@ -49,7 +49,7 @@ const desktopNavWidthClass: Record<string, string> = {
 };
 
 const useIsomorphicLayoutEffect =
-  typeof globalThis.window === "undefined" ? useEffect : useLayoutEffect;
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
   cn(

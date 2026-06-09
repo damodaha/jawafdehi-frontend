@@ -303,12 +303,14 @@ function LLMTab() {
 
 // ── MCP Servers tab ───────────────────────────────────────────────────────────
 
+function getStatusColorClass(status: string): string {
+  if (status === "connected") return "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200";
+  if (status === "error") return "bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-200";
+  return "bg-muted text-muted-foreground";
+}
+
 function ServerStatusBadge({ status }: Readonly<{ status: string }>) {
-  const colorClass =
-    status === "connected" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200"
-    : status === "error" ? "bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-200"
-    : "bg-muted text-muted-foreground";
-  return <span className={`text-xs px-1.5 py-0.5 rounded-full ${colorClass}`}>{status}</span>;
+  return <span className={`text-xs px-1.5 py-0.5 rounded-full ${getStatusColorClass(status)}`}>{status}</span>;
 }
 
 function MCPTab() {

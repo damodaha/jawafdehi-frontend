@@ -200,7 +200,7 @@ function htmlToSearchLineText(html: string): string[] {
     .replace(/<noscript[\s\S]*?<\/noscript>/gi, ' ')
     .replace(/<svg[\s\S]*?<\/svg>/gi, ' ')
     .replace(/<(br|hr)\b[^>]*>/gi, '\n')
-    .replace(/<\/(address|article|aside|blockquote|d[dtl]|fig(caption|ure)|footer|form|h[1-6]|header|li|main|nav|ol|p|pre|section|t(able|body|d|foot|h|head|r)|ul)>/gi, '\n')
+    .replace(/<\/(?:address|article|aside|blockquote|dd|div|dl|dt|figcaption|figure|footer|form|h[1-6]|header|li|main|nav|ol|p|pre|section|table|tbody|td|tfoot|th|thead|tr|ul)>/gi, '\n')
     .replace(/<[^>]*>/g, ' ');
 
   return decodeHtmlEntities(visibleText)

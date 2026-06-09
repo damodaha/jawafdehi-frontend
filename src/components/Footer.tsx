@@ -107,6 +107,12 @@ function FooterLinkGroup({ title, links }: Readonly<{ title: string; links: Foot
   );
 }
 
+function renderBadgeIcon(marker: string | undefined, Icon: ComponentType<{ className?: string }> | undefined, iconClassName: string) {
+  if (marker) return <span aria-hidden="true" className="text-sm leading-none">{marker}</span>;
+  if (Icon) return <Icon className={cn("h-3.5 w-3.5", iconClassName)} />;
+  return null;
+}
+
 export const Footer = () => {
   const { t } = useTranslation();
 
@@ -194,11 +200,7 @@ export const Footer = () => {
                   {index > 0 && (
                     <span aria-hidden="true" className="mr-1 h-1 w-1 rounded-full bg-[var(--footer-dot)]" />
                   )}
-                  {marker
-                    ? (<span aria-hidden="true" className="text-sm leading-none">{marker}</span>)
-                    : Icon
-                      ? (<Icon className={cn("h-3.5 w-3.5", iconClassName)} />)
-                      : null}
+                  {renderBadgeIcon(marker, Icon, iconClassName)}
                   {t(labelKey)}
                 </span>
               ))}

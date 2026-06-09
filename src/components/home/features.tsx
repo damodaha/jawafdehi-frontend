@@ -50,7 +50,7 @@ export function Features() {
   const activeFeature = features.find((feature) => feature.id === activeFeatureId);
 
   return (
-    <div onMouseLeave={() => setActiveFeatureId(null)} role="presentation">
+    <div onMouseLeave={() => setActiveFeatureId(null)}>
       <section id="features" className="py-12 md:py-20 bg-background border-b border-border">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-10">
