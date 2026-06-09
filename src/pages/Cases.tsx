@@ -212,95 +212,22 @@ const Cases = () => {
           ) : null}
 
           <section id="case-results">
-          {isInitialLoading ? (
-            <output aria-label={t("cases.loading")} className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "flex flex-col gap-6"}>
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className={viewMode === "list" ? "w-full" : ""}>
-                  <CaseCardSkeleton />
-                </div>
-              ))}
-            </output>
-          ) : filteredCases.length > 0 ? (
-            <>
-              <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "flex flex-col gap-6"}>
-                {/* NOTE: Dynamic case content (title, description, entity names) from Entity API
-                    remains in English until API-side i18n is implemented. See GitHub issue for i18n. */}
-                {filteredCases.map((caseItem) => {
-                  // Get accused and location entities from unified entities array
-                  const accusedEntities = caseItem.entities?.filter(e => e.type === 'accused') || [];
-                  const locationEntities = caseItem.entities?.filter(e => e.type === 'location') || [];
-                  
-                  // Translate entity names
-                  const entityNames = accusedEntities.map(e => {
-                    if (e.nes_id && resolvedEntities[e.nes_id]) {
-                      const entity = resolvedEntities[e.nes_id];
-                      return entity?.names?.[0]?.en?.full || entity?.names?.[0]?.ne?.full || e.display_name || e.nes_id;
-                    }
-                    return e.display_name || e.nes_id || translateDynamicText('Unknown Entity', currentLang);
-                  });
-                  const entityDisplayName = entityNames.join(', ') || translateDynamicText('Unknown Entity', currentLang);
-
-                  // Translate location names
-                  const locationNames = locationEntities.map(e => {
-                    if (e.nes_id && resolvedEntities[e.nes_id]) {
-                      const entity = resolvedEntities[e.nes_id];
-                      const name = entity?.names?.[0]?.en?.full || entity?.names?.[0]?.ne?.full || e.display_name || e.nes_id;
-                      return translateDynamicText(name, currentLang);
-                    }
-                    const name = e.display_name || e.nes_id || 'Unknown';
-                    return translateDynamicText(name, currentLang);
-                  }).join(', ') || translateDynamicText('Unknown Location', currentLang);
-
-                  return (
-                    <CaseCard
-                      key={caseItem.id}
-                      id={caseItem.id.toString()}
-                      slug={caseItem.slug}
-                      title={caseItem.title}
-                      entity={entityDisplayName}
-                      entityNames={entityNames}
-                      location={locationNames}
-                      status={mapCaseStatusToBadge(getCaseStatus(caseItem))}
-                      tags={caseItem.tags || []}
-                      description={caseItem.description.replace(/<[^>]*>/g, '').substring(0, 200)}
-                      allegations={caseItem.key_allegations}
-                      entityIds={accusedEntities.map(e => e.id)}
-                      locationIds={locationEntities.map(e => e.id)}
-                      thumbnailUrl={caseItem.thumbnail_url ?? undefined}
-                      viewMode={viewMode}
-                    />
-                  );
-                })}
-              </div>
-              {!isError && casesData?.next && (
-                <div className="mt-8 flex justify-center">
-                  <Button
-                    onClick={() => setPage(p => p + 1)}
-                    disabled={isFetching}
-                    variant="outline"
-                    size="lg"
-                  >
-                    {isFetching ? t("cases.loadingMore") : t("cases.loadMore")}
-                  </Button>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground text-lg mb-4">
-                {isError ? t("cases.unableToLoad") : t("cases.noCasesFound")}
-              </p>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setStatusFilter("all");
-                  setSearchQuery("");
-                }}
-              >
-                {isError ? t("cases.tryAgain") : t("cases.clearAllFilters")}
-              </Button>
-            </div>
-          )}
+<CaseResults
+              isInitialLoading={isInitialLoading}
+              isError={isError}
+              viewMode={viewMode}
+              filteredCases={filteredCases}
+              casesData={casesData}
+              resolvedEntities={resolvedEntities}
+              currentLang={currentLang}
+              searchQuery={searchQuery}
+              isFetching={isFetching}
+              refetch={refetch}
+              setPage={setPage}
+              setStatusFilter={setStatusFilter}
+              setSearchQuery={setSearchQuery}
+              t={t}
+            />
           </section>
         </div>
       </main>
@@ -310,3 +237,115 @@ const Cases = () => {
 };
 
 export default Cases;
+
+type CaseResultsProps = Readonly<{
+  isInitialLoading: boolean;
+  isError: boolean;
+  viewMode: "grid" | "list";
+  filteredCases: Case[];
+  casesData: { count: number; next: string | null } | undefined;
+  resolvedEntities: Record<string, unknown>;
+  currentLang: string;
+  searchQuery: string;
+  isFetching: boolean;
+  refetch: () => void;
+  setPage: (fn: (p: number) => number) => void;
+  setStatusFilter: (v: "all" | "ongoing" | "closed" | "others") => void;
+  setSearchQuery: (v: string) => void;
+  t: ReturnType<typeof useTranslation>["t"];
+}>;
+
+function CaseResults({
+  isInitialLoading, isError, viewMode, filteredCases, casesData, resolvedEntities,
+  currentLang, searchQuery, isFetching, refetch, setPage, setStatusFilter, setSearchQuery, t,
+}: CaseResultsProps) {
+  const gridClass = viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "flex flex-col gap-6";
+
+  if (isInitialLoading) {
+    return (
+      <output aria-label={t("cases.loading")} className={gridClass}>
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div key={i} className={viewMode === "list" ? "w-full" : ""}>
+            <CaseCardSkeleton />
+          </div>
+        ))}
+      </output>
+    );
+  }
+
+  if (filteredCases.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground text-lg mb-4">
+          {isError ? t("cases.unableToLoad") : t("cases.noCasesFound")}
+        </p>
+        <Button variant="outline" onClick={() => { setStatusFilter("all"); setSearchQuery(""); }}>
+          {isError ? t("cases.tryAgain") : t("cases.clearAllFilters")}
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className={gridClass}>
+        {/* NOTE: Dynamic case content (title, description, entity names) from Entity API
+            remains in English until API-side i18n is implemented. See GitHub issue for i18n. */}
+        {filteredCases.map((caseItem) => (
+          <CaseCard
+            key={caseItem.id}
+            id={caseItem.id.toString()}
+            slug={caseItem.slug}
+            title={caseItem.title}
+            entity={getEntityDisplayName(caseItem, resolvedEntities, currentLang)}
+            entityNames={getEntityNames(caseItem, resolvedEntities, currentLang)}
+            location={getLocationNames(caseItem, resolvedEntities, currentLang)}
+            status={mapCaseStatusToBadge(getCaseStatus(caseItem))}
+            tags={caseItem.tags || []}
+            description={caseItem.description.replace(/<[^>]*>/g, '').substring(0, 200)}
+            allegations={caseItem.key_allegations}
+            entityIds={(caseItem.entities?.filter(e => e.type === 'accused') || []).map(e => e.id)}
+            locationIds={(caseItem.entities?.filter(e => e.type === 'location') || []).map(e => e.id)}
+            thumbnailUrl={caseItem.thumbnail_url ?? undefined}
+            viewMode={viewMode}
+          />
+        ))}
+      </div>
+      {!searchQuery && !isError && casesData?.next && (
+        <div className="mt-8 flex justify-center">
+          <Button onClick={() => setPage(p => p + 1)} disabled={isFetching} variant="outline" size="lg">
+            {isFetching ? t("cases.loadingMore") : t("cases.loadMore")}
+          </Button>
+        </div>
+      )}
+    </>
+  );
+}
+
+function getEntityNames(caseItem: Case, resolvedEntities: Record<string, any>, currentLang: string): string[] {
+  const accusedEntities = caseItem.entities?.filter(e => e.type === 'accused') || [];
+  return accusedEntities.map(e => {
+    if (e.nes_id && resolvedEntities[e.nes_id]) {
+      const entity = resolvedEntities[e.nes_id];
+      return entity?.names?.[0]?.en?.full || entity?.names?.[0]?.ne?.full || e.display_name || e.nes_id;
+    }
+    return e.display_name || e.nes_id || translateDynamicText('Unknown Entity', currentLang);
+  });
+}
+
+function getEntityDisplayName(caseItem: Case, resolvedEntities: Record<string, any>, currentLang: string): string {
+  return getEntityNames(caseItem, resolvedEntities, currentLang).join(', ') || translateDynamicText('Unknown Entity', currentLang);
+}
+
+function getLocationNames(caseItem: Case, resolvedEntities: Record<string, any>, currentLang: string): string {
+  const locationEntities = caseItem.entities?.filter(e => e.type === 'location') || [];
+  return locationEntities.map(e => {
+    if (e.nes_id && resolvedEntities[e.nes_id]) {
+      const entity = resolvedEntities[e.nes_id];
+      const name = entity?.names?.[0]?.en?.full || entity?.names?.[0]?.ne?.full || e.display_name || e.nes_id;
+      return translateDynamicText(name, currentLang);
+    }
+    const name = e.display_name || e.nes_id || 'Unknown';
+    return translateDynamicText(name, currentLang);
+  }).join(', ') || translateDynamicText('Unknown Location', currentLang);
+}
