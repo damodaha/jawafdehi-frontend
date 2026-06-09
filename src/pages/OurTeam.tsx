@@ -31,7 +31,7 @@ const ContactIcon = ({ contact }: { contact: Contact }) => {
 };
 
 const OurTeam = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const lang = (i18n.language?.startsWith("ne") ? "ne" : "en") as "en" | "ne";
 
   return (
