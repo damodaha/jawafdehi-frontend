@@ -19,7 +19,6 @@ import OurProducts from "./pages/OurProducts";
 import Information from "./pages/Information";
 import CaseDetail from "./pages/CaseDetail";
 import EntityProfile from "./pages/EntityProfile";
-import ReportAllegation from "./pages/ReportAllegation";
 import EntityResponse from "./pages/EntityResponse";
 import ModerationDashboard from "./pages/ModerationDashboard";
 import Feedback from "./pages/Feedback";
@@ -69,7 +68,6 @@ const App = () => (
             <Route path="/search" element={<ArchiveSearch />} />
             <Route path="/entity/:id" element={<EntityProfile />} />
             <Route path="/ask" element={<GuestChat />} />
-            <Route path="/report" element={<ReportAllegation />} />
             <Route path="/entity-response/:id" element={<EntityResponse />} />
             <Route path="/moderation" element={<ModerationDashboard />} />
             <Route path="/feedback" element={<Feedback />} />

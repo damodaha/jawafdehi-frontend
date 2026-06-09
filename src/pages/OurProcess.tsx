@@ -1,6 +1,7 @@
 import { Helmet } from "react-helmet-async";
 
 import { DataSources } from "@/components/data-sources";
+import { ReportCaseCta } from "@/components/home/report-case-cta";
 import { OurProcessHero } from "@/components/ourprocess/hero";
 import { ProcessTimeline } from "@/components/ourprocess/timeline";
 
@@ -28,6 +29,8 @@ const OurProcess = () => (
       <ProcessTimeline />
 
       <DataSources />
+
+      <ReportCaseCta />
     </main>
   </div>
 );
