@@ -1,14 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  ArrowRight,
-  Building2,
-  FileText,
-  Landmark,
-  MapPin,
-  Scale,
-  UserRound,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +17,7 @@ import { toggleArchiveSearchParam } from "@/utils/archive-search-params";
 
 export function SearchResultCard({ result }: Readonly<{ result: ArchiveSearchResult }>) {
   const [searchParams, setSearchParams] = useSearchParams();
+  const metadata = resultMetadata(result);
   const caseSlug = result.result_type === "case" ? result.slug : undefined;
   const [imageFailed, setImageFailed] = useState(false);
   const { data: caseImageUrl, isFetching: isImageLoading } = useQuery({
@@ -74,19 +67,11 @@ export function SearchResultCard({ result }: Readonly<{ result: ArchiveSearchRes
           reserveImageSpace && "sm:pl-64 lg:pl-72",
         )}
       >
-        <span className="mt-0.5 rounded-full bg-secondary/70 p-2 text-primary">
-          <ResultIcon result={result} />
-        </span>
         <div className="min-w-0 flex-1">
           <div className="mb-1.5 flex flex-wrap items-center gap-2">
             <Badge className="capitalize" variant="outline">
-              {result.result_type}
+              {resultLabel(result)}
             </Badge>
-            {result.result_type === "entity" ? (
-              <span className="text-xs capitalize text-muted-foreground">
-                {result.entity_type}
-              </span>
-            ) : null}
           </div>
           <h2 className="truncate text-base font-bold leading-6 text-foreground group-hover:text-primary">
             <Link to={result.url} className="focus:outline-none">
@@ -97,9 +82,11 @@ export function SearchResultCard({ result }: Readonly<{ result: ArchiveSearchRes
           <p className="mt-1 line-clamp-2 text-sm leading-5 text-muted-foreground">
             {formatDescription(result)}
           </p>
-          <p className="mt-2 truncate text-xs leading-5 text-muted-foreground">
-            {resultMetadata(result)}
-          </p>
+          {metadata ? (
+            <p className="mt-2 truncate text-xs leading-5 text-muted-foreground">
+              {metadata}
+            </p>
+          ) : null}
           {result.result_type === "case" && result.tags && result.tags.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
               {result.tags.map((tag) => (
@@ -148,7 +135,6 @@ export function SearchResultCardSkeleton({
           showTags && "sm:pl-64 lg:pl-72",
         )}
       >
-        <Skeleton className="mt-0.5 h-9 w-9 shrink-0 rounded-full" />
         <div className="min-w-0 flex-1">
           <div className="mb-2 flex items-center gap-2">
             <Skeleton className="h-5 w-16 rounded-full" />
@@ -173,13 +159,11 @@ export function SearchResultCardSkeleton({
   );
 }
 
-function ResultIcon({ result }: Readonly<{ result: ArchiveSearchResult }>) {
-  if (result.result_type === "case") return <Scale aria-hidden="true" className="h-5 w-5" />;
-  if (result.result_type === "document") return <FileText aria-hidden="true" className="h-5 w-5" />;
-  if (result.entity_type === "person") return <UserRound aria-hidden="true" className="h-5 w-5" />;
-  if (result.entity_type === "organization") return <Building2 aria-hidden="true" className="h-5 w-5" />;
-  if (result.entity_type === "location") return <MapPin aria-hidden="true" className="h-5 w-5" />;
-  return <Landmark aria-hidden="true" className="h-5 w-5" />;
+function resultLabel(result: ArchiveSearchResult) {
+  if (result.result_type === "entity") {
+    return `Entity · ${humanize(result.entity_type)}`;
+  }
+  return result.result_type;
 }
 
 function resultMetadata(result: ArchiveSearchResult) {
@@ -191,22 +175,19 @@ function resultMetadata(result: ArchiveSearchResult) {
 function caseMetadata(result: CaseSearchResult) {
   const primaryEntity = result.entities.find((entity) => entity.relationship_type === "accused");
   const location = result.entities.find((entity) => entity.relationship_type === "location");
-  return [
-    humanize(result.state),
-    entityName(primaryEntity),
-    entityName(location),
-    result.date,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  return [entityName(primaryEntity), entityName(location)].filter(Boolean).join(" · ");
 }
 
 function entityMetadata(result: EntitySearchResult) {
+  const accusedCount = result.role_counts.accused || 0;
   return [
-    humanize(result.entity_type),
-    `${result.role_counts.accused || 0} accused`,
+    result.entity_type !== "location" && accusedCount > 0
+      ? `${accusedCount} accused`
+      : "",
     `${result.related_case_count} related ${result.related_case_count === 1 ? "case" : "cases"}`,
-  ].join(" · ");
+  ]
+    .filter(Boolean)
+    .join(" · ");
 }
 
 function documentMetadata(result: DocumentSearchResult) {
@@ -234,7 +215,7 @@ function formatTitle(result: ArchiveSearchResult) {
 function formatDescription(result: ArchiveSearchResult) {
   if (result.result_type === "entity" && result.entity_type === "location") {
     const locationName = formatTitle(result);
-    return `See corruption cases happening in ${locationName}`;
+    return `Browse documented cases connected to ${locationName}.`;
   }
   return result.description;
 }
