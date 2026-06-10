@@ -150,6 +150,9 @@ describe("ArchiveSearch", () => {
         .getByRole("region", { name: "Archive search results" })
         .getAttribute("aria-busy"),
     ).toBe("true");
+    expect(searchArchiveMock).toHaveBeenCalledWith(
+      expect.objectContaining({ page_size: 4 }),
+    );
   });
 
   it("keeps filters stable but replaces results during a refresh", async () => {

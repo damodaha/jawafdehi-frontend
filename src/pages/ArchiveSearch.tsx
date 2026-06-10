@@ -48,6 +48,7 @@ const validSorts = new Set<ArchiveSearchSort>([
   "oldest",
   "title",
 ]);
+const archiveSearchPageSize = 4;
 const emptyFacets: ArchiveSearchFacets = {
   type: [],
   entity_type: [],
@@ -336,7 +337,7 @@ function readParams(searchParams: URLSearchParams): ArchiveSearchParams {
     tags: searchParams.getAll("tags"),
     sort: requestedSort && validSorts.has(requestedSort) ? requestedSort : "relevance",
     page: Number.isFinite(page) && page > 0 ? page : 1,
-    page_size: 10,
+    page_size: archiveSearchPageSize,
   };
 }
 
@@ -357,7 +358,7 @@ function ArchiveSearchResults({
         className="space-y-3"
         role="status"
       >
-        {[false, true, false, true, false].map((showTags, index) => (
+        {[false, true, false, true].map((showTags, index) => (
           <SearchResultCardSkeleton
             key={index}
             showTags={showTags}
