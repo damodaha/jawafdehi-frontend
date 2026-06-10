@@ -27,7 +27,7 @@ import type {
   ArchiveSearchType,
 } from "@/types/search";
 
-type RefinementName = "type" | "entity_type" | "role" | "case_type" | "tags";
+type RefinementName = "type" | "entity_type" | "role" | "case_type";
 
 const validSorts = new Set<ArchiveSearchSort>([
   "relevance",
@@ -82,7 +82,7 @@ export default function ArchiveSearch() {
 
   const clearRefinements = () => {
     const next = new URLSearchParams(searchParams);
-    (["type", "entity_type", "role", "case_type", "tags"] as RefinementName[]).forEach(
+    (["type", "entity_type", "role", "case_type"] as RefinementName[]).forEach(
       (name) => next.delete(name),
     );
     next.set("page", "1");
@@ -99,7 +99,6 @@ export default function ArchiveSearch() {
     entity_type: params.entity_type || [],
     role: params.role || [],
     case_type: params.case_type || [],
-    tags: params.tags || [],
   };
   const activeRefinementCount = Object.values(selectedRefinements).reduce(
     (count, values) => count + values.length,

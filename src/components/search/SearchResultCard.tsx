@@ -7,7 +7,7 @@ import {
   Scale,
   UserRound,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { Badge } from "@/components/ui/badge";
 import type {
@@ -18,6 +18,8 @@ import type {
 } from "@/types/search";
 
 export function SearchResultCard({ result }: Readonly<{ result: ArchiveSearchResult }>) {
+  const navigate = useNavigate();
+
   return (
     <Link
       draggable={false}
@@ -48,6 +50,22 @@ export function SearchResultCard({ result }: Readonly<{ result: ArchiveSearchRes
           <p className="mt-2 truncate text-xs leading-5 text-muted-foreground">
             {resultMetadata(result)}
           </p>
+          {result.result_type === "case" && result.tags && result.tags.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {result.tags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(`/search?tags=${encodeURIComponent(tag)}`);
+                  }}
+                  className="rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-semibold text-secondary-foreground hover:bg-secondary/80 transition-colors"
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <ArrowRight
           aria-hidden="true"
