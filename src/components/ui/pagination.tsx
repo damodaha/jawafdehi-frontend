@@ -1,5 +1,6 @@
 import * as React from "react";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
 import { Button, ButtonProps, buttonVariants } from "@/components/ui/button";
@@ -46,20 +47,26 @@ const PaginationLink = ({ className, isActive, size = "icon", ...props }: Pagina
 );
 PaginationLink.displayName = "PaginationLink";
 
-const PaginationPrevious = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink aria-label="Go to previous page" size="default" className={cn("gap-1 pl-2.5", className)} {...props}>
+const PaginationPrevious = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => {
+  const { t } = useTranslation();
+  return (
+  <PaginationLink aria-label={t("pagination.goToPrevPage")} size="default" className={cn("gap-1 pl-2.5", className)} {...props}>
     <ChevronLeft className="h-4 w-4" />
-    <span>Previous</span>
+    <span>{t("pagination.previous")}</span>
   </PaginationLink>
-);
+  );
+};
 PaginationPrevious.displayName = "PaginationPrevious";
 
-const PaginationNext = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink aria-label="Go to next page" size="default" className={cn("gap-1 pr-2.5", className)} {...props}>
-    <span>Next</span>
+const PaginationNext = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => {
+  const { t } = useTranslation();
+  return (
+  <PaginationLink aria-label={t("pagination.goToNextPage")} size="default" className={cn("gap-1 pr-2.5", className)} {...props}>
+    <span>{t("pagination.next")}</span>
     <ChevronRight className="h-4 w-4" />
   </PaginationLink>
-);
+  );
+};
 PaginationNext.displayName = "PaginationNext";
 
 const PaginationEllipsis = ({ className, ...props }: React.ComponentProps<"span">) => (
@@ -85,7 +92,9 @@ const PaginationControls = ({
   onPageChange,
   className,
 }: PaginationControlsProps) => {
-  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const { t } = useTranslation();
+  const safePageSize = Math.max(1, pageSize);
+  const totalPages = Math.max(1, Math.ceil(totalItems / safePageSize));
   if (totalPages <= 1) return null;
 
   const pageItems = getPageItems(page, totalPages);
@@ -94,7 +103,7 @@ const PaginationControls = ({
       <PaginationContent className="w-full justify-between gap-2 sm:w-auto sm:justify-center sm:gap-1">
         <PaginationItem>
           <Button
-            aria-label="Go to previous page"
+            aria-label={t("pagination.goToPrevPage")}
             className="h-10 rounded-full px-4"
             disabled={page <= 1}
             onClick={() => onPageChange(page - 1)}
@@ -102,7 +111,7 @@ const PaginationControls = ({
             variant="outline"
           >
             <ChevronLeft className="h-4 w-4" />
-            <span className="hidden sm:inline">Previous</span>
+            <span className="hidden sm:inline">{t("pagination.previous")}</span>
           </Button>
         </PaginationItem>
 
@@ -114,7 +123,7 @@ const PaginationControls = ({
               ) : (
                 <Button
                   aria-current={item === page ? "page" : undefined}
-                  aria-label={`Go to page ${item}`}
+                  aria-label={t("pagination.goToPage", { page: item })}
                   className={cn(
                     "h-10 w-10 rounded-full p-0",
                     item === page && "pointer-events-none",
@@ -132,21 +141,20 @@ const PaginationControls = ({
 
         <PaginationItem className="sm:hidden">
           <span className="text-sm text-muted-foreground">
-            Page <span className="tabular-nums">{page}</span> of{" "}
-            <span className="tabular-nums">{totalPages}</span>
+            {t("pagination.pageOf", { page, totalPages })}
           </span>
         </PaginationItem>
 
         <PaginationItem>
           <Button
-            aria-label="Go to next page"
+            aria-label={t("pagination.goToNextPage")}
             className="h-10 rounded-full px-4"
             disabled={page >= totalPages}
             onClick={() => onPageChange(page + 1)}
             type="button"
             variant="outline"
           >
-            <span className="hidden sm:inline">Next</span>
+            <span className="hidden sm:inline">{t("pagination.next")}</span>
             <ChevronRight className="h-4 w-4" />
           </Button>
         </PaginationItem>

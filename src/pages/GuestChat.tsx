@@ -233,7 +233,7 @@ export default function GuestChat() {
                   }
                   submitLabel={t("guestChatInput.submit")}
                   loadingLabel={t("guestChatInput.searching")}
-                  disabled
+                  disabled={isLoading}
                   isSubmitting={isLoading}
                   onSubmit={handleSubmit}
                 />

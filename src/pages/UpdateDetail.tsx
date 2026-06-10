@@ -10,8 +10,18 @@ import { useTranslation } from "react-i18next";
 import { stripMarkdown } from "@/utils/markdown";
 import { cn } from "@/lib/utils";
 
+const extractText = (node: ReactNode): string => {
+    if (!node && node !== 0) return "";
+    if (typeof node === "string" || typeof node === "number") return String(node);
+    if (Array.isArray(node)) return node.map(extractText).join("");
+    if (typeof node === "object" && "props" in node && (node as { props?: { children?: ReactNode } }).props?.children) {
+        return extractText((node as { props: { children: ReactNode } }).props.children);
+    }
+    return "";
+};
+
 const headingId = (children: ReactNode) =>
-    String(children)
+    extractText(children)
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "");
@@ -127,32 +137,7 @@ const UpdateDetail = () => {
                             </div>
 
                             <div className="markdown-content">
-                                <Markdown
-                                    // remarkPlugins={[remarkGfm]}
-                                    components={{
-                                        h2: ({ node, children, ...props }) => (
-                                            <h2 id={headingId(children)} className="text-2xl font-bold mt-10 mb-4" {...props}>{children}</h2>
-                                        ),
-                                        h3: ({ node, children, ...props }) => (
-                                            <h3 id={headingId(children)} className="text-xl font-semibold mt-8 mb-3" {...props}>{children}</h3>
-                                        ),
-                                        p: ({ node, ...props }) => (
-                                            <p className="my-6 leading-relaxed" {...props} />
-                                        ),
-                                        li: ({ node, ...props }) => (
-                                            <li className="ml-5 my-2 list-disc" {...props} />
-                                        ),
-                                        a: ({ node, ...props }) => (
-                                            <a className="text-primary underline hover:text-primary/80 transition-colors" {...props} />
-                                        ),
-                                        img: ({ node, ...props }) => (
-                                            <img
-                                                {...props}
-                                                className="rounded-lg border shadow-sm my-8 w-full max-h-[500px] object-cover"
-                                            />
-                                        ),
-                                    }}
-                                >
+                                <Markdown components={markdownComponents}>
                                     {update.content}
                                 </Markdown>
                             </div>

@@ -25,6 +25,7 @@ export interface SearchFacetItem {
 }
 
 export interface ArchiveSearchFacets {
+  type: SearchFacetItem[];
   entity_type: SearchFacetItem[];
   role: SearchFacetItem[];
   case_type: SearchFacetItem[];

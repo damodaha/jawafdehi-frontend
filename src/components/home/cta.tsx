@@ -1,4 +1,5 @@
-import { Heart, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { FaDiscord } from "react-icons/fa";
 
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,8 @@ type CtaProps = {
   className?: string;
 };
 
-export function Cta({ className }: CtaProps) {
+export function Cta({ className }: Readonly<CtaProps>) {
+  const { t } = useTranslation();
   return (
     <section
       id="contribute"
@@ -29,18 +31,16 @@ export function Cta({ className }: CtaProps) {
         />
 
         <div className="flex max-w-3xl flex-col items-start">
-         
 
           <h2
             id="contribute-title"
             className="mt-4 max-w-2xl text-3xl font-extrabold leading-tight tracking-normal text-white md:text-4xl"
           >
-           Volunteer with Jawafdehi
+            {t("cta.title")}
           </h2>
 
           <p className="mt-5 max-w-2xl text-sm leading-7 text-white/90 md:text-base">
-            Start by joining our Discord server or send us an email to
-            introduce yourself and tell us which team interests you.
+            {t("cta.description")}
           </p>
 
           <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
@@ -56,7 +56,7 @@ export function Cta({ className }: CtaProps) {
                 rel="noopener noreferrer"
               >
                 <FaDiscord className="mr-2 h-5 w-5 text-[#5865F2]" aria-hidden="true" />
-                Discord
+                {t("cta.discord")}
               </a>
             </Button>
 
@@ -68,7 +68,7 @@ export function Cta({ className }: CtaProps) {
             >
               <a href="mailto:cases@jawafdehi.org">
                 <Mail className="h-4 w-4" aria-hidden="true" />
-                Email us
+                {t("cta.email")}
               </a>
             </Button>
           </div>

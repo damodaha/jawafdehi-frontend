@@ -303,6 +303,16 @@ function LLMTab() {
 
 // ── MCP Servers tab ───────────────────────────────────────────────────────────
 
+function getStatusColorClass(status: string): string {
+  if (status === "connected") return "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200";
+  if (status === "error") return "bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-200";
+  return "bg-muted text-muted-foreground";
+}
+
+function ServerStatusBadge({ status }: Readonly<{ status: string }>) {
+  return <span className={`text-xs px-1.5 py-0.5 rounded-full ${getStatusColorClass(status)}`}>{status}</span>;
+}
+
 function MCPTab() {
   const [servers, setServers] = useState<MCPServer[]>([]);
   const [creating, setCreating] = useState(false);
@@ -398,11 +408,7 @@ function MCPTab() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="font-medium text-sm">{s.display_name ?? s.name}</p>
-                  <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                    s.status === "connected" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200"
-                    : s.status === "error" ? "bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-200"
-                    : "bg-muted text-muted-foreground"
-                  }`}>{s.status}</span>
+                  <ServerStatusBadge status={s.status} />
                   {status[s.id] === true && <span className="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200 px-1.5 py-0.5 rounded-full flex items-center gap-0.5"><Zap className="h-3 w-3" /> OK</span>}
                   {status[s.id] === false && <span className="text-xs bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-200 px-1.5 py-0.5 rounded-full">Failed</span>}
                 </div>

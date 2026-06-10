@@ -7,7 +7,9 @@ export function AppLayout() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <Outlet />
+      <main>
+        <Outlet />
+      </main>
       <Footer />
     </div>
   );

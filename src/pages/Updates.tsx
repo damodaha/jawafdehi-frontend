@@ -123,8 +123,7 @@ const Updates = () => {
                                 </p>
                             </div>
 
-                            <div
-                                role="group"
+                            <fieldset
                                 aria-label="Choose updates layout"
                                 className="relative inline-flex h-10 w-[92px] shrink-0 items-center overflow-hidden rounded-full border border-border/70 bg-background/70 px-1 text-sm font-semibold leading-none text-foreground shadow-sm shadow-foreground/5 transition-[background-color,border-color,box-shadow,transform] duration-200 ease-out hover:-translate-y-0.5 hover:border-foreground/15 hover:bg-background hover:shadow-md"
                             >
@@ -156,12 +155,12 @@ const Updates = () => {
                                     title="List view"
                                     className={cn(
                                         "relative z-10 grid h-full flex-1 place-items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                                        !isCardView ? "text-background" : "text-muted-foreground hover:text-foreground",
+                                        isCardView ? "text-muted-foreground hover:text-foreground" : "text-background",
                                     )}
                                 >
                                     <List className="h-4 w-4" aria-hidden="true" />
                                 </button>
-                            </div>
+                            </fieldset>
                         </div>
 
                         <div className={isCardView ? "grid gap-6 md:grid-cols-2 xl:grid-cols-3" : "grid gap-5"}>

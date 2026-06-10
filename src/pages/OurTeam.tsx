@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { Mail, Linkedin, Facebook, Github, Globe, Users } from "lucide-react";
+import { Mail, Linkedin, Facebook, Github, Globe, Users, Instagram } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { teamMembers } from "@/data/team";
 import type { Contact } from "@/data/team";
@@ -14,6 +14,7 @@ const ContactIcon = ({ contact }: { contact: Contact }) => {
     facebook: <Facebook className="h-4 w-4" />,
     github: <Github className="h-4 w-4" />,
     website: <Globe className="h-4 w-4" />,
+    instagram: <Instagram className="h-4 w-4" />,
   }[contact.type];
 
   return (
@@ -30,7 +31,7 @@ const ContactIcon = ({ contact }: { contact: Contact }) => {
 };
 
 const OurTeam = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const lang = (i18n.language?.startsWith("ne") ? "ne" : "en") as "en" | "ne";
 
   return (
@@ -71,14 +72,14 @@ const OurTeam = () => {
             <div className="mx-auto max-w-5xl">
               
               <h1 className="text-[2.65rem] font-extrabold leading-[0.98] tracking-normal text-primary sm:text-5xl md:text-[3.35rem]">
-                Built by{" "}
+                {t("team.hero.builtBy")}{" "}
                 <span className="text-accent sm:whitespace-nowrap">
-                  Nepali volunteers
+                  {t("team.hero.nepaliVolunteers")}
                 </span>
-                <span className="block text-primary">for Nepal</span>
+                <span className="block text-primary">{t("team.hero.forNepal")}</span>
               </h1>
               <p className="mx-auto mt-6 max-w-3xl text-base leading-8 text-muted-foreground md:text-lg">
-                Jawafdehi runs entirely on volunteer effort from Nepali citizens across technology, research, journalism, and public policy. No corporate interests. No government funding. Just people who believe accountability matters.
+                {t("team.hero.description")}
               </p>
             </div>
           </div>

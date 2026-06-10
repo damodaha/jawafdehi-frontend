@@ -16,7 +16,7 @@ export function SearchFilters({
   selected,
   onToggle,
   onClear,
-}: SearchFiltersProps) {
+}: Readonly<SearchFiltersProps>) {
   return (
     <aside
       aria-label="Archive search filters"
@@ -76,13 +76,13 @@ function FilterGroup({
   onToggle,
   selectedValues,
   title,
-}: {
+}: Readonly<{
   items: SearchFacetItem[];
   name: FilterName;
   onToggle: (name: FilterName, value: string) => void;
   selectedValues: string[];
   title: string;
-}) {
+}>) {
   return (
     <fieldset className="space-y-0.5">
       <legend className="mb-1.5 text-sm font-semibold text-foreground">

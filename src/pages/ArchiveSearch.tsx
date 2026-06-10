@@ -22,7 +22,9 @@ import { searchArchive } from "@/services/search-api";
 import type {
   ArchiveSearchFacets,
   ArchiveSearchParams,
+  ArchiveSearchResponse,
   ArchiveSearchSort,
+  ArchiveSearchType,
 } from "@/types/search";
 
 type RefinementName = "type" | "entity_type" | "role" | "case_type" | "tags";
@@ -221,27 +223,7 @@ export default function ArchiveSearch() {
               </Alert>
             ) : null}
 
-            {isLoading ? (
-              <div aria-live="polite" className="space-y-3" role="status">
-                <span className="sr-only">Searching archive</span>
-                {[1, 2, 3, 4].map((item) => (
-                  <Skeleton className="h-32 rounded-xl" key={item} />
-                ))}
-              </div>
-            ) : data?.results.length ? (
-              <div className="space-y-3">
-                {data.results.map((result) => (
-                  <SearchResultCard key={`${result.result_type}-${result.id}`} result={result} />
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-xl border border-dashed p-10 text-center">
-                <h2 className="text-lg font-bold text-foreground">No archive records found</h2>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  Try a broader term or remove one of the filters.
-                </p>
-              </div>
-            )}
+            <ArchiveSearchResults isLoading={isLoading} data={data} />
 
             {data && data.count > data.page_size ? (
               <PaginationControls
@@ -263,9 +245,7 @@ function readParams(searchParams: URLSearchParams): ArchiveSearchParams {
   const page = Number.parseInt(searchParams.get("page") || "1", 10);
   return {
     q: searchParams.get("q") || undefined,
-    type: searchParams
-      .getAll("type")
-      .filter((type) => ["case", "entity", "document"].includes(type)),
+    type: (["case", "entity", "document"].includes(searchParams.get("type") || "") ? searchParams.get("type") as ArchiveSearchType : undefined),
     entity_type: searchParams.getAll("entity_type"),
     role: searchParams.getAll("role"),
     case_type: searchParams.getAll("case_type"),
@@ -274,6 +254,44 @@ function readParams(searchParams: URLSearchParams): ArchiveSearchParams {
     page: Number.isFinite(page) && page > 0 ? page : 1,
     page_size: 10,
   };
+}
+
+function ArchiveSearchResults({
+  isLoading,
+  data,
+}: Readonly<{
+  isLoading: boolean;
+  data: ArchiveSearchResponse | undefined;
+}>) {
+  if (isLoading) {
+    return (
+      <div aria-live="polite" className="space-y-3" role="status">
+        <span className="sr-only">Searching archive</span>
+        {[1, 2, 3, 4].map((item) => (
+          <Skeleton className="h-32 rounded-xl" key={item} />
+        ))}
+      </div>
+    );
+  }
+
+  if (!data?.results.length) {
+    return (
+      <div className="rounded-xl border border-dashed p-10 text-center">
+        <h2 className="text-lg font-bold text-foreground">No archive records found</h2>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          Try a broader term or remove one of the filters.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {data.results.map((result) => (
+        <SearchResultCard key={`${result.result_type}-${result.id}`} result={result} />
+      ))}
+    </div>
+  );
 }
 
 function getSelectedItems(

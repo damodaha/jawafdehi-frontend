@@ -1,4 +1,8 @@
+import { useTranslation, Trans } from "react-i18next";
+
 export function OurProcessHero() {
+  const { t } = useTranslation();
+
   return (
     <section id="process-hero" className="relative isolate -mt-[76px] overflow-hidden bg-background pt-[76px]">
       <div
@@ -16,8 +20,10 @@ export function OurProcessHero() {
 
       <div className="container relative z-10 mx-auto flex w-full items-center justify-start py-10 md:min-h-[35svh] md:justify-center md:py-12 lg:py-14">
         <h1 className="max-w-5xl text-left text-4xl font-extrabold leading-[1.05] tracking-tight text-primary sm:text-5xl md:text-center md:text-[3.35rem] md:leading-[0.98]">
-          How a <span className="text-accent">corruption</span> case goes from discovery to the{" "}
-          <span className="text-accent">public archive</span>
+          <Trans i18nKey="ourProcess.hero.heading">
+            How a <span className="text-accent">corruption</span> case goes from discovery to the{" "}
+            <span className="text-accent">public archive</span>
+          </Trans>
         </h1>
       </div>
     </section>

@@ -1,4 +1,4 @@
-export type ContactType = "email" | "facebook" | "linkedin" | "github" | "website";
+export type ContactType = "email" | "facebook" | "linkedin" | "github" | "website" | "instagram";
 
 export interface Contact {
   type: ContactType;
@@ -55,14 +55,6 @@ export const teamMembers: TeamMember[] = [
     contacts: [
       { type: "linkedin", value: "https://www.linkedin.com/in/gbishwas/" },
       { type: "github", value: "https://github.com/bishwasgautam" },
-    ],
-  },
-  {
-    displayName: { en: "Jenish Khanal", ne: "जेनिस खनाल" },
-    thumb: "https://s3.jawafdehi.org/team/jenish.jpeg",
-    description: "Volunteer, Let's Build Nepal",
-    contacts: [
-      { type: "linkedin", value: "https://www.linkedin.com/in/jenish-khanal-709458201/" },
     ],
   },
   {
@@ -157,6 +149,23 @@ export const teamMembers: TeamMember[] = [
     description: "Software Engineer Intern, Jawafdehi.org",
     contacts: [
       { type: "github", value: "https://github.com/sjungthapa" },
+    ],
+  },
+  {
+    displayName: { en: "Sambhav Koirala", ne: "सम्भव कोइराला" },
+    thumb: "https://jawafdehi.org/assets/teammembers/sambhav.jpeg",
+    description: "Case Documentation Intern, Jawafdehi.org. Future-Focused and Purpose-Driven.",
+    contacts: [
+      { type: "linkedin", value: "https://www.linkedin.com/in/sambhav-koirala-7a6b47368" },
+    ],
+  },
+  {
+    displayName: { en: "Subodh Kandel", ne: "सुबोध कँडेल" },
+    thumb: "https://jawafdehi.org/assets/teammembers/subodh.jpeg",
+    description: "Case Documentation Intern, Jawafdehi.org",
+    contacts: [
+      { type: "email", value: "kandelsubodh46@gmail.com" },
+      { type: "instagram", value: "https://www.instagram.com/subodh_kandel" },
     ],
   },
 ];

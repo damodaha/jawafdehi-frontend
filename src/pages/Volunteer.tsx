@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { useTranslation } from "react-i18next";
 import { Cta } from "@/components/home/cta";
 import { VolunteerHero } from "@/components/volunteer/hero";
 import {
@@ -14,86 +15,58 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-const TEAMS = [
-  {
-    icon: Search,
-    name: "Data Scraping Team",
-    responsibilities: [
-      "Archive government documents into digital text for large-scale analysis",
-      "Scrape Nepali media sources — existing and newly identified",
-      "Leverage AI to bootstrap case drafts and update them as new information emerges",
-      "Maintain the Nepal Entity Service data pipeline",
-    ],
-  },
-  {
-    icon: Megaphone,
-    name: "Outreach Team",
-    responsibilities: [
-      "Build relationships with investigative journalists, corruption watchdogs, and YouTubers",
-      "Source evidence and case leads from civil society organisations",
-      "Coordinate with CIAA, CIB, and media for primary source access",
-    ],
-  },
-  {
-    icon: Globe,
-    name: "Platform Development",
-    responsibilities: [
-      "Keep the platform accessible and performant for all stakeholders",
-      "Maintain open APIs for public data access",
-      "Build monitoring dashboards and run load testing",
-      "Ship website improvements based on user feedback",
-    ],
-  },
-  {
-    icon: BookOpen,
-    name: "Corruption Compilation Team",
-    responsibilities: [
-      "Compile, structure, and publish corruption cases",
-      "Maintain case accuracy with ongoing updates and corrections",
-      "Ensure every published case meets verification standards",
-    ],
-  },
-  {
-    icon: FlaskConical,
-    name: "Corruption Research",
-    responsibilities: [
-      "Investigate what legally and ethically constitutes corruption in each context",
-      "Analyse the role of corruption in Nepali governance structures",
-      "Evaluate the effectiveness of anti-corruption policy and institutional frameworks",
-    ],
-  },
+type TeamEntry = {
+  icon: LucideIcon;
+  nameKey: string;
+  responsibilityKeys: string[];
+};
+
+const teamConfigs: Array<{ icon: LucideIcon; nameKey: string; respKey: string }> = [
+  { icon: Search, nameKey: "volunteer.teams.dataScraping", respKey: "volunteer.teams.dataScrapingResponsibilities" },
+  { icon: Megaphone, nameKey: "volunteer.teams.outreach", respKey: "volunteer.teams.outreachResponsibilities" },
+  { icon: Globe, nameKey: "volunteer.teams.platformDevelopment", respKey: "volunteer.teams.platformDevelopmentResponsibilities" },
+  { icon: BookOpen, nameKey: "volunteer.teams.corruptionCompilation", respKey: "volunteer.teams.corruptionCompilationResponsibilities" },
+  { icon: FlaskConical, nameKey: "volunteer.teams.corruptionResearch", respKey: "volunteer.teams.corruptionResearchResponsibilities" },
 ];
 
 type VolunteerProfile = {
   icon: LucideIcon;
-  title: string;
-  desc: string;
+  titleKey: string;
+  descKey: string;
 };
 
-const VOLUNTEER_PROFILES: VolunteerProfile[] = [
+const getProfiles = (): VolunteerProfile[] => [
   {
     icon: Laptop,
-    title: "Technology Enthusiasts",
-    desc: "Developers, data engineers, and AI practitioners who want to build civic infrastructure that matters. Frontend, backend, scraping, NLP — all skills are needed.",
+    titleKey: "volunteer.profiles.technologyEnthusiasts.title",
+    descKey: "volunteer.profiles.technologyEnthusiasts.desc",
   },
   {
     icon: BriefcaseBusiness,
-    title: "Working Professionals",
-    desc: "Accountants, analysts, policy professionals, and domain experts who can bring their field knowledge to understanding and verifying corruption cases.",
+    titleKey: "volunteer.profiles.workingProfessionals.title",
+    descKey: "volunteer.profiles.workingProfessionals.desc",
   },
   {
     icon: Scale,
-    title: "Legal Professionals",
-    desc: "Lawyers, law students, and legal researchers who can help interpret CIAA filings, court orders, and legal timelines accurately for a public audience.",
+    titleKey: "volunteer.profiles.legalProfessionals.title",
+    descKey: "volunteer.profiles.legalProfessionals.desc",
   },
   {
     icon: GraduationCap,
-    title: "Students",
-    desc: "Students in law, public policy, computer science, journalism, or any field — this is real-world experience working on a problem that matters for Nepal.",
+    titleKey: "volunteer.profiles.students.title",
+    descKey: "volunteer.profiles.students.desc",
   },
 ];
 
-const Volunteer = () => (
+const Volunteer = () => {
+  const { t } = useTranslation();
+  const teams: TeamEntry[] = teamConfigs.map((cfg) => ({
+    icon: cfg.icon,
+    nameKey: cfg.nameKey,
+    responsibilityKeys: t(cfg.respKey, { returnObjects: true }) as string[],
+  }));
+  const profiles = getProfiles();
+  return (
   <div className="min-h-screen flex flex-col bg-background">
     <Helmet>
       <title>Volunteer with Us — Jawafdehi</title>
@@ -119,37 +92,37 @@ const Volunteer = () => (
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-2xl text-center">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-              Who can join
+              {t("volunteer.whoCanJoin.eyebrow")}
             </p>
             <h2 className="text-3xl font-bold text-foreground md:text-4xl">
-              Who we're looking for
+              {t("volunteer.whoCanJoin.title")}
             </h2>
             <p className="mt-4 text-base leading-7 text-foreground/70">
-              You don't need to be an expert. You need to care about Nepal and be willing to contribute your skills. Jawafdehi needs people who can help with technology, research, legal interpretation, data compilation, outreach, and translation.
+              {t("volunteer.whoCanJoin.description")}
             </p>
           </div>
 
           <div className="mx-auto mt-10 grid max-w-6xl grid-cols-1 gap-10 md:grid-cols-2 md:gap-12 lg:grid-cols-4 lg:gap-10">
-            {VOLUNTEER_PROFILES.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="mx-auto flex max-w-[16rem] flex-col items-center text-center">
+            {profiles.map(({ icon: Icon, titleKey, descKey }) => (
+              <div key={titleKey} className="mx-auto flex max-w-[16rem] flex-col items-center text-center">
                 <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full border border-primary/20 bg-primary/[0.07] text-primary">
                   <Icon aria-hidden="true" className="h-10 w-10" strokeWidth={1.45} />
                 </div>
-                <h3 className="mb-2 text-lg font-bold leading-tight text-foreground">{title}</h3>
-                <p className="text-sm leading-6 text-foreground/70">{desc}</p>
+                <h3 className="mb-2 text-lg font-bold leading-tight text-foreground">{t(titleKey)}</h3>
+                <p className="text-sm leading-6 text-foreground/70">{t(descKey)}</p>
               </div>
             ))}
           </div>
 
           <div className="mx-auto mt-12 max-w-3xl text-center">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-              Global community
+              {t("volunteer.globalCommunity.eyebrow")}
             </p>
             <h2 className="mb-4 text-2xl font-bold tracking-normal text-foreground md:text-3xl">
-              A worldwide network of Nepali professionals
+              {t("volunteer.globalCommunity.title")}
             </h2>
             <p className="text-base leading-8 text-foreground/75 md:text-[1.0625rem]">
-              Our volunteers are based across Nepal and around the world — in the US, Thailand, India, and beyond. When you join Jawafdehi, you become part of a global community of Nepali professionals united by a single goal: making sure Nepal remembers.
+              {t("volunteer.globalCommunity.description")}
             </p>
           </div>
         </div>
@@ -160,27 +133,27 @@ const Volunteer = () => (
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-10 max-w-2xl text-center">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-              Where you can help
+              {t("volunteer.teams.eyebrow")}
             </p>
             <h2 className="text-3xl font-bold text-foreground md:text-4xl">
-              Our Volunteer Teams
+              {t("volunteer.teams.title")}
             </h2>
             <p className="mt-4 text-base leading-7 text-foreground/70">
-              Each team owns a distinct part of the pipeline. Find the one that matches your skills.
+              {t("volunteer.teams.description")}
             </p>
           </div>
 
           <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {TEAMS.map(({ icon: Icon, name, responsibilities }) => (
-              <div key={name} className="rounded-lg border border-primary/10 bg-background/70 p-6 shadow-sm shadow-primary/5">
+            {teams.map(({ icon: Icon, nameKey, responsibilityKeys }) => (
+              <div key={nameKey} className="rounded-lg border border-primary/10 bg-background/70 p-6 shadow-sm shadow-primary/5">
                 <div className="mb-5 flex items-center gap-3">
                   <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/[0.07] text-primary">
                     <Icon aria-hidden="true" className="h-6 w-6" strokeWidth={1.55} />
                   </div>
-                  <h3 className="text-lg font-bold leading-tight text-foreground">{name}</h3>
+                  <h3 className="text-lg font-bold leading-tight text-foreground">{t(nameKey)}</h3>
                 </div>
                 <ul className="space-y-3">
-                  {responsibilities.map((item) => (
+                  {responsibilityKeys.map((item) => (
                     <li key={item} className="flex items-start gap-3 text-sm leading-6 text-foreground/70">
                       <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent" />
                       <span>{item}</span>
@@ -197,6 +170,7 @@ const Volunteer = () => (
     </main>
 
   </div>
-);
+  );
+};
 
 export default Volunteer;

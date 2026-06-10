@@ -60,12 +60,12 @@ const About = () => {
                 <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
                   {t("about.building.eyebrow", "What we do")}
                 </p>
-                <h2 className="mb-4 text-2xl font-bold tracking-normal text-foreground md:text-3xl">What We're Building</h2>
+                <h2 className="mb-4 text-2xl font-bold tracking-normal text-foreground md:text-3xl">{t("about.building.title")}</h2>
                 <p className="text-justify text-base leading-8 text-foreground/75 md:text-[1.0625rem]">
-                  Corruption-related records are scattered across dozens of government portals, court systems, and public databases — inaccessible to most citizens. We are building the technology and the volunteer network to bring it all into one permanent, publicly searchable knowledge base.
+                  {t("about.building.description1")}
                 </p>
                 <p className="mt-5 text-justify text-base leading-8 text-foreground/75 md:text-[1.0625rem]">
-                  Free to use. Open source. Built entirely by Nepali volunteers who believe accountability has no expiry.
+                  {t("about.building.description2")}
                 </p>
               </div>
             </div>
