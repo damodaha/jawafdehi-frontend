@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { Mail, Linkedin, Facebook, Github, Globe, Users, Instagram } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { teamMembers } from "@/data/team";
+import { usBoard, nepalBoard, members, pastMembers } from "@/data/team";
 import type { Contact } from "@/data/team";
 import { Cta } from "@/components/home/cta";
 import { TeamCard } from "@/components/ui/card";
@@ -85,53 +85,83 @@ const OurTeam = () => {
           </div>
         </section>
 
-        {/* Team grid */}
-        <section id="team-members" className="py-12 md:py-16">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {teamMembers.map((member) => (
-                <TeamCard key={member.displayName.en}>
-                  {/* Photo */}
-                  <div className="mb-5">
-                    {member.thumb ? (
-                      <img
-                        src={member.thumb}
-                        alt={member.displayName.en}
-                        className="h-28 w-28 rounded-full object-cover ring-4 ring-background shadow-md"
-                      />
-                    ) : (
-                      <div className="h-28 w-28 rounded-full bg-primary/10 flex items-center justify-center ring-4 ring-background shadow-md">
-                        <Users className="h-12 w-12 text-primary/40" />
+        {/* Team sections */}
+        {[
+          { id: "us-board", heading: "US Board", data: usBoard },
+          { id: "nepal-board", heading: "Nepal Board", data: nepalBoard },
+          { id: "members", heading: "Current Members", data: members },
+          { id: "past-members", heading: "Past Members", data: pastMembers },
+        ].map(({ id, heading, data }) => (
+          <section key={id} id={id} className="py-12 md:py-16">
+            <div className="container mx-auto px-4">
+              <h2 className="text-2xl font-bold text-primary mb-8">{heading}</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {data.map((member) => (
+                  <TeamCard key={member.displayName.en}>
+                    {/* Photo */}
+                    <div className="mb-5">
+                      {member.thumb ? (
+                        <img
+                          src={member.thumb}
+                          alt={member.displayName.en}
+                          className="h-28 w-28 rounded-full object-cover ring-4 ring-background shadow-md"
+                        />
+                      ) : (
+                        <div className="h-28 w-28 rounded-full bg-primary/10 flex items-center justify-center ring-4 ring-background shadow-md">
+                          <Users className="h-12 w-12 text-primary/40" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Name */}
+                    <h3 className="text-lg font-bold text-foreground mb-0.5">
+                      {member.displayName[lang]}
+                    </h3>
+                    {lang === "en" && member.displayName.ne && (
+                      <p className="text-sm text-muted-foreground/60 mb-3">{member.displayName.ne}</p>
+                    )}
+
+                    {/* Description */}
+                    {member.description && (
+                      <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-1">
+                        {member.description}
+                      </p>
+                    )}
+
+                    {/* Tags */}
+                    {member.tags && member.tags.length > 0 && (
+                      <div className="flex flex-wrap items-center justify-center gap-1.5 mb-4">
+                        {member.tags.map((tag) => {
+                          const isFounder = tag === "Founder";
+                          const colorClasses = isFounder
+                            ? "bg-emerald-500/10 text-emerald-600"
+                            : "bg-blue-500/10 text-blue-600";
+                          return (
+                            <span
+                              key={tag}
+                              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${colorClasses}`}
+                            >
+                              {tag}
+                            </span>
+                          );
+                        })}
                       </div>
                     )}
-                  </div>
 
-                  {/* Name */}
-                  <h3 className="text-lg font-bold text-foreground mb-0.5">
-                    {member.displayName[lang]}
-                  </h3>
-                  {lang === "en" && member.displayName.ne && (
-                    <p className="text-sm text-muted-foreground/60 mb-3">{member.displayName.ne}</p>
-                  )}
-
-                  {/* Description */}
-                  <p className="text-sm text-muted-foreground leading-relaxed mb-5 flex-1">
-                    {member.description}
-                  </p>
-
-                  {/* Social links */}
-                  {member.contacts.length > 0 && (
-                    <div className="flex items-center gap-3 pt-4 border-t border-border w-full justify-center">
-                      {member.contacts.map((contact, i) => (
-                        <ContactIcon key={i} contact={contact} />
-                      ))}
-                    </div>
-                  )}
-                </TeamCard>
-              ))}
+                    {/* Social links */}
+                    {member.contacts.length > 0 && (
+                      <div className="flex items-center gap-3 pt-4 border-t border-border w-full justify-center">
+                        {member.contacts.map((contact, i) => (
+                          <ContactIcon key={i} contact={contact} />
+                        ))}
+                      </div>
+                    )}
+                  </TeamCard>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        ))}
 
        <Cta/>
       </main>
