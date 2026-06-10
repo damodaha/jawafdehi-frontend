@@ -220,7 +220,7 @@ const Index = () => {
 
             <div className="text-center mt-10 mb-4 flex justify-center">
               <Button variant="primary" size="xl" asChild>
-                <Link to="/search">
+                <Link to="/search?type=case">
                   View all cases <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>

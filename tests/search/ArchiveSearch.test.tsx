@@ -151,7 +151,10 @@ describe("ArchiveSearch", () => {
         .getAttribute("aria-busy"),
     ).toBe("true");
     expect(searchArchiveMock).toHaveBeenCalledWith(
-      expect.objectContaining({ page_size: 4 }),
+      expect.objectContaining({ page_size: 4, type: "case" }),
+    );
+    expect(screen.getByTestId("location-search").textContent).toBe(
+      "?type=case",
     );
   });
 
@@ -213,15 +216,6 @@ describe("ArchiveSearch", () => {
     renderSearch();
     await screen.findByText("Original result");
 
-    fireEvent.click(
-      screen.getAllByRole("radio", { name: "Cases: 8 results" })[0],
-    );
-
-    await waitFor(() => {
-      expect(screen.getByTestId("location-search").textContent).toContain(
-        "type=case",
-      );
-    });
     expect(
       screen
         .getAllByRole("radio", { name: "Cases: 8 results" })[0]
@@ -231,8 +225,8 @@ describe("ArchiveSearch", () => {
     fireEvent.click(screen.getAllByRole("radio", { name: "All records" })[0]);
 
     await waitFor(() => {
-      expect(screen.getByTestId("location-search").textContent).not.toContain(
-        "type=",
+      expect(screen.getByTestId("location-search").textContent).toContain(
+        "type=all",
       );
     });
     expect(
@@ -240,6 +234,9 @@ describe("ArchiveSearch", () => {
         .getAllByRole("radio", { name: "All records" })[0]
         .getAttribute("data-state"),
     ).toBe("checked");
+    expect(searchArchiveMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({ type: undefined }),
+    );
   });
 
   it("adds card tags as URL refinements without exposing a tag sidebar", async () => {

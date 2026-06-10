@@ -3,7 +3,7 @@ const defaultValues: Record<string, string> = {
   sort: "relevance",
 };
 const validSorts = new Set(["relevance", "newest", "oldest", "title"]);
-const validTypes = new Set(["case", "entity", "document"]);
+const validTypes = new Set(["all", "case", "entity", "document"]);
 
 export function normalizeArchiveSearchParams(current: URLSearchParams) {
   const next = new URLSearchParams(current);
@@ -23,8 +23,8 @@ export function normalizeArchiveSearchParams(current: URLSearchParams) {
   }
 
   const type = next.get("type");
-  if (!type || type === "all" || !validTypes.has(type)) {
-    next.delete("type");
+  if (!type || !validTypes.has(type)) {
+    next.set("type", "case");
   } else {
     next.set("type", type);
   }

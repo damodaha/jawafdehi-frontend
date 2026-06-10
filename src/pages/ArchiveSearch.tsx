@@ -59,7 +59,14 @@ const emptyFacets: ArchiveSearchFacets = {
 
 export default function ArchiveSearch() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const params = useMemo(() => readParams(searchParams), [searchParams]);
+  const selectedRecordType = useMemo(
+    () => readRecordType(searchParams),
+    [searchParams],
+  );
+  const params = useMemo(
+    () => readParams(searchParams, selectedRecordType),
+    [searchParams, selectedRecordType],
+  );
   const [query, setQuery] = useState(params.q || "");
 
   useEffect(() => setQuery(params.q || ""), [params.q]);
@@ -117,7 +124,7 @@ export default function ArchiveSearch() {
   };
 
   const updateRecordType = (type?: ArchiveSearchType) => {
-    updateParams({ type, page: 1 });
+    updateParams({ type: type || "all", page: 1 });
   };
 
   const removeRefinement = (name: RefinementName, value: string) => {
@@ -149,7 +156,7 @@ export default function ArchiveSearch() {
   };
   const selectedRefinements = {
     ...selectedSidebarFilters,
-    type: params.type ? [params.type] : [],
+    type: selectedRecordType === "all" ? [] : [selectedRecordType],
     tags: params.tags || [],
   };
   const activeRefinementCount = Object.values(selectedRefinements).reduce(
@@ -168,7 +175,7 @@ export default function ArchiveSearch() {
         onToggle={toggleRefinement}
         onTypeChange={updateRecordType}
         selected={selectedSidebarFilters}
-        selectedType={params.type}
+        selectedType={selectedRecordType}
       />
     )
   ) : null;
@@ -325,12 +332,22 @@ export default function ArchiveSearch() {
   );
 }
 
-function readParams(searchParams: URLSearchParams): ArchiveSearchParams {
+function readRecordType(searchParams: URLSearchParams): ArchiveSearchType {
+  const requestedType = searchParams.get("type");
+  return ["all", "case", "entity", "document"].includes(requestedType || "")
+    ? (requestedType as ArchiveSearchType)
+    : "case";
+}
+
+function readParams(
+  searchParams: URLSearchParams,
+  selectedRecordType: ArchiveSearchType,
+): ArchiveSearchParams {
   const requestedSort = searchParams.get("sort") as ArchiveSearchSort | null;
   const page = Number.parseInt(searchParams.get("page") || "1", 10);
   return {
     q: searchParams.get("q") || undefined,
-    type: (["case", "entity", "document"].includes(searchParams.get("type") || "") ? searchParams.get("type") as ArchiveSearchType : undefined),
+    type: selectedRecordType === "all" ? undefined : selectedRecordType,
     entity_type: searchParams.getAll("entity_type"),
     role: searchParams.getAll("role"),
     case_type: searchParams.getAll("case_type"),
