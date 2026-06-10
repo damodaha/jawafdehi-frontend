@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { ArchiveSearchFacets, SearchFacetItem } from "@/types/search";
 
-type FilterName = "type" | "entity_type" | "role" | "case_type" | "tags";
+type FilterName = "type" | "entity_type" | "role" | "case_type";
 
 type SearchFiltersProps = {
   facets: ArchiveSearchFacets;
@@ -59,13 +59,7 @@ export function SearchFilters({
         selectedValues={selected.case_type}
         title="Case type"
       />
-      <FilterGroup
-        items={facets.tags}
-        name="tags"
-        onToggle={onToggle}
-        selectedValues={selected.tags}
-        title="Tags"
-      />
+
     </aside>
   );
 }
