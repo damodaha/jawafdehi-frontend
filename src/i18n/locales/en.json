@@ -354,6 +354,8 @@
       "opposition": "Opposition",
       "victim": "Victims",
       "location": "Locations",
+      "respondent": "Respondent",
+      "petitioner": "Petitioner",
       "unknown": "Other Related Parties"
     },
     "andMoreAccused": "and {{count}} more",
@@ -963,6 +965,8 @@
     "relationTypeWitness": "Witness",
     "relationTypeOpposition": "Opposition",
     "relationTypeVictim": "Victim",
+    "relationTypeRespondent": "Respondent",
+    "relationTypePetitioner": "Petitioner",
     "relationTypeLocation": "Location",
     "relationTypeUnknown": "Related",
     "bell": "Bell",

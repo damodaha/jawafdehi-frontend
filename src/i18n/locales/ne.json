@@ -354,6 +354,8 @@
       "opposition": "विपक्षी",
       "victim": "पीडित",
       "location": "स्थानहरू",
+      "respondent": "प्रत्यर्थी",
+      "petitioner": "रिट निवेदक",
       "unknown": "अन्य सम्बद्ध पक्षहरू"
     },
     "andMoreAccused": "र {{count}} थप",
@@ -962,6 +964,8 @@
     "relationTypeWitness": "साक्षी",
     "relationTypeOpposition": "विपक्ष",
     "relationTypeVictim": "पीडित",
+    "relationTypeRespondent": "प्रत्यर्थी",
+    "relationTypePetitioner": "रिट निवेदक",
     "relationTypeLocation": "स्थान",
     "relationTypeUnknown": "सम्बन्धित",
     "bell": "घण्टा",
