@@ -93,7 +93,7 @@ function FooterNavLink({ label, to, external }: Readonly<FooterLink>) {
 function FooterLinkGroup({ title, links }: Readonly<{ title: string; links: FooterLink[] }>) {
   return (
     <nav aria-label={title}>
-      <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--footer-title)]">
+      <h3 className="mb-3 text-sm font-bold text-[var(--footer-fg)]">
         {title}
       </h3>
       <ul className="space-y-1">
@@ -153,7 +153,7 @@ export const Footer = () => {
       className={cn(
         "relative isolate overflow-hidden border-t bg-[var(--footer-bg)] text-[var(--footer-fg)]",
         "[--footer-bg:hsl(var(--primary))] [--footer-fg:hsl(var(--primary-foreground))] [--footer-muted:hsl(var(--primary-foreground)/0.78)]",
-        "[--footer-title:hsl(354_100%_71%)]",
+        "[--footer-title:#FF000E]",
         "[--footer-soft:hsl(var(--primary-foreground)/0.10)] [--footer-soft-hover:hsl(var(--primary-foreground)/0.16)]",
         "[--footer-border:hsl(var(--primary-foreground)/0.16)] [--footer-border-hover:hsl(var(--primary-foreground)/0.28)] [--footer-dot:hsl(var(--primary-foreground)/0.30)]",
         "border-[var(--footer-border)]",
