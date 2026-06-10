@@ -95,7 +95,7 @@ export default function ArchiveSearch() {
   };
 
   const selectedRefinements = {
-    type: params.type || [],
+    type: params.type ? [params.type] : [],
     entity_type: params.entity_type || [],
     role: params.role || [],
     case_type: params.case_type || [],
