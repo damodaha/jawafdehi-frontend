@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
-import { GuestCaseChatDrawer } from "@/components/guest/GuestCaseChatDrawer";
 import { DocumentSourceCard } from "@/components/DocumentSourceCard";
 import { ResponsiveTable } from "@/components/ResponsiveTable";
 import Markdown from "react-markdown";
@@ -156,10 +155,6 @@ const CaseDetail = () => {
   const currentLang = i18n.language;
   const { id } = useParams();
   const trackedCaseIdRef = useRef<string | null>(null);
-  const [isAskDrawerOpen, setIsAskDrawerOpen] = useState(false);
-  const [showAskPopup, setShowAskPopup] = useState(true);
-  const [isAskCondensed, setIsAskCondensed] = useState(false);
-  const [isIntroFinished, setIsIntroFinished] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const isMobile = useIsMobile();
 
@@ -227,23 +222,6 @@ const CaseDetail = () => {
     trackedCaseIdRef.current = loadedCaseId;
   }, [id, caseData?.id, isError]);
 
-  useEffect(() => {
-    if (isAskDrawerOpen) {
-      setIsAskCondensed(false);
-      setIsIntroFinished(false);
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setIsAskCondensed(true);
-      setIsIntroFinished(true);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [isAskDrawerOpen]);
-
-
-
   const resolvedSources: Record<number, DocumentSource> = {};
   (caseData?.evidence ?? []).forEach((evidence, i) => {
     const data = sourceQueries[i]?.data;
@@ -261,12 +239,6 @@ const CaseDetail = () => {
     : {};
 
   const hasInvolvedParties = Object.keys(groupedEntities).length > 0;
-
-  const chatSources = (caseData?.evidence ?? []).map((evidence) => ({
-    sourceId: evidence.source_id,
-    source: resolvedSources[evidence.source_id] ?? null,
-    evidenceDescription: evidence.description,
-  }));
 
   // Group evidence by tier
   const groupedEvidence: Record<EvidenceGroup, Array<typeof caseData.evidence[0] & { originalIndex: number }>> = {
@@ -340,7 +312,6 @@ const CaseDetail = () => {
   }
 
   const canonicalUrl = `https://jawafdehi.org/case/${id}`;
-  const isAskPopupVisible = showAskPopup && !isAskDrawerOpen;
   const plainDescription = stripMarkdown(caseData.description).substring(0, 160);
   const metaDescription = plainDescription || caseData.key_allegations?.slice(0, 2).join('. ').substring(0, 160) || "";
 
@@ -377,14 +348,8 @@ const CaseDetail = () => {
 
       <main id="main-content" className="flex-1 py-8">
         <div className="container mx-auto max-w-8xl px-4">
-          <div className={cn(
-            "grid gap-8 transition-[grid-template-columns] duration-300 ease-out",
-            isAskDrawerOpen && "xl:grid-cols-[minmax(0,1fr)_460px] 2xl:grid-cols-[minmax(0,1fr)_520px] xl:items-start"
-          )}>
-            <div className={cn(
-              "min-w-0 transition-all duration-300 ease-out",
-              isAskDrawerOpen && "order-2 xl:order-1"
-            )}>
+          <div>
+            <div className="min-w-0">
               <FloatingShareSidebar
                 url={canonicalUrl}
                 title={caseData.title}
@@ -484,7 +449,7 @@ const CaseDetail = () => {
 
                 <div className={cn(
                   "grid gap-8 transition-[grid-template-columns] duration-300 ease-out print:block",
-                  (caseData.timeline || []).length > 0 && !isAskDrawerOpen && "lg:grid-cols-[minmax(0,1fr)_20rem] xl:grid-cols-[minmax(0,1fr)_24rem]"
+                  (caseData.timeline || []).length > 0 && "lg:grid-cols-[minmax(0,1fr)_20rem] xl:grid-cols-[minmax(0,1fr)_24rem]"
                 )}>
                   <div className="min-w-0 lg:col-start-1 mx-auto max-w-4xl w-full">
                     <Card className="mb-6 sm:mb-8">
@@ -559,10 +524,7 @@ const CaseDetail = () => {
                   <CaseTimeline
                     timeline={caseData.timeline || []}
                     title={t("caseDetail.timeline")}
-                    className={cn(
-                      "print:static print:mb-8 lg:col-start-2 lg:row-start-1 lg:row-span-2",
-                      isAskDrawerOpen ? "hidden print:block" : "mb-8 text-foreground"
-                    )}
+                    className="mb-8 text-foreground print:static print:mb-8 lg:col-start-2 lg:row-start-1 lg:row-span-2"
                   />
 
                   <div className="min-w-0 lg:col-start-1 mx-auto max-w-4xl w-full">
@@ -694,61 +656,9 @@ const CaseDetail = () => {
               />
             </div>
 
-            {isAskDrawerOpen ? (
-              <div className="order-1 min-w-0 animate-in fade-in-0 slide-in-from-right-4 duration-300 xl:order-2 xl:sticky xl:top-24 xl:h-[calc(100vh-8rem)]">
-                <GuestCaseChatDrawer
-                  caseId={caseData.id}
-                  caseTitle={caseData.title}
-                  caseData={caseData}
-                  sources={chatSources}
-                  open={isAskDrawerOpen}
-                  onOpenChange={setIsAskDrawerOpen}
-                />
-              </div>
-            ) : null}
           </div>
         </div>
       </main>
-
-      <div
-        className={cn(
-          "pointer-events-none fixed bottom-5 z-40 flex transition-all duration-300 no-print right-4 sm:right-6 xl:right-10",
-          isAskPopupVisible
-            ? "translate-y-0 opacity-100"
-            : "translate-y-4 opacity-0"
-        )}
-        aria-hidden={!isAskPopupVisible}
-      >
-        <button
-          type="button"
-          onClick={() => setIsAskDrawerOpen(true)}
-          onMouseEnter={() => isIntroFinished && setIsAskCondensed(false)}
-          onMouseLeave={() => isIntroFinished && setIsAskCondensed(true)}
-          aria-label={t("caseDetail.askPopupTitle")}
-          tabIndex={isAskPopupVisible ? 0 : -1}
-          className={cn(
-            "pointer-events-auto flex items-center rounded-full border border-primary bg-background/95 p-3 text-left shadow-[0_18px_40px_rgba(15,23,42,0.14),0_0_0_1px_rgba(37,99,235,0.06),0_0_24px_rgba(37,99,235,0.12)] ring-1 ring-primary backdrop-blur transition-all duration-500 ease-in-out hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-[0_22px_44px_rgba(15,23,42,0.16),0_0_0_1px_rgba(37,99,235,0.08),0_0_30px_rgba(37,99,235,0.16)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:shadow-[0_22px_44px_rgba(15,23,42,0.16),0_0_0_1px_rgba(37,99,235,0.1),0_0_0_6px_rgba(37,99,235,0.14),0_0_34px_rgba(37,99,235,0.2)] supports-[backdrop-filter]:bg-background/90",
-            isAskCondensed 
-              ? "w-[74px] h-[74px] overflow-hidden justify-center" 
-              : "w-[calc(100vw-2rem)] max-w-[24rem] sm:w-[22rem]"
-          )}
-        >
-          <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
-            <MessageCircle className="h-5 w-5" />
-          </span>
-          <span className={cn(
-            "min-w-0 flex-1 transition-all duration-500 ease-in-out",
-            isAskCondensed ? "max-w-0 opacity-0 invisible" : "max-w-[18rem] opacity-100 visible pl-3"
-          )}>
-            <span className="block truncate text-sm font-semibold text-foreground">
-              {t("caseDetail.askPopupTitle")}
-            </span>
-            <span className="block truncate text-xs text-muted-foreground">
-              {t("caseDetail.askPopupDescription")}
-            </span>
-          </span>
-        </button>
-      </div>
 
       {/* Mobile Share Button */}
       {isMobile && (
