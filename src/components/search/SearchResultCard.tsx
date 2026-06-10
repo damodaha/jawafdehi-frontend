@@ -40,10 +40,10 @@ export function SearchResultCard({ result }: Readonly<{ result: ArchiveSearchRes
             ) : null}
           </div>
           <h2 className="truncate text-base font-bold leading-6 text-foreground group-hover:text-primary">
-            {result.title}
+            {formatTitle(result)}
           </h2>
           <p className="mt-1 line-clamp-2 text-sm leading-5 text-muted-foreground">
-            {result.description}
+            {formatDescription(result)}
           </p>
           <p className="mt-2 truncate text-xs leading-5 text-muted-foreground">
             {resultMetadata(result)}
@@ -105,4 +105,21 @@ function entityName(entity?: { display_name: string | null; nes_id: string | nul
 
 function humanize(value: string) {
   return value.replaceAll("_", " ").toLowerCase();
+}
+
+function formatTitle(result: ArchiveSearchResult) {
+  if (result.result_type === "entity" && result.entity_type === "location") {
+    const parts = result.title.split("/");
+    const rawName = parts[parts.length - 1];
+    return rawName.charAt(0).toUpperCase() + rawName.slice(1).replaceAll("_", " ");
+  }
+  return result.title;
+}
+
+function formatDescription(result: ArchiveSearchResult) {
+  if (result.result_type === "entity" && result.entity_type === "location") {
+    const locationName = formatTitle(result);
+    return `See corruption cases happening in ${locationName}`;
+  }
+  return result.description;
 }
