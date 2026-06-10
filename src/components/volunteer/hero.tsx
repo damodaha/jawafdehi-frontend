@@ -39,7 +39,7 @@ export function VolunteerHero() {
               </a>
             </Button>
             <Button asChild variant="secondary" size="lg" className="font-semibold">
-              <a href="mailto:cases@jawafdehi.org">
+              <a href="mailto:report@jawafdehi.org">
                 <Mail className="h-5 w-5" aria-hidden="true" />
                 {t("volunteer.hero.email")}
               </a>
