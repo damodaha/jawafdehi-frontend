@@ -4,8 +4,15 @@ import { AlertCircle, X } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { useSearchParams } from "react-router-dom";
 
-import { SearchFilters } from "@/components/search/SearchFilters";
-import { SearchResultCard } from "@/components/search/SearchResultCard";
+import {
+  SearchFilters,
+  SearchFiltersSkeleton,
+  type SidebarFilterName,
+} from "@/components/search/SearchFilters";
+import {
+  SearchResultCard,
+  SearchResultCardSkeleton,
+} from "@/components/search/SearchResultCard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { PaginationControls } from "@/components/ui/pagination";
@@ -26,8 +33,14 @@ import type {
   ArchiveSearchSort,
   ArchiveSearchType,
 } from "@/types/search";
+import { cn } from "@/lib/utils";
+import {
+  normalizeArchiveSearchParams,
+  setArchiveSearchParam,
+  toggleArchiveSearchParam,
+} from "@/utils/archive-search-params";
 
-type RefinementName = "type" | "entity_type" | "role" | "case_type";
+type RefinementName = SidebarFilterName | "type" | "tags";
 
 const validSorts = new Set<ArchiveSearchSort>([
   "relevance",
@@ -49,18 +62,45 @@ export default function ArchiveSearch() {
   const [query, setQuery] = useState(params.q || "");
 
   useEffect(() => setQuery(params.q || ""), [params.q]);
+  useEffect(() => {
+    const normalized = normalizeArchiveSearchParams(searchParams);
+    if (normalized.toString() !== searchParams.toString()) {
+      setSearchParams(normalized, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
-  const { data, isLoading, isError, refetch } = useQuery({
+  const {
+    data,
+    isError,
+    isFetching,
+    isLoading,
+    isPlaceholderData,
+    refetch,
+  } = useQuery({
     queryKey: ["archive-search", params],
     queryFn: () => searchArchive(params),
+    placeholderData: (previousData) => previousData,
     staleTime: 5 * 60 * 1000,
   });
+  const [lastSuccessfulData, setLastSuccessfulData] =
+    useState<ArchiveSearchResponse>();
+
+  useEffect(() => {
+    if (data && !isPlaceholderData && !isError) {
+      setLastSuccessfulData(data);
+    }
+  }, [data, isError, isPlaceholderData]);
+
+  const displayData = data || lastSuccessfulData;
+  const isInitialLoading = isLoading && !displayData;
+  const isRefreshing = isFetching && !isInitialLoading;
+  const showError = isError && !isFetching;
+  const showFilters = isInitialLoading || Boolean(displayData);
 
   const updateParams = (updates: Record<string, string | number | undefined>) => {
-    const next = new URLSearchParams(searchParams);
+    let next = new URLSearchParams(searchParams);
     Object.entries(updates).forEach(([name, value]) => {
-      if (value === undefined || value === "") next.delete(name);
-      else next.set(name, String(value));
+      next = setArchiveSearchParam(next, name, value);
     });
     setSearchParams(next);
   };
@@ -69,23 +109,30 @@ export default function ArchiveSearch() {
     updateParams({ [name]: value, page: 1 });
   };
 
-  const toggleRefinement = (name: RefinementName, value: string) => {
-    const next = new URLSearchParams(searchParams);
-    const selected = new Set(next.getAll(name));
-    if (selected.has(value)) selected.delete(value);
-    else selected.add(value);
-    next.delete(name);
-    selected.forEach((item) => next.append(name, item));
-    next.set("page", "1");
-    setSearchParams(next);
+  const toggleRefinement = (name: SidebarFilterName | "tags", value: string) => {
+    setSearchParams(
+      toggleArchiveSearchParam(searchParams, name, value),
+    );
+  };
+
+  const updateRecordType = (type?: ArchiveSearchType) => {
+    updateParams({ type, page: 1 });
+  };
+
+  const removeRefinement = (name: RefinementName, value: string) => {
+    if (name === "type") {
+      updateRecordType(undefined);
+      return;
+    }
+    toggleRefinement(name, value);
   };
 
   const clearRefinements = () => {
     const next = new URLSearchParams(searchParams);
-    (["type", "entity_type", "role", "case_type"] as RefinementName[]).forEach(
-      (name) => next.delete(name),
-    );
-    next.set("page", "1");
+    (
+      ["type", "entity_type", "role", "case_type", "tags"] as RefinementName[]
+    ).forEach((name) => next.delete(name));
+    next.delete("page");
     setSearchParams(next);
   };
 
@@ -94,26 +141,36 @@ export default function ArchiveSearch() {
     updateParams({ q: query.trim() || undefined, page: 1 });
   };
 
-  const selectedRefinements = {
-    type: params.type || [],
+  const selectedSidebarFilters = {
     entity_type: params.entity_type || [],
     role: params.role || [],
     case_type: params.case_type || [],
+  };
+  const selectedRefinements = {
+    ...selectedSidebarFilters,
+    type: params.type ? [params.type] : [],
+    tags: params.tags || [],
   };
   const activeRefinementCount = Object.values(selectedRefinements).reduce(
     (count, values) => count + values.length,
     0,
   );
-  const facets = data?.facets || emptyFacets;
+  const facets = displayData?.facets || emptyFacets;
   const selectedItems = getSelectedItems(facets, selectedRefinements);
-  const searchFilters = (
-    <SearchFilters
-      facets={facets}
-      onClear={clearRefinements}
-      onToggle={toggleRefinement}
-      selected={selectedRefinements}
-    />
-  );
+  const searchFilters = showFilters ? (
+    isInitialLoading ? (
+      <SearchFiltersSkeleton />
+    ) : (
+      <SearchFilters
+        facets={facets}
+        onClear={clearRefinements}
+        onToggle={toggleRefinement}
+        onTypeChange={updateRecordType}
+        selected={selectedSidebarFilters}
+        selectedType={params.type}
+      />
+    )
+  ) : null;
 
   return (
     <main id="main-content" className="min-h-screen bg-background py-8 md:py-12">
@@ -154,6 +211,17 @@ export default function ArchiveSearch() {
             value={query}
           />
           <div className="flex items-center gap-3 lg:ml-auto lg:justify-end">
+            <p
+              aria-live="polite"
+              className="mr-auto flex min-h-5 items-center whitespace-nowrap text-sm font-medium text-muted-foreground lg:mr-1"
+            >
+              {isInitialLoading || isRefreshing ? (
+                <>
+                  <span className="sr-only">Searching archive</span>
+                  <Skeleton aria-hidden="true" className="h-4 w-20" />
+                </>
+              ) : showError ? null : `${displayData?.count || 0} results`}
+            </p>
             <label className="text-sm font-semibold text-muted-foreground" htmlFor="archive-sort">
               Sort
             </label>
@@ -174,41 +242,52 @@ export default function ArchiveSearch() {
           </div>
         </form>
 
-        <div className="mt-3 flex min-h-8 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap gap-2" aria-label="Selected filters">
-            {selectedItems.length
-              ? selectedItems.map((item) => (
-                  <button
-                    className="inline-flex max-w-full items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    key={`${item.name}-${item.value}`}
-                    onClick={() => toggleRefinement(item.name, item.value)}
-                    type="button"
-                  >
-                    <span className="truncate">{item.label}</span>
-                    <X aria-hidden="true" className="h-3 w-3 shrink-0" />
-                  </button>
-                ))
-              : null}
+        {selectedItems.length ? (
+          <div
+            aria-label="Selected filters"
+            className="mt-3 flex flex-wrap gap-2"
+          >
+            {selectedItems.map((item) => (
+              <button
+                className="inline-flex max-w-full items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                key={`${item.name}-${item.value}`}
+                onClick={() => removeRefinement(item.name, item.value)}
+                type="button"
+              >
+                <span className="truncate">{item.label}</span>
+                <X aria-hidden="true" className="h-3 w-3 shrink-0" />
+              </button>
+            ))}
           </div>
-          <p className="text-sm text-muted-foreground">
-            {isLoading ? "Searching archive..." : `${data?.count || 0} results`}
-          </p>
-        </div>
+        ) : null}
 
-        <div className="mt-5 lg:hidden">
-          <details className="rounded-xl border bg-card">
-            <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-foreground">
-              Filters{activeRefinementCount ? ` (${activeRefinementCount})` : ""}
-            </summary>
-            <div className="border-t p-3">{searchFilters}</div>
-          </details>
-        </div>
+        {showFilters ? (
+          <div className="mt-5 lg:hidden">
+            <details className="rounded-xl border bg-card">
+              <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-foreground">
+                Filters{activeRefinementCount ? ` (${activeRefinementCount})` : ""}
+              </summary>
+              <div className="border-t p-3">{searchFilters}</div>
+            </details>
+          </div>
+        ) : null}
 
-        <div className="mt-7 grid gap-7 lg:grid-cols-[250px_minmax(0,1fr)]">
-          <div className="hidden lg:block">{searchFilters}</div>
+        <div
+          className={cn(
+            "mt-7 grid items-start gap-7",
+            showFilters && "lg:grid-cols-[250px_minmax(0,1fr)]",
+          )}
+        >
+          {showFilters ? (
+            <div className="hidden self-start lg:block">{searchFilters}</div>
+          ) : null}
 
-          <section aria-label="Archive search results">
-            {isError ? (
+          <section
+            aria-busy={isInitialLoading || isRefreshing}
+            aria-label="Archive search results"
+            className="self-start"
+          >
+            {showError ? (
               <Alert className="mb-5" variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription className="flex items-center justify-between gap-4">
@@ -220,9 +299,17 @@ export default function ArchiveSearch() {
               </Alert>
             ) : null}
 
-            <ArchiveSearchResults isLoading={isLoading} data={data} />
+            <ArchiveSearchResults
+              data={displayData}
+              isError={showError}
+              isLoading={isInitialLoading || isRefreshing}
+            />
 
-            {data && data.count > data.page_size ? (
+            {!showError &&
+            !isFetching &&
+            !isPlaceholderData &&
+            data &&
+            data.count > data.page_size ? (
               <PaginationControls
                 onPageChange={(page) => updateParams({ page })}
                 page={data.page}
@@ -254,22 +341,33 @@ function readParams(searchParams: URLSearchParams): ArchiveSearchParams {
 }
 
 function ArchiveSearchResults({
-  isLoading,
   data,
+  isError,
+  isLoading,
 }: Readonly<{
-  isLoading: boolean;
   data: ArchiveSearchResponse | undefined;
+  isError: boolean;
+  isLoading: boolean;
 }>) {
   if (isLoading) {
     return (
-      <div aria-live="polite" className="space-y-3" role="status">
-        <span className="sr-only">Searching archive</span>
-        {[1, 2, 3, 4].map((item) => (
-          <Skeleton className="h-32 rounded-xl" key={item} />
+      <div
+        aria-label="Searching archive"
+        aria-live="polite"
+        className="space-y-3"
+        role="status"
+      >
+        {[false, true, false, true, false].map((showTags, index) => (
+          <SearchResultCardSkeleton
+            key={index}
+            showTags={showTags}
+          />
         ))}
       </div>
     );
   }
+
+  if (isError) return null;
 
   if (!data?.results.length) {
     return (

@@ -1,19 +1,29 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { ArchiveSearchFacets, SearchFacetItem } from "@/types/search";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Skeleton } from "@/components/ui/skeleton";
+import type {
+  ArchiveSearchFacets,
+  ArchiveSearchType,
+  SearchFacetItem,
+} from "@/types/search";
 
-type FilterName = "type" | "entity_type" | "role" | "case_type";
+export type SidebarFilterName = "entity_type" | "role" | "case_type";
 
 type SearchFiltersProps = {
   facets: ArchiveSearchFacets;
-  selected: Record<FilterName, string[]>;
-  onToggle: (name: FilterName, value: string) => void;
+  selected: Record<SidebarFilterName, string[]>;
+  selectedType?: ArchiveSearchType;
+  onTypeChange: (type?: ArchiveSearchType) => void;
+  onToggle: (name: SidebarFilterName, value: string) => void;
   onClear: () => void;
 };
 
 export function SearchFilters({
   facets,
   selected,
+  selectedType,
+  onTypeChange,
   onToggle,
   onClear,
 }: Readonly<SearchFiltersProps>) {
@@ -31,12 +41,10 @@ export function SearchFilters({
         </Button>
       </div>
 
-      <FilterGroup
+      <RecordTypeFilter
         items={facets.type}
-        name="type"
-        onToggle={onToggle}
-        selectedValues={selected.type}
-        title="Record type"
+        onChange={onTypeChange}
+        selectedType={selectedType}
       />
       <FilterGroup
         items={facets.entity_type}
@@ -59,8 +67,118 @@ export function SearchFilters({
         selectedValues={selected.case_type}
         title="Case type"
       />
-
     </aside>
+  );
+}
+
+export function SearchFiltersSkeleton() {
+  const groups = [
+    { control: "radio", rowCount: 4 },
+    { control: "checkbox", rowCount: 4 },
+    { control: "checkbox", rowCount: 3 },
+    { control: "checkbox", rowCount: 3 },
+  ] as const;
+
+  return (
+    <aside
+      aria-hidden="true"
+      className="space-y-4 rounded-xl border bg-card p-4"
+    >
+      <div className="flex h-8 items-center justify-between gap-4">
+        <Skeleton className="h-4 w-14" />
+        <Skeleton className="h-8 w-12 rounded-md" />
+      </div>
+
+      {groups.map(({ control, rowCount }, groupIndex) => (
+        <div className="space-y-2" key={groupIndex}>
+          <Skeleton className="h-4 w-24" />
+          <div className="space-y-1">
+            {Array.from({ length: rowCount }).map((_, rowIndex) => (
+              <div
+                className="flex min-h-8 items-center gap-2 px-1"
+                key={rowIndex}
+              >
+                <Skeleton
+                  className={
+                    control === "radio"
+                      ? "h-4 w-4 shrink-0 rounded-full"
+                      : "h-4 w-4 shrink-0 rounded-sm"
+                  }
+                />
+                <Skeleton
+                  className={
+                    rowIndex % 2 === 0 ? "h-3.5 w-28" : "h-3.5 w-20"
+                  }
+                />
+                <Skeleton className="ml-auto h-3 w-5" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </aside>
+  );
+}
+
+function RecordTypeFilter({
+  items,
+  onChange,
+  selectedType,
+}: Readonly<{
+  items: SearchFacetItem[];
+  onChange: (type?: ArchiveSearchType) => void;
+  selectedType?: ArchiveSearchType;
+}>) {
+  const displayItems = items.filter(
+    (item) => ["case", "entity", "document"].includes(item.name),
+  );
+
+  return (
+    <fieldset>
+      <legend className="mb-1.5 text-sm font-semibold text-foreground">
+        Record type
+      </legend>
+      <RadioGroup
+        className="gap-0.5"
+        onValueChange={(value) =>
+          onChange(value === "all" ? undefined : value as ArchiveSearchType)
+        }
+        value={selectedType || "all"}
+      >
+        <FilterOption count={null} label="All records" value="all" />
+        {displayItems.map((item) => (
+          <FilterOption
+            count={item.count}
+            key={item.name}
+            label={item.display_name}
+            value={item.name}
+          />
+        ))}
+      </RadioGroup>
+    </fieldset>
+  );
+}
+
+function FilterOption({
+  count,
+  label,
+  value,
+}: Readonly<{
+  count: number | null;
+  label: string;
+  value: string;
+}>) {
+  return (
+    <label className="flex min-h-8 cursor-pointer items-center gap-2 rounded-md px-1 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+      <RadioGroupItem
+        aria-label={count === null ? label : `${label}: ${count} results`}
+        value={value}
+      />
+      <span className="min-w-0 flex-1 truncate">{label}</span>
+      {count !== null ? (
+        <span className="text-xs tabular-nums">{count}</span>
+      ) : null}
+    </label>
   );
 }
 
@@ -72,17 +190,30 @@ function FilterGroup({
   title,
 }: Readonly<{
   items: SearchFacetItem[];
-  name: FilterName;
-  onToggle: (name: FilterName, value: string) => void;
+  name: SidebarFilterName;
+  onToggle: (name: SidebarFilterName, value: string) => void;
   selectedValues: string[];
   title: string;
 }>) {
+  const displayItems = [...(items || [])];
+  selectedValues.forEach((val) => {
+    if (!displayItems.some((item) => item.name === val)) {
+      displayItems.push({
+        name: val,
+        display_name: val.replaceAll("_", " ").replaceAll("-", " "),
+        count: 0,
+      });
+    }
+  });
+
+  if (displayItems.length === 0) return null;
+
   return (
     <fieldset className="space-y-0.5">
       <legend className="mb-1.5 text-sm font-semibold text-foreground">
         {title}
       </legend>
-      {items.map((item) => {
+      {displayItems.map((item) => {
         const isChecked = selectedValues.includes(item.name);
         return (
           <label

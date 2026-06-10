@@ -7,24 +7,24 @@ import {
   Scale,
   UserRound,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import type {
   ArchiveSearchResult,
   CaseSearchResult,
   DocumentSearchResult,
   EntitySearchResult,
 } from "@/types/search";
+import { toggleArchiveSearchParam } from "@/utils/archive-search-params";
 
 export function SearchResultCard({ result }: Readonly<{ result: ArchiveSearchResult }>) {
-  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   return (
-    <Link
-      draggable={false}
-      className="group block rounded-xl border bg-card p-4 transition-colors hover:border-primary/35 hover:bg-muted/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-      to={result.url}
+    <div
+      className="group relative block rounded-xl border bg-card p-4 transition-colors hover:border-primary/35 hover:bg-muted/35 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
     >
       <article className="flex min-h-20 items-start gap-3">
         <span className="mt-0.5 rounded-full bg-secondary/70 p-2 text-primary">
@@ -42,7 +42,10 @@ export function SearchResultCard({ result }: Readonly<{ result: ArchiveSearchRes
             ) : null}
           </div>
           <h2 className="truncate text-base font-bold leading-6 text-foreground group-hover:text-primary">
-            {formatTitle(result)}
+            <Link to={result.url} className="focus:outline-none">
+              <span className="absolute inset-0" aria-hidden="true" />
+              {formatTitle(result)}
+            </Link>
           </h2>
           <p className="mt-1 line-clamp-2 text-sm leading-5 text-muted-foreground">
             {formatDescription(result)}
@@ -57,9 +60,11 @@ export function SearchResultCard({ result }: Readonly<{ result: ArchiveSearchRes
                   key={tag}
                   onClick={(e) => {
                     e.preventDefault();
-                    navigate(`/search?tags=${encodeURIComponent(tag)}`);
+                    setSearchParams(
+                      toggleArchiveSearchParam(searchParams, "tags", tag),
+                    );
                   }}
-                  className="rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-semibold text-secondary-foreground hover:bg-secondary/80 transition-colors"
+                  className="relative z-10 rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-semibold text-secondary-foreground hover:bg-secondary/80 transition-colors"
                 >
                   {tag}
                 </button>
@@ -72,7 +77,41 @@ export function SearchResultCard({ result }: Readonly<{ result: ArchiveSearchRes
           className="mt-2 h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary"
         />
       </article>
-    </Link>
+    </div>
+  );
+}
+
+export function SearchResultCardSkeleton({
+  showTags = false,
+}: Readonly<{ showTags?: boolean }>) {
+  return (
+    <div
+      aria-hidden="true"
+      className="rounded-xl border bg-card p-4"
+    >
+      <div className="flex min-h-20 items-start gap-3">
+        <Skeleton className="mt-0.5 h-9 w-9 shrink-0 rounded-full" />
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 flex items-center gap-2">
+            <Skeleton className="h-5 w-16 rounded-full" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+          <Skeleton className="h-5 w-4/5 max-w-xl" />
+          <div className="mt-2 space-y-1.5">
+            <Skeleton className="h-3.5 w-full max-w-2xl" />
+            <Skeleton className="h-3.5 w-3/5 max-w-md" />
+          </div>
+          <Skeleton className="mt-3 h-3 w-2/5 max-w-xs" />
+          {showTags ? (
+            <div className="mt-3 flex gap-2">
+              <Skeleton className="h-5 w-16 rounded-full" />
+              <Skeleton className="h-5 w-20 rounded-full" />
+            </div>
+          ) : null}
+        </div>
+        <Skeleton className="mt-2 h-4 w-4 shrink-0" />
+      </div>
+    </div>
   );
 }
 
