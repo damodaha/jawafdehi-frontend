@@ -17,12 +17,6 @@ interface DocumentSourceCardProps {
   evidenceDescription?: string;
 }
 
-const ROLE_LABELS: Record<SourceLinkRole, string> = {
-  RAW: 'RAW',
-  MARKDOWN: 'Markdown',
-  PERMALINK: 'Permalink',
-};
-
 const normalizeUrls = (url: SourceUrlEntry[] | string | null | undefined): NormalizedUrl[] => {
   if (!url) return [];
 
@@ -95,7 +89,7 @@ export function DocumentSourceCard({
                     <div key={`${index}-${item.href}`} className="inline-flex items-center gap-1.5">
                       {item.role && (
                         <Badge variant="secondary" className="rounded px-1.5 py-0 text-[10px] font-medium">
-                          {ROLE_LABELS[item.role] ?? item.role}
+                          {t(`documentSource.roles.${item.role}`, { defaultValue: item.role })}
                         </Badge>
                       )}
                       <a
