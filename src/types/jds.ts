@@ -55,7 +55,7 @@ export interface JawafEntity {
   id: number;
   nes_id: string | null; // Entity ID from Nepal Entity Service
   display_name: string | null; // Display name for the entity
-  type?: string; // Relationship type: 'accused', 'alleged', 'related', 'witness', 'location', etc.
+  type?: string; // Relationship type: 'accused', 'alleged', 'related', 'witness', 'location', 'respondent', 'petitioner', etc.
   notes?: string; // Additional notes about the relationship
   related_cases?: EntityCaseRelationship[]; // Unified case links with relation metadata
 }

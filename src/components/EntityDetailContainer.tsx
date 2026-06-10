@@ -91,6 +91,8 @@ export function EntityDetailContainer({
       opposition: 'entityDetail.relationTypeOpposition',
       victim: 'entityDetail.relationTypeVictim',
       location: 'entityDetail.relationTypeLocation',
+      respondent: 'entityDetail.relationTypeRespondent',
+      petitioner: 'entityDetail.relationTypePetitioner',
     };
 
     return t(relationKeyMap[relationType] || 'entityDetail.relationTypeUnknown');
