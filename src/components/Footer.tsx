@@ -184,7 +184,7 @@ export const Footer = () => {
 
             <div className="max-w-sm space-y-3">
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--footer-title)]">
-                {t("footer.accountabilityNoExpiry")}
+                <em>{t("footer.accountabilityNoExpiry")}</em>
               </p>
               <p className="text-sm leading-6 text-[var(--footer-muted)]">
                 {t("footer.permanentArchive")}
