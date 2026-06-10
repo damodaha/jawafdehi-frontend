@@ -23,7 +23,7 @@ export function SearchFilters({
       className="space-y-4 rounded-xl border bg-card p-4"
     >
       <div className="flex items-center justify-between gap-4">
-        <h2 className="text-sm font-bold uppercase tracking-[0.14em] text-foreground">
+        <h2 className="text-sm font-bold tracking-tight text-foreground">
           Filters
         </h2>
         <Button className="h-8 px-2 text-xs" onClick={onClear} variant="ghost">

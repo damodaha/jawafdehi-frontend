@@ -129,9 +129,7 @@ export default function ArchiveSearch() {
 
       <div className="container mx-auto px-4">
         <header className="max-w-3xl">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent">
-            Public accountability archive
-          </p>
+
           <h1 className="mt-3 text-3xl font-extrabold text-primary md:text-4xl">
             Archive Search
           </h1>
