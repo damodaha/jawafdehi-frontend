@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
   Building2,
@@ -17,16 +19,61 @@ import type {
   DocumentSearchResult,
   EntitySearchResult,
 } from "@/types/search";
+import { cn } from "@/lib/utils";
+import { getCaseById } from "@/services/jds-api";
 import { toggleArchiveSearchParam } from "@/utils/archive-search-params";
 
 export function SearchResultCard({ result }: Readonly<{ result: ArchiveSearchResult }>) {
   const [searchParams, setSearchParams] = useSearchParams();
+  const caseSlug = result.result_type === "case" ? result.slug : undefined;
+  const [imageFailed, setImageFailed] = useState(false);
+  const { data: caseImageUrl, isFetching: isImageLoading } = useQuery({
+    queryKey: ["case", caseSlug],
+    queryFn: () => getCaseById(caseSlug!),
+    enabled: Boolean(caseSlug),
+    retry: false,
+    select: (caseData) => caseData.thumbnail_url || caseData.banner_url || null,
+    staleTime: 5 * 60 * 1000,
+  });
+  const reserveImageSpace =
+    result.result_type === "case" &&
+    Boolean(caseSlug) &&
+    (isImageLoading || Boolean(caseImageUrl && !imageFailed));
+
+  useEffect(() => setImageFailed(false), [caseImageUrl]);
 
   return (
     <div
-      className="group relative block rounded-xl border bg-card p-4 transition-colors hover:border-primary/35 hover:bg-muted/35 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
+      className="group relative block overflow-hidden rounded-xl border bg-card p-4 transition-colors hover:border-primary/35 hover:bg-muted/35 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
     >
-      <article className="flex min-h-20 items-start gap-3">
+      {reserveImageSpace ? (
+        <div
+          aria-hidden="true"
+          className="absolute inset-y-0 left-0 hidden w-64 overflow-hidden sm:block lg:w-72"
+        >
+          {caseImageUrl && !imageFailed ? (
+            <img
+              alt=""
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              decoding="async"
+              loading="lazy"
+              onError={() => setImageFailed(true)}
+              src={caseImageUrl}
+            />
+          ) : (
+            <Skeleton className="h-full w-full rounded-none" />
+          )}
+          <div className="absolute inset-y-0 right-0 w-2/5 bg-gradient-to-r from-transparent to-card" />
+          <div className="absolute inset-0 bg-gradient-to-b from-card/5 to-card/10" />
+        </div>
+      ) : null}
+
+      <article
+        className={cn(
+          "relative z-10 flex min-h-20 items-start gap-3 transition-[padding] duration-200",
+          reserveImageSpace && "sm:pl-64 lg:pl-72",
+        )}
+      >
         <span className="mt-0.5 rounded-full bg-secondary/70 p-2 text-primary">
           <ResultIcon result={result} />
         </span>
@@ -87,9 +134,20 @@ export function SearchResultCardSkeleton({
   return (
     <div
       aria-hidden="true"
-      className="rounded-xl border bg-card p-4"
+      className="relative overflow-hidden rounded-xl border bg-card p-4"
     >
-      <div className="flex min-h-20 items-start gap-3">
+      {showTags ? (
+        <div className="absolute inset-y-0 left-0 hidden w-64 overflow-hidden sm:block lg:w-72">
+          <Skeleton className="h-full w-full rounded-none" />
+          <div className="absolute inset-y-0 right-0 w-2/5 bg-gradient-to-r from-transparent to-card" />
+        </div>
+      ) : null}
+      <div
+        className={cn(
+          "relative z-10 flex min-h-20 items-start gap-3",
+          showTags && "sm:pl-64 lg:pl-72",
+        )}
+      >
         <Skeleton className="mt-0.5 h-9 w-9 shrink-0 rounded-full" />
         <div className="min-w-0 flex-1">
           <div className="mb-2 flex items-center gap-2">

@@ -12,12 +12,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import ArchiveSearch from "@/pages/ArchiveSearch";
 import type { ArchiveSearchResponse } from "@/types/search";
 
-const { searchArchiveMock } = vi.hoisted(() => ({
+const { getCaseByIdMock, searchArchiveMock } = vi.hoisted(() => ({
+  getCaseByIdMock: vi.fn(),
   searchArchiveMock: vi.fn(),
 }));
 
 vi.mock("@/services/search-api", () => ({
   searchArchive: searchArchiveMock,
+}));
+
+vi.mock("@/services/jds-api", () => ({
+  getCaseById: getCaseByIdMock,
 }));
 
 const baseResponse: ArchiveSearchResponse = {
@@ -118,6 +123,11 @@ function renderSearch(initialEntry = "/search") {
 
 describe("ArchiveSearch", () => {
   beforeEach(() => {
+    getCaseByIdMock.mockReset();
+    getCaseByIdMock.mockResolvedValue({
+      banner_url: null,
+      thumbnail_url: "https://example.com/case-thumbnail.jpg",
+    });
     searchArchiveMock.mockReset();
   });
 
@@ -242,6 +252,21 @@ describe("ArchiveSearch", () => {
       );
     });
     expect(screen.queryByRole("group", { name: "Tags" })).toBeNull();
+  });
+
+  it("loads case artwork from the detail response", async () => {
+    searchArchiveMock.mockResolvedValue(baseResponse);
+    renderSearch();
+    await screen.findByText("Original result");
+
+    await waitFor(() => {
+      expect(
+        document.querySelector(
+          'img[src="https://example.com/case-thumbnail.jpg"]',
+        ),
+      ).toBeTruthy();
+    });
+    expect(getCaseByIdMock).toHaveBeenCalledWith("original-result");
   });
 
   it("does not show an empty state after an initial request failure", async () => {
