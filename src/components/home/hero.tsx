@@ -22,7 +22,7 @@ type HeroMapImage = {
 };
 
 const heroCopy = {
-  eyebrow: "Accountability has no expiry",
+  eyebrow: "Accountability has no expiry.",
   titlePrefix: "Nepal's Permanent",
   titleHighlight: "Corruption Case",
   titleSuffix: "Archive",
@@ -88,10 +88,10 @@ export function Hero({
         </p>
 
         <h1 className="mt-5 max-w-[min(100%,9.6em)] text-[clamp(2.35rem,10.6vw,3.55rem)] font-extrabold leading-[0.96] tracking-[-0.045em] text-primary sm:max-w-[min(100%,10.8em)] sm:text-[clamp(3rem,8vw,4rem)] md:max-w-4xl md:text-6xl md:leading-[1.02] lg:text-6xl">
-  {heroCopy.titlePrefix}{" "}
-  <span className="text-accent">{heroCopy.titleHighlight}</span>{" "}
-  {heroCopy.titleSuffix}
-</h1>
+          {heroCopy.titlePrefix}{" "}
+          <span className="text-accent">{heroCopy.titleHighlight}</span>{" "}
+          {heroCopy.titleSuffix}
+        </h1>
 
         <p className="mt-6 max-w-[min(100%,34rem)] text-[clamp(0.95rem,2.8vw,1.05rem)] leading-8 text-muted-foreground md:max-w-2xl md:text-lg">
           {heroCopy.description}

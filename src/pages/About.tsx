@@ -65,7 +65,7 @@ const About = () => {
                   Corruption-related records are scattered across dozens of government portals, court systems, and public databases — inaccessible to most citizens. We are building the technology and the volunteer network to bring it all into one permanent, publicly searchable knowledge base.
                 </p>
                 <p className="mt-5 text-justify text-base leading-8 text-foreground/75 md:text-[1.0625rem]">
-                  Free to use. Open source. Built entirely by Nepali volunteers who believe accountability has no expiry date.
+                  Free to use. Open source. Built entirely by Nepali volunteers who believe accountability has no expiry.
                 </p>
               </div>
             </div>

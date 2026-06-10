@@ -179,7 +179,7 @@ export const Footer = () => {
 
             <div className="max-w-sm space-y-3">
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--footer-title)]">
-                Accountability has no expiry
+                Accountability has no expiry.
               </p>
               <p className="text-sm leading-6 text-[var(--footer-muted)]">
                 Nepal's permanent public archive of CIAA corruption cases, free forever, built by Nepali volunteers.
