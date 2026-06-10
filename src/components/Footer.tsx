@@ -171,12 +171,12 @@ export const Footer = () => {
               className="inline-flex rounded-full transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <img
-                src="/assets/logo-dark.png"
+                src="/assets/logo-dark.svg"
                 alt="Jawafdehi"
                 className="h-9 w-auto object-contain dark:hidden"
               />
               <img
-                src="/assets/logo-dark.png"
+                src="/assets/logo-dark.svg"
                 alt="Jawafdehi"
                 className="hidden h-9 w-auto object-contain dark:block"
               />
