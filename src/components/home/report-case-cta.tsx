@@ -15,11 +15,10 @@ export function ReportCaseCta() {
       <div className="container mx-auto px-4 text-center">
         <div className="mx-auto flex max-w-3xl flex-col items-center">
           <h2 className="text-3xl font-extrabold leading-tight tracking-normal text-white md:text-4xl">
-            Know of an undocumented case?
+            Know of a corruption case?
           </h2>
           <p className="mt-5 max-w-2xl text-sm leading-7 text-white/90 md:text-base">
-            Help us hold the powerful accountable. Submit information about missing corruption
-            cases, officials, or entities to be added to the Jawafdehi archive.
+            Help us hold the powerful accountable. Submit information about a corruption case, officials and related entities.
           </p>
           <ReportAllegationDialog />
         </div>

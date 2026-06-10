@@ -15,7 +15,13 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
-import { AlertCircle, Upload, Download, FileText, FilePlus2, Mail } from "lucide-react";
+import {
+  AlertCircle,
+  FilePlus2,
+  Mail,
+  Upload,
+} from "lucide-react";
+import { WhatsAppIcon } from "@/components/SocialIcons";
 import { trackEvent } from "@/utils/analytics";
 
 export function ReportAllegationDialog() {
@@ -49,9 +55,9 @@ export function ReportAllegationDialog() {
       </DialogTrigger>
       <DialogContent
         overlayClassName="bg-black/65 backdrop-blur-[2px]"
-        className="flex h-[calc(100dvh-1.5rem)] w-[calc(100vw-1.25rem)] max-w-[calc(100vw-1.25rem)] flex-col gap-0 overflow-hidden rounded-[2rem] border-border/60 bg-background/95 p-0 shadow-2xl shadow-black/25 backdrop-blur-xl sm:h-auto sm:max-h-[90vh] sm:w-full sm:max-w-3xl sm:rounded-[2rem] [&>button]:right-5 [&>button]:top-5 [&>button]:flex [&>button]:h-9 [&>button]:w-9 [&>button]:items-center [&>button]:justify-center [&>button]:!rounded-full [&>button]:bg-muted [&>button]:text-muted-foreground [&>button]:opacity-100 [&>button]:transition-colors [&>button:hover]:bg-accent/15 [&>button:hover]:text-accent"
+        className="flex h-[calc(100dvh-1.5rem)] w-[calc(100vw-1.25rem)] max-w-[calc(100vw-1.25rem)] flex-col gap-0 overflow-hidden rounded-[2rem] border-0 bg-background p-0 shadow-2xl shadow-black/25 sm:h-auto sm:max-h-[90vh] sm:w-full sm:max-w-3xl sm:rounded-[2rem] [&>button]:right-5 [&>button]:top-5 [&>button]:flex [&>button]:h-9 [&>button]:w-9 [&>button]:items-center [&>button]:justify-center [&>button]:!rounded-full [&>button]:bg-primary/[0.06] [&>button]:text-primary [&>button]:opacity-100 [&>button]:transition-colors [&>button:hover]:bg-accent/10 [&>button:hover]:text-accent"
       >
-        <DialogHeader className="shrink-0 border-b border-border/60 bg-muted/20 px-6 pb-5 pt-7 text-left sm:px-8 sm:pb-6 sm:pt-8">
+        <DialogHeader className="shrink-0 bg-primary/[0.035] px-6 pb-5 pt-7 text-left sm:px-8 sm:pb-6 sm:pt-8">
           <DialogTitle className="pr-10 text-2xl font-extrabold tracking-normal text-primary sm:text-3xl">
             {t("report.title")}
           </DialogTitle>
@@ -263,77 +269,70 @@ export function ReportAllegationDialog() {
                       {t("report.templateDownload.description")}
                     </p>
 
-                    <div className="space-y-3 rounded-2xl border border-border/60 bg-muted/35 p-5">
+                    <div className="space-y-4 rounded-2xl bg-primary/[0.045] p-5">
                       <p className="text-sm font-medium leading-6 text-foreground/80">
                         {t("report.templateDownload.instructions")}
                       </p>
-                      <div className="flex items-center gap-3 rounded-xl border border-border/70 bg-background px-4 py-3.5 shadow-sm">
-                        <Mail className="h-5 w-5 text-primary" />
+                      <div className="grid gap-3 sm:grid-cols-2">
                         <a
-                          href="mailto:cases@jawafdehi.org"
-                          className="font-semibold text-primary underline-offset-4 hover:underline"
+                          href="mailto:report@jawafdehi.org"
+                          className="group flex min-h-11 items-center gap-3 rounded-lg text-sm font-semibold text-primary outline-none transition-colors hover:text-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                         >
-                          {t("report.templateDownload.email")}
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors group-hover:bg-accent">
+                            <Mail className="h-4 w-4" aria-hidden="true" />
+                          </span>
+                          <span className="truncate">
+                            {t("report.templateDownload.email")}
+                          </span>
+                        </a>
+                        <a
+                          href="https://wa.me/9779768630501"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="group flex min-h-11 items-center gap-3 rounded-lg text-sm font-semibold text-primary outline-none transition-colors hover:text-accent focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2"
+                        >
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#25D366] text-white shadow-sm transition-colors group-hover:bg-[#1fbd59]">
+                            <WhatsAppIcon className="h-5 w-5" aria-hidden="true" />
+                          </span>
+                          <span>{t("report.templateDownload.whatsapp")}</span>
                         </a>
                       </div>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="rounded-lg bg-background/80 px-3 py-2.5 text-sm font-semibold leading-5 text-primary shadow-sm">
                         {t("report.templateDownload.emailSubject")}
                       </p>
                     </div>
 
-                    <div className="space-y-3">
-                      <h3 className="text-base font-bold text-foreground">
+                    <div className="flex flex-col gap-3 rounded-2xl bg-muted/45 p-4 sm:flex-row sm:items-center sm:justify-between">
+                      <h3 className="text-sm font-medium text-foreground/75">
                         {t("report.templateDownload.availableFormats")}
                       </h3>
 
-                      <div className="grid gap-3">
-                        {/* DOCX Download */}
+                      <div className="flex flex-wrap gap-2">
                         <a
                           href="/case-entry-template/case-entry-template.docx"
                           download
-                          className="group flex items-center justify-between rounded-2xl border border-border/70 bg-background p-4 shadow-sm transition-[border-color,background-color,transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/[0.03] hover:shadow-md"
+                          className="inline-flex h-9 min-w-20 items-center justify-center rounded-md bg-primary px-3 text-xs font-bold tracking-wide text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="rounded-xl bg-blue-100 p-2.5 dark:bg-blue-950">
-                              <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                            </div>
-                            <div>
-                              <p className="font-semibold text-foreground transition-colors group-hover:text-primary">
-                                {t("report.templateDownload.downloadDocx")}
-                              </p>
-                              <p className="text-xs text-muted-foreground">Microsoft Word format</p>
-                            </div>
-                          </div>
-                          <Download className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                          <span>{t("report.templateDownload.downloadDocx")}</span>
                         </a>
 
-                        {/* Markdown Download */}
                         <a
                           href="/case-entry-template/case-entry-template.md"
                           download
-                          className="group flex items-center justify-between rounded-2xl border border-border/70 bg-background p-4 shadow-sm transition-[border-color,background-color,transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/[0.03] hover:shadow-md"
+                          className="inline-flex h-9 min-w-20 items-center justify-center rounded-md bg-accent px-3 text-xs font-bold tracking-wide text-accent-foreground shadow-sm transition-colors hover:bg-accent/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="rounded-xl bg-green-100 p-2.5 dark:bg-green-950">
-                              <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
-                            </div>
-                            <div>
-                              <p className="font-semibold text-foreground transition-colors group-hover:text-primary">
-                                {t("report.templateDownload.downloadMd")}
-                              </p>
-                              <p className="text-xs text-muted-foreground">Plain text format</p>
-                            </div>
-                          </div>
-                          <Download className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                          <span>{t("report.templateDownload.downloadMd")}</span>
                         </a>
                       </div>
                     </div>
 
                     {/* Important Notice */}
-                    <div className="flex items-start gap-3 rounded-2xl border border-warning/20 bg-warning/[0.07] p-5">
-                      <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-warning" />
-                      <div className="text-sm leading-6 text-foreground/65">
-                        <p className="mb-1 font-bold text-foreground">{t("report.importantNotice")}</p>
+                    <div className="flex items-start gap-3 rounded-2xl bg-accent/[0.07] p-5">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent">
+                        <AlertCircle className="h-4 w-4" aria-hidden="true" />
+                      </span>
+                      <div className="text-sm leading-6 text-foreground/70">
+                        <p className="mb-1 font-bold text-accent">{t("report.importantNotice")}</p>
                         <p>{t("report.importantNoticeText")}</p>
                       </div>
                     </div>

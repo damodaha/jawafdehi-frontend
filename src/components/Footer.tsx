@@ -93,7 +93,7 @@ function FooterNavLink({ label, to, external }: Readonly<FooterLink>) {
 function FooterLinkGroup({ title, links }: Readonly<{ title: string; links: FooterLink[] }>) {
   return (
     <nav aria-label={title}>
-      <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--footer-title)]">
+      <h3 className="mb-3 text-sm font-bold text-[var(--footer-fg)]">
         {title}
       </h3>
       <ul className="space-y-1">
@@ -137,7 +137,7 @@ export const Footer = () => {
     { label: t("footer.contributorPortal"), to: "https://portal.jawafdehi.org", external: true },
     { label: t("footer.githubRepo"), to: "https://github.com/Jawafdehi/Jawafdehi", external: true },
     { label: t("footer.siteStatus"), to: "https://status.jawafdehi.org/status/public", external: true },
-    { label: t("footer.letsBuildNepal"), to: "https://LetsBuildNepal.com", external: true },
+
   ];
 
   const socialLinks: FooterSocialLink[] = [
@@ -153,7 +153,7 @@ export const Footer = () => {
       className={cn(
         "relative isolate overflow-hidden border-t bg-[var(--footer-bg)] text-[var(--footer-fg)]",
         "[--footer-bg:hsl(var(--primary))] [--footer-fg:hsl(var(--primary-foreground))] [--footer-muted:hsl(var(--primary-foreground)/0.78)]",
-        "[--footer-title:hsl(354_100%_71%)]",
+        "[--footer-title:#FF000E]",
         "[--footer-soft:hsl(var(--primary-foreground)/0.10)] [--footer-soft-hover:hsl(var(--primary-foreground)/0.16)]",
         "[--footer-border:hsl(var(--primary-foreground)/0.16)] [--footer-border-hover:hsl(var(--primary-foreground)/0.28)] [--footer-dot:hsl(var(--primary-foreground)/0.30)]",
         "border-[var(--footer-border)]",
@@ -171,12 +171,12 @@ export const Footer = () => {
               className="inline-flex rounded-full transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <img
-                src="/assets/logo-dark.png"
+                src="/assets/logo-dark.svg"
                 alt="Jawafdehi"
                 className="h-9 w-auto object-contain dark:hidden"
               />
               <img
-                src="/assets/logo-dark.png"
+                src="/assets/logo-dark.svg"
                 alt="Jawafdehi"
                 className="hidden h-9 w-auto object-contain dark:block"
               />
@@ -184,7 +184,7 @@ export const Footer = () => {
 
             <div className="max-w-sm space-y-3">
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--footer-title)]">
-                {t("footer.accountabilityNoExpiry")}
+                <em>{t("footer.accountabilityNoExpiry")}</em>
               </p>
               <p className="text-sm leading-6 text-[var(--footer-muted)]">
                 {t("footer.permanentArchive")}

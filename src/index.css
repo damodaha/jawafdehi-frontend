@@ -30,8 +30,8 @@ All colors MUST be HSL.
     --popover: 36 100% 99%;
     --popover-foreground: 215 28% 17%;
 
-    /* Navy blue - trust and authority */
-    --primary: 209 61% 16%;
+    /* Navy blue - trust and authority | #0E1F3B */
+    --primary: 217 62% 14%;
     --primary-foreground: 36 100% 99%;
 
     /* Light slate - secondary surfaces */
@@ -41,7 +41,7 @@ All colors MUST be HSL.
     --muted: 215 20% 96%;
     --muted-foreground: 215 15% 45%;
 
-    --accent: 354 66% 47%;
+    --accent: 357 67% 43%; /* #B5242C */
     --accent-foreground: 36 100% 99%;
 
     /* Amber - urgent/corruption indicator */
@@ -50,7 +50,7 @@ All colors MUST be HSL.
 
     --border: 215 20% 88%;
     --input: 215 20% 88%;
-    --ring: 209 61% 16%;
+    --ring: 217 62% 14%;
 
     --radius: 0.5rem;
 

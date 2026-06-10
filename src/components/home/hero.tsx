@@ -22,7 +22,7 @@ type HeroMapImage = {
 };
 
 const heroCopy = {
-  eyebrow: "Accountability has no expiry",
+  eyebrow: "Accountability has no expiry.",
   titlePrefix: "Nepal's Permanent",
   titleHighlight: "Corruption Case",
   titleSuffix: "Archive",
@@ -62,11 +62,11 @@ export function Hero({
     const trimmedQuery = query.trim();
 
     if (!trimmedQuery) {
-      navigate("/search");
+      navigate("/search?type=case");
       return;
     }
 
-    const params = new URLSearchParams({ q: trimmedQuery });
+    const params = new URLSearchParams({ q: trimmedQuery, type: "case" });
     navigate(`/search?${params.toString()}`);
   };
 
@@ -84,7 +84,7 @@ export function Hero({
 
       <div className="container relative z-10 mx-auto flex min-h-[72svh] flex-col items-start justify-center px-6 py-14 text-left sm:px-8 sm:py-16 md:min-h-[74svh] md:items-center md:px-6 md:py-20 md:text-center lg:min-h-[76svh] lg:py-24">
         <p className="max-w-full text-[clamp(0.68rem,1.8vw,0.75rem)] font-bold uppercase tracking-[0.26em] text-accent sm:tracking-[0.28em]">
-          {heroCopy.eyebrow}
+          <em>{heroCopy.eyebrow}</em>
         </p>
 
         <h1 className="mt-5 max-w-[min(100%,9.6em)] text-[clamp(2.35rem,10.6vw,3.55rem)] font-extrabold leading-[0.96] tracking-[-0.045em] text-primary sm:max-w-[min(100%,10.8em)] sm:text-[clamp(3rem,8vw,4rem)] md:max-w-4xl md:text-6xl md:leading-[1.02] lg:text-6xl">

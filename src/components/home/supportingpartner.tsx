@@ -12,6 +12,8 @@ export function SupportingPartner() {
           Supporting Partners
         </h2>
 
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-8 md:gap-12">
+
         <a
           href="https://monal.cloud"
           target="_blank"
@@ -24,6 +26,20 @@ export function SupportingPartner() {
             className="h-24 w-auto object-contain"
           />
         </a>
+
+        <a
+          href="https://letsbuildnepal.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visit Let's Build Nepal"
+        >
+          <img
+            src="/assets/lbn.png"
+            alt="Let's Build Nepal"
+            className="h-16 w-auto object-contain"
+          />
+        </a>
+        </div>
       </div>
     </section>
   );

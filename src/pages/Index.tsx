@@ -61,7 +61,7 @@ const Index = () => {
       });
 
       const entities = await Promise.all(entityPromises);
-      
+
       // Only update state if component is still mounted
       if (isMounted) {
         const entitiesMap = entities.reduce((acc, item) => {
@@ -178,7 +178,6 @@ const Index = () => {
           officialsAndEntitiesTracked={getStatValue(stats?.entities_tracked)}
         />
 
-    
 
         {/* ── What we're building ── */}
         {/* <section id="archive-intro" className="py-12 bg-muted/30 border-b border-border">
@@ -203,11 +202,6 @@ const Index = () => {
                 <h2 className="text-2xl font-bold text-foreground">Recently Documented Cases</h2>
                 <p className="text-muted-foreground mt-1">Latest cases added to the archive</p>
               </div>
-              <Button variant="outline" asChild className="hidden sm:flex">
-                <Link to="/search">
-                  View all cases <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
             </div>
 
             {featuredCases.length > 0 ? (
@@ -224,9 +218,11 @@ const Index = () => {
               </div>
             )}
 
-            <div className="text-center sm:hidden mt-8">
-              <Button variant="outline" asChild className="w-full">
-                <Link to="/search">View all cases <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            <div className="text-center mt-10 mb-4 flex justify-center">
+              <Button variant="primary" size="xl" asChild>
+                <Link to="/search?type=case">
+                  View all cases <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
               </Button>
             </div>
           </div>
@@ -234,7 +230,7 @@ const Index = () => {
 
         <ReportCaseCta />
         <Faq />
-            <SupportingPartner />
+        <SupportingPartner />
       </main>
 
     </div>

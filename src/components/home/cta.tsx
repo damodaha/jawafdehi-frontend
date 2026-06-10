@@ -66,7 +66,7 @@ export function Cta({ className }: Readonly<CtaProps>) {
               size="lg"
               className="border border-white/20 bg-white/10 text-white hover:bg-white/18 hover:text-white dark:border-white/20 dark:bg-white/10 dark:text-white dark:hover:bg-white/18"
             >
-              <a href="mailto:cases@jawafdehi.org">
+              <a href="mailto:report@jawafdehi.org">
                 <Mail className="h-4 w-4" aria-hidden="true" />
                 {t("cta.email")}
               </a>
