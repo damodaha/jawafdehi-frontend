@@ -506,6 +506,9 @@
     "role": {
       "raw": "View original",
       "permalink": "Permalink",
+      "sourcePage": "Source page",
+      "alternate": "Alternate format",
+      "alternateN": "Alternate format {{n}}",
       "markdown": "Show markdown transcript",
       "markdownN": "Show markdown transcript {{n}}"
     }

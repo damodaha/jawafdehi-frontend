@@ -1,4 +1,4 @@
-import { Archive, ExternalLink, FileText } from "lucide-react";
+import { Archive, ExternalLink, FileText, Files, Globe } from "lucide-react";
 import type { ComponentType } from "react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +21,13 @@ interface DocumentSourceCardProps {
 // URL scheme validation - only allow http/https
 const isAllowedScheme = (u: string) => /^https?:\/\//i.test(u.trim());
 
-const KNOWN_ROLES: SourceLinkRole[] = ["RAW", "PERMALINK", "MARKDOWN"];
+const KNOWN_ROLES: SourceLinkRole[] = [
+  "RAW",
+  "PERMALINK",
+  "MARKDOWN",
+  "SOURCE_PAGE",
+  "ALTERNATE",
+];
 
 // web.archive.org / archive.org snapshot URLs are permalinks by nature. Some
 // records mis-tag these as RAW (importer bug), so we override the stated role
@@ -52,24 +58,33 @@ const resolveLinks = (source: DocumentSource | null): SourceLink[] => {
     .map((u) => ({ link: u.link.trim(), role: normalizeRole(u.role, u.link) }));
 };
 
+// Roles rendered as prominent primary links (a labelled button row).
+type PrimaryRole = "RAW" | "PERMALINK" | "SOURCE_PAGE";
+
 // Visual treatment per role: icon + i18n label key for the prominent links.
 const PRIMARY_ROLE_META: Record<
-  "RAW" | "PERMALINK",
+  PrimaryRole,
   { icon: ComponentType<{ className?: string }>; labelKey: string }
 > = {
   RAW: { icon: ExternalLink, labelKey: "documentSource.role.raw" },
   PERMALINK: { icon: Archive, labelKey: "documentSource.role.permalink" },
+  SOURCE_PAGE: { icon: Globe, labelKey: "documentSource.role.sourcePage" },
 };
 
 /**
- * Split links into the prominent primary links and the markdown transcript(s).
+ * Split links into prominent primary links, de-emphasized secondary links
+ * (markdown transcript(s) + alternate-format renderings), and so on.
  *
  * The backend over-tags the markdown transcript's S3 URL: the same URL often
  * appears BOTH as MARKDOWN and again as RAW/PERMALINK. Any non-markdown link
  * pointing at a markdown URL is therefore the transcript itself, not a separate
  * source — collapse it into the transcript (rendered once, as small text). The
- * remaining primary links are then deduped by URL so a link tagged twice (e.g.
+ * remaining links are then deduped by URL so a link tagged twice (e.g.
  * RAW + PERMALINK on the same href) renders a single button.
+ *
+ * ALTERNATE links (an alternate file format of the RAW document, e.g. a .doc
+ * next to the canonical .pdf) are split out into their own small secondary row,
+ * since they are redundant content the reader rarely needs.
  */
 const partitionLinks = (links: SourceLink[]) => {
   const markdownHrefs = new Set<string>();
@@ -80,15 +95,20 @@ const partitionLinks = (links: SourceLink[]) => {
   });
 
   const primaryLinks: SourceLink[] = [];
+  const alternateLinks: SourceLink[] = [];
   const seen = new Set<string>();
   for (const l of links) {
     if (l.role === "MARKDOWN" || markdownHrefs.has(l.link)) continue;
     if (seen.has(l.link)) continue;
     seen.add(l.link);
-    primaryLinks.push(l);
+    if (l.role === "ALTERNATE") {
+      alternateLinks.push(l);
+    } else {
+      primaryLinks.push(l);
+    }
   }
 
-  return { primaryLinks, markdownLinks };
+  return { primaryLinks, alternateLinks, markdownLinks };
 };
 
 export function DocumentSourceCard({
@@ -99,7 +119,7 @@ export function DocumentSourceCard({
 }: DocumentSourceCardProps) {
   const { t } = useTranslation();
   const links = resolveLinks(source);
-  const { primaryLinks, markdownLinks } = partitionLinks(links);
+  const { primaryLinks, alternateLinks, markdownLinks } = partitionLinks(links);
 
   // Get source type label with i18n support and fallback for legacy types
   const sourceTypeLabel = source?.source_type
@@ -141,7 +161,7 @@ export function DocumentSourceCard({
             {primaryLinks.length > 0 && (
               <div className="flex flex-shrink-0 flex-wrap items-center gap-x-4 gap-y-1 md:justify-end">
                 {primaryLinks.map((link, index) => {
-                  const meta = PRIMARY_ROLE_META[link.role as "RAW" | "PERMALINK"] ?? PRIMARY_ROLE_META.RAW;
+                  const meta = PRIMARY_ROLE_META[link.role as PrimaryRole] ?? PRIMARY_ROLE_META.RAW;
                   const Icon = meta.icon;
                   const isNumbered = primaryRoleCounts[link.role] > 1;
                   const n = (primaryRoleSeen[link.role] = (primaryRoleSeen[link.role] ?? 0) + 1);
@@ -177,6 +197,32 @@ export function DocumentSourceCard({
             <p className="mt-2 text-sm leading-6 text-muted-foreground break-words">
               {evidenceDescription}
             </p>
+          )}
+
+          {alternateLinks.length > 0 && (
+            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+              {alternateLinks.map((link, index) => {
+                const linkText =
+                  alternateLinks.length > 1
+                    ? t("documentSource.role.alternateN", { n: index + 1 })
+                    : t("documentSource.role.alternate");
+                const ariaLabel = `${linkText} ${t("documentSource.opensInNewTab")}`;
+
+                return (
+                  <a
+                    key={`alt-${index}-${link.link}`}
+                    href={link.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={ariaLabel}
+                    className="inline-flex items-center gap-1 text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+                  >
+                    <Files className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
+                    {linkText}
+                  </a>
+                );
+              })}
+            </div>
           )}
 
           {markdownLinks.length > 0 && (

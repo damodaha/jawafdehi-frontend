@@ -158,7 +158,12 @@ export interface CaseDetail extends Case {
   court_cases: string[] | null;
 }
 
-export type SourceLinkRole = 'RAW' | 'MARKDOWN' | 'PERMALINK';
+export type SourceLinkRole =
+  | 'RAW'
+  | 'MARKDOWN'
+  | 'PERMALINK'
+  | 'SOURCE_PAGE'
+  | 'ALTERNATE';
 
 /** A source link with an explicit role (the `urls` field shape). */
 export interface SourceLink {
@@ -172,7 +177,7 @@ export interface DocumentSource {
   title: string;
   description: string;
   source_type: DocumentSourceType | string | null; // DocumentSourceType for known values; plain string covers legacy/unknown backend values; null if not classified
-  urls?: SourceLink[] | null; // Link dicts with explicit role (RAW/MARKDOWN/PERMALINK); includes uploaded-file URL when present
+  urls?: SourceLink[] | null; // Link dicts with explicit role (RAW/MARKDOWN/PERMALINK/SOURCE_PAGE/ALTERNATE); includes uploaded-file URL when present
   related_entities: JawafEntity[]; // Related entities
   created_at: string;
   updated_at: string;
