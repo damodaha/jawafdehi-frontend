@@ -502,7 +502,12 @@
     "fallbackTitle": "Source {{id}}",
     "viewSource": "View Source",
     "viewSourceN": "View Source {{n}}",
-    "opensInNewTab": "(opens in a new tab)"
+    "opensInNewTab": "(opens in a new tab)",
+    "roles": {
+      "RAW": "RAW",
+      "MARKDOWN": "Markdown",
+      "PERMALINK": "Permalink"
+    }
   },
   "sourceType": {
     "LEGAL_COURT_ORDER": "Legal: Court Order/Verdict",

@@ -502,7 +502,12 @@
     "fallbackTitle": "स्रोत {{id}}",
     "viewSource": "स्रोत हेर्नुहोस्",
     "viewSourceN": "स्रोत {{n}} हेर्नुहोस्",
-    "opensInNewTab": "(नयाँ ट्याबमा खुल्छ)"
+    "opensInNewTab": "(नयाँ ट्याबमा खुल्छ)",
+    "roles": {
+      "RAW": "RAW",
+      "MARKDOWN": "Markdown",
+      "PERMALINK": "स्थायी लिङ्क"
+    }
   },
   "sourceType": {
     "LEGAL_COURT_ORDER": "कानूनी: अदालतको आदेश/फैसला",
