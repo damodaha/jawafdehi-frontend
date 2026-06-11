@@ -37,8 +37,26 @@ export default defineConfig(({ mode, isSsrBuild }) => {
 
   return {
     server: {
-      host: "::",
-      port: 8080,
+      // Loopback only; reached via SSH port-forward of this single port.
+      host: "127.0.0.1",
+      port: 40114,
+      strictPort: true,
+      // Same-origin /api and /admin -> local gunicorn, so only one tunnel is needed.
+      proxy: {
+        "/api": {
+          target: "http://127.0.0.1:40173",
+          changeOrigin: true,
+        },
+        "/admin": {
+          target: "http://127.0.0.1:40173",
+          changeOrigin: true,
+        },
+        // Django/WhiteNoise static (admin CSS etc.) lives under /static.
+        "/static": {
+          target: "http://127.0.0.1:40173",
+          changeOrigin: true,
+        },
+      },
     },
     plugins: [
       react(),
