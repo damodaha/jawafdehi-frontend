@@ -332,6 +332,7 @@
     "listView": "List view",
     "type": {
       "corruption": "Corruption",
+      "taxEvasion": "Tax Evasion",
       "misconduct": "Misconduct",
       "breachOfTrust": "Breach of Trust",
       "mediaTrial": "Media Trial"

@@ -14,6 +14,7 @@ import { getEntityById } from "@/services/api";
 import { useQuery, useQueries } from "@tanstack/react-query";
 
 import { translateDynamicText } from "@/lib/translate-dynamic-content";
+import { getSubjectEntities } from "@/utils/case-entities";
 import type { Case } from "@/types/jds";
 
 /**
@@ -325,8 +326,10 @@ function CaseResults({
 }
 
 function getEntityNames(caseItem: Case, resolvedEntities: Record<string, unknown>, currentLang: string): string[] {
-  const accusedEntities = caseItem.entities?.filter(e => e.type === 'accused') || [];
-  return accusedEntities.map(e => {
+  // Subject entities: accused for CORRUPTION cases, else any named (non-location)
+  // entity so cases without an accused (e.g. TAX_EVASION) still name a subject.
+  const namedEntities = getSubjectEntities(caseItem.entities, e => e.type);
+  return namedEntities.map(e => {
     if (e.nes_id && resolvedEntities[e.nes_id]) {
       const entity = resolvedEntities[e.nes_id];
       return entity?.names?.[0]?.en?.full || entity?.names?.[0]?.ne?.full || e.display_name || e.nes_id;

@@ -10,6 +10,7 @@ import { formatCaseDateRange } from "@/utils/date";
 import { getPrimaryName } from "@/utils/nes-helpers";
 import { translateDynamicText } from "@/lib/translate-dynamic-content";
 import { formatBigo } from "@/utils/number";
+import { getCaseTypeLabelKey } from "@/utils/case-entities";
 
 interface CaseDetailBannerProps {
   caseData: CaseDetail;
@@ -39,7 +40,7 @@ export function CaseDetailBanner({
   };
   const statusKey = caseData.state ? stateMap[caseData.state] : "caseDetail.status.ongoing";
   const statusLabel = t(statusKey || "caseDetail.status.ongoing");
-  const caseTypeLabel = t("cases.type.corruption");
+  const caseTypeLabel = t(getCaseTypeLabelKey(caseData.case_type));
   const dateRange = formatCaseDateRange(caseData.case_start_date, caseData.case_end_date, t("cases.status.ongoing"));
   const notAvailableLabel = t("common.notAvailable");
 

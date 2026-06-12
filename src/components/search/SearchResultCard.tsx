@@ -14,6 +14,7 @@ import type {
 import { cn } from "@/lib/utils";
 import { getCaseById } from "@/services/jds-api";
 import { toggleArchiveSearchParam } from "@/utils/archive-search-params";
+import { getSubjectEntities } from "@/utils/case-entities";
 
 export function SearchResultCard({ result }: Readonly<{ result: ArchiveSearchResult }>) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -173,7 +174,9 @@ function resultMetadata(result: ArchiveSearchResult) {
 }
 
 function caseMetadata(result: CaseSearchResult) {
-  const primaryEntity = result.entities.find((entity) => entity.relationship_type === "accused");
+  // Subject entity: accused for CORRUPTION cases, else any named (non-location)
+  // entity so cases without an accused (e.g. TAX_EVASION) still name a subject.
+  const [primaryEntity] = getSubjectEntities(result.entities, e => e.relationship_type);
   const location = result.entities.find((entity) => entity.relationship_type === "location");
   return [entityName(primaryEntity), entityName(location)].filter(Boolean).join(" · ");
 }

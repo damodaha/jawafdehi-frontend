@@ -31,6 +31,7 @@ import type { Entity } from "@/types/nes";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { formatCaseDateRange } from "@/utils/date";
 import { stripMarkdown } from "@/utils/markdown";
+import { getSubjectEntities } from "@/utils/case-entities";
 import { ReportCaseDialog } from "@/components/ReportCaseDialog";
 import { DisqusComments } from "@/components/DisqusComments";
 import { JAWAFDEHI_WHATSAPP_NUMBER, JAWAFDEHI_EMAIL } from "@/config/constants";
@@ -170,11 +171,13 @@ const CaseDetail = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  const accusedEntities = caseData?.entities.filter(e => e.type === 'accused') ?? [];
-  const accusedCount = accusedEntities.length;
+  // Subject entities: accused for CORRUPTION cases, else any named (non-location)
+  // entity so cases without an accused (e.g. TAX_EVASION) still name a subject.
+  const bannerEntities = getSubjectEntities(caseData?.entities, e => e.type);
+  const accusedCount = bannerEntities.length;
   const BANNER_ACCUSED_LIMIT = 5;
   const collapsedAccused = accusedCount > BANNER_ACCUSED_LIMIT;
-  const visibleAccusedEntities = collapsedAccused ? accusedEntities.slice(0, BANNER_ACCUSED_LIMIT) : accusedEntities;
+  const visibleAccusedEntities = collapsedAccused ? bannerEntities.slice(0, BANNER_ACCUSED_LIMIT) : bannerEntities;
   const hiddenAccusedCount = accusedCount - visibleAccusedEntities.length;
 
   const sourceQueries = useQueries({
