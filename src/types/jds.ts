@@ -67,9 +67,12 @@ export interface EntityCaseRelationship {
 }
 
 export interface TimelineEntry {
-  date: string; // ISO date format
+  date: string; // AD ISO date format
   title: string;
   description: string;
+  date_bs?: string; // Bikram Sambat date (YYYY-MM-DD), as recorded in the source
+  end_date?: string; // AD ISO date; present when the event spans a period
+  end_date_bs?: string; // Bikram Sambat date (YYYY-MM-DD) for the span's end
 }
 
 export interface EvidenceEntry {

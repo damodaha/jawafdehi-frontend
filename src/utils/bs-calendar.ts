@@ -84,3 +84,21 @@ export function adToBS(adYear: number, adMonth: number, adDay: number): BSDate {
     throw new RangeError('Date conversion failed');
   }
 }
+
+/**
+ * Format a curated Bikram Sambat date string ("YYYY-MM-DD") in the same
+ * Devanagari style as {@link adToBS} (e.g. "२०८२ पौष १७").
+ *
+ * Returns null if the string is not a well-formed BS date, so callers can fall
+ * back to converting the AD date instead.
+ */
+export function formatBSString(bsDateString: string | null | undefined): string | null {
+  if (!bsDateString) return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(bsDateString);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const date = Number(match[3]);
+  if (month < 1 || month > 12 || date < 1 || date > 32) return null;
+  return `${toNepaliNumerals(year)} ${NEPALI_MONTHS[month - 1]} ${toNepaliNumerals(date)}`;
+}
