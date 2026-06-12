@@ -117,7 +117,7 @@ const Donate = () => {
         </section>
 
         {/* Ways to give */}
-        <section id="donate-ways" className="bg-muted/20 pt-10 pb-12 md:pt-12 md:pb-14">
+        <section id="donate-ways" className="scroll-mt-[76px] bg-muted/20 pt-10 pb-12 md:pt-12 md:pb-14">
           <div className="container mx-auto px-4">
             <div className="mx-auto mb-10 max-w-2xl text-center">
               <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
