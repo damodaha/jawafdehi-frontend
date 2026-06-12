@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   ChevronDown,
+  HeartHandshake,
   Menu,
   MessageCircle,
   Search,
@@ -302,6 +303,20 @@ export function Navbar() {
 
             <Button
               asChild
+              size="navCta"
+              className={cn(
+                "min-w-0 bg-accent px-4 font-semibold text-accent-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-accent/90",
+                isScrolled ? "shadow-md shadow-accent/20" : "shadow-none",
+              )}
+            >
+              <Link to="/donate">
+                <HeartHandshake className="h-4 w-4" />
+                {t("nav.donate")}
+              </Link>
+            </Button>
+
+            <Button
+              asChild
               variant="primary"
               size="navCta"
               className={cn(
@@ -385,6 +400,17 @@ export function Navbar() {
                 </nav>
 
                 <div className="mt-8 grid gap-3">
+                  <Button
+                    asChild
+                    size="navSheet"
+                    className="bg-accent font-semibold text-accent-foreground hover:bg-accent/90"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Link to="/donate">
+                      <HeartHandshake className="h-4 w-4" />
+                      {t("nav.donate")}
+                    </Link>
+                  </Button>
                   <Button
                     asChild
                     variant="primary"

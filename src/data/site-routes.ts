@@ -119,6 +119,14 @@ export const PRE_RENDERED_STATIC_ROUTES = [
     sitemapTitle: "Volunteer — Jawafdehi",
   },
   {
+    path: "/donate",
+    titleKey: "nav.donate",
+    descriptionKey: "searchCommand.descriptions.donate",
+    keywords: ["donate", "donation", "support", "fund", "give", "contribute"],
+    icon: "HeartHandshake",
+    sitemapTitle: "Donate — Jawafdehi",
+  },
+  {
     path: "/about",
     titleKey: "nav.about",
     descriptionKey: "searchCommand.descriptions.about",
