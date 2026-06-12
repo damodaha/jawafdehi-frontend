@@ -14,6 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import type { Entity } from "@/types/nes";
 import { translateDynamicText } from "@/lib/translate-dynamic-content";
+import { getSubjectEntities } from "@/utils/case-entities";
 import { useTranslation } from "react-i18next";
 
 const Index = () => {
@@ -84,11 +85,13 @@ const Index = () => {
   const featuredCases = useMemo(() => {
     if (!casesData?.results) return [];
     return casesData.results.slice(0, 3).map((caseItem) => {
-      // Get accused entities and locations from unified entities array
-      const accusedEntities = caseItem.entities?.filter(e => e.type === 'accused') || [];
+      // Locations and the case's subject entities. Subjects are the accused for
+      // CORRUPTION cases, else any named (non-location) entity so cases without
+      // an accused (e.g. TAX_EVASION) still name a subject.
       const locationEntities = caseItem.entities?.filter(e => e.type === 'location') || [];
+      const namedEntities = getSubjectEntities(caseItem.entities, e => e.type);
 
-      const entityNames = accusedEntities.map(e => {
+      const entityNames = namedEntities.map(e => {
         if (e.nes_id && resolvedEntities[e.nes_id]) {
           const entity = resolvedEntities[e.nes_id];
           return entity?.names?.[0]?.en?.full || entity?.names?.[0]?.ne?.full || e.display_name || e.nes_id;
@@ -120,7 +123,7 @@ const Index = () => {
         allegations: caseItem.key_allegations, // Pass key allegations to CaseCard
         thumbnailUrl: caseItem.thumbnail_url ?? undefined,
         tags: caseItem.tags,
-        entityIds: accusedEntities.map(e => e.id),
+        entityIds: namedEntities.map(e => e.id),
         locationIds: locationEntities.map(l => l.id),
       };
     });

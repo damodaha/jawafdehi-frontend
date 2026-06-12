@@ -332,6 +332,7 @@
     "listView": "सूची दृश्य",
     "type": {
       "corruption": "भ्रष्टाचार",
+      "taxEvasion": "कर छली",
       "misconduct": "दुर्व्यवहार",
       "breachOfTrust": "विश्वासको उल्लङ्घन",
       "mediaTrial": "मिडिया ट्रायल"

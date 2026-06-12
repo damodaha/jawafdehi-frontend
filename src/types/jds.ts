@@ -11,8 +11,9 @@
 // Enums
 // ============================================================================
 
-export type CaseType = 
-  | 'CORRUPTION';
+export type CaseType =
+  | 'CORRUPTION'
+  | 'TAX_EVASION';
 
 export type CaseState =
   | 'DRAFT'
