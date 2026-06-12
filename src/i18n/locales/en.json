@@ -11,6 +11,7 @@
     "ourProcess": "Our Process",
     "volunteer": "Volunteer",
     "weeklySeries": "Weekly Series",
+    "donate": "Donate",
     "ourCommitment": "Our Commitment",
     "skipToContent": "Skip to content",
     "searchCases": "Search cases",
@@ -82,6 +83,7 @@
       "process": "See how records are reviewed and documented.",
       "commitment": "Read the principles behind the archive.",
       "volunteer": "Help build the accountability archive.",
+      "donate": "Support Jawafdehi with a donation.",
       "about": "Learn about Jawafdehi and its mission.",
       "team": "Meet the people behind Jawafdehi.",
       "products": "Explore Jawafdehi tools and products.",
@@ -301,6 +303,104 @@
         "Investigate what legally and ethically constitutes corruption in each context",
         "Analyse the role of corruption in Nepali governance structures",
         "Evaluate the effectiveness of anti-corruption policy and institutional frameworks"
+      ]
+    }
+  },
+  "donate": {
+    "hero": {
+      "support": "Keep Nepal's",
+      "accountabilityArchive": "accountability archive",
+      "alive": "alive",
+      "description": "Jawafdehi is run by volunteers and funded by people who believe corruption should never be forgotten. Your donation pays for the servers, document archiving, and tooling that keep this public record permanent and free for everyone.",
+      "giveNow": "Ways to give",
+      "email": "Email us"
+    },
+    "impact": {
+      "eyebrow": "Where your money goes",
+      "title": "Every rupee funds the public record",
+      "description": "Jawafdehi takes no profit. Donations cover the direct costs of keeping a permanent, openly accessible corruption archive online.",
+      "items": [
+        {
+          "title": "Hosting & infrastructure",
+          "desc": "Servers, databases, and bandwidth that keep the archive fast and available to anyone, anywhere, around the clock."
+        },
+        {
+          "title": "Document archiving",
+          "desc": "Scraping, digitising, and permanently storing government filings, court orders, and media reports so they cannot disappear."
+        },
+        {
+          "title": "Verification & research",
+          "desc": "Tooling and resources that help volunteers verify cases accurately before they are published to the public."
+        },
+        {
+          "title": "Open access for all",
+          "desc": "Keeping every case, entity, and document free to read, search, and reuse — with no paywalls and no ads."
+        }
+      ]
+    },
+    "ways": {
+      "eyebrow": "Ways to give",
+      "title": "Choose how you'd like to donate",
+      "description": "Give from inside Nepal with a digital wallet, send a bank transfer, or support us internationally. Every contribution, large or small, keeps the archive running.",
+      "wallets": {
+        "title": "Digital wallets (Nepal)",
+        "desc": "Scan or send to our eSewa, Khalti, or IME Pay account from anywhere in Nepal.",
+        "esewaLabel": "eSewa ID",
+        "esewaId": "TODO_ESEWA_ID",
+        "khaltiLabel": "Khalti ID",
+        "khaltiId": "TODO_KHALTI_ID",
+        "imepayLabel": "IME Pay ID",
+        "imepayId": "TODO_IMEPAY_ID",
+        "qrNote": "Scan the QR code with your wallet app, or send to the IDs above."
+      },
+      "bank": {
+        "title": "Bank transfer",
+        "desc": "For larger gifts or international wires, transfer directly to our bank account.",
+        "accountNameLabel": "Account name",
+        "accountName": "TODO_ACCOUNT_NAME",
+        "accountNumberLabel": "Account number",
+        "accountNumber": "TODO_ACCOUNT_NUMBER",
+        "bankNameLabel": "Bank",
+        "bankName": "TODO_BANK_NAME",
+        "branchLabel": "Branch",
+        "branch": "TODO_BRANCH",
+        "swiftLabel": "SWIFT / BIC",
+        "swift": "TODO_SWIFT_CODE"
+      },
+      "international": {
+        "title": "International donors",
+        "desc": "Supporting us from outside Nepal? Give securely through our online donation platform — one-time or recurring.",
+        "cta": "Donate online",
+        "url": "https://TODO_INTERNATIONAL_DONATE_URL"
+      },
+      "copy": "Copy",
+      "copied": "Copied"
+    },
+    "transparency": {
+      "eyebrow": "Our promise",
+      "title": "Transparent by default",
+      "description": "Jawafdehi is open source and built in the public interest. We publish how funds are used and never sell or share donor information. If you would like a receipt or have questions about giving, just email us."
+    },
+    "faq": {
+      "eyebrow": "Questions",
+      "title": "Frequently asked questions",
+      "items": [
+        {
+          "q": "Is my donation tax-deductible?",
+          "a": "TODO: Confirm Jawafdehi's legal/charitable status and update this answer with tax-deductibility details for Nepal and international donors."
+        },
+        {
+          "q": "Can I give monthly instead of once?",
+          "a": "Yes — our international donation platform supports recurring gifts. For wallet or bank donations, you're welcome to give on any schedule that works for you."
+        },
+        {
+          "q": "Where exactly does the money go?",
+          "a": "Donations fund hosting, document archiving, verification tooling, and keeping the archive free and open. Jawafdehi is volunteer-run and takes no profit."
+        },
+        {
+          "q": "Can I get a receipt?",
+          "a": "Yes. Email us after donating and we'll send a confirmation and receipt for your records."
+        }
       ]
     }
   },

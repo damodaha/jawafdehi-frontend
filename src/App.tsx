@@ -15,6 +15,7 @@ import Commitment from "./pages/Commitment";
 import OurProcess from "./pages/OurProcess";
 import OurTeam from "./pages/OurTeam";
 import Volunteer from "./pages/Volunteer";
+import Donate from "./pages/Donate";
 import OurProducts from "./pages/OurProducts";
 import WeeklyMeetings from "./pages/WeeklyMeetings";
 import Information from "./pages/Information";
@@ -118,6 +119,7 @@ const App = () => (
             <Route path="/our-process" element={<OurProcess />} />
             <Route path="/team" element={<OurTeam />} />
             <Route path="/volunteer" element={<Volunteer />} />
+            <Route path="/donate" element={<Donate />} />
             <Route path="/products" element={<OurProducts />} />
             <Route path="/saptahik" element={<WeeklyMeetings />} />
             <Route path="/privacy" element={<Privacy />} />
