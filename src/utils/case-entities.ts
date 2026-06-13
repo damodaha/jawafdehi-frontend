@@ -35,6 +35,13 @@ export function getSubjectEntities<T>(
 // value. Single source of truth so every display site stays consistent.
 const CASE_TYPE_LABEL_KEYS: Record<string, string> = {
   CORRUPTION: "cases.type.corruption",
+  BRIBERY: "cases.type.bribery",
+  FORGERY: "cases.type.forgery",
+  EMBEZZLEMENT: "cases.type.embezzlement",
+  ABUSE_OF_OFFICE: "cases.type.abuseOfOffice",
+  MONEY_LAUNDERING: "cases.type.moneyLaundering",
+  ILLEGAL_PROPERTY: "cases.type.illegalProperty",
+  EXAM_RIGGING: "cases.type.examRigging",
   TAX_EVASION: "cases.type.taxEvasion",
 };
 
@@ -43,4 +50,25 @@ const DEFAULT_CASE_TYPE_LABEL_KEY = "cases.type.corruption";
 /** i18n key for a case type's display label (falls back to corruption). */
 export function getCaseTypeLabelKey(caseType: string | null | undefined): string {
   return (caseType && CASE_TYPE_LABEL_KEYS[caseType]) || DEFAULT_CASE_TYPE_LABEL_KEY;
+}
+
+/**
+ * Display label for a search facet item.
+ *
+ * The backend ships a `display_name` for every facet, but for `case_type` that
+ * string carries a bilingual "English (नेपाली)" admin label (from the
+ * CaseType choices). The archive search should instead show the value in the
+ * viewer's own language, so we localize case-type facets from their `name`
+ * (the stable CaseType value) via the i18n keys; every other facet keeps the
+ * backend `display_name`.
+ */
+export function getFacetItemLabel(
+  facetName: string,
+  item: { name: string; display_name: string },
+  translate: (key: string) => string,
+): string {
+  if (facetName === "case_type") {
+    return translate(getCaseTypeLabelKey(item.name));
+  }
+  return item.display_name;
 }

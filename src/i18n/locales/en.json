@@ -332,6 +332,13 @@
     "listView": "List view",
     "type": {
       "corruption": "Corruption",
+      "bribery": "Bribery",
+      "forgery": "Forgery",
+      "embezzlement": "Embezzlement",
+      "abuseOfOffice": "Abuse of Office",
+      "moneyLaundering": "Money Laundering",
+      "illegalProperty": "Illegal Property",
+      "examRigging": "Exam Rigging",
       "taxEvasion": "Tax Evasion",
       "misconduct": "Misconduct",
       "breachOfTrust": "Breach of Trust",
