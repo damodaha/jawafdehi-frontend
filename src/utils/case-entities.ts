@@ -51,3 +51,24 @@ const DEFAULT_CASE_TYPE_LABEL_KEY = "cases.type.corruption";
 export function getCaseTypeLabelKey(caseType: string | null | undefined): string {
   return (caseType && CASE_TYPE_LABEL_KEYS[caseType]) || DEFAULT_CASE_TYPE_LABEL_KEY;
 }
+
+/**
+ * Display label for a search facet item.
+ *
+ * The backend ships a `display_name` for every facet, but for `case_type` that
+ * string carries a bilingual "English (नेपाली)" admin label (from the
+ * CaseType choices). The archive search should instead show the value in the
+ * viewer's own language, so we localize case-type facets from their `name`
+ * (the stable CaseType value) via the i18n keys; every other facet keeps the
+ * backend `display_name`.
+ */
+export function getFacetItemLabel(
+  facetName: string,
+  item: { name: string; display_name: string },
+  translate: (key: string) => string,
+): string {
+  if (facetName === "case_type") {
+    return translate(getCaseTypeLabelKey(item.name));
+  }
+  return item.display_name;
+}

@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AlertCircle, X } from "lucide-react";
 import { Helmet } from "react-helmet-async";
+import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 
 import {
@@ -39,6 +40,7 @@ import {
   setArchiveSearchParam,
   toggleArchiveSearchParam,
 } from "@/utils/archive-search-params";
+import { getFacetItemLabel } from "@/utils/case-entities";
 
 type RefinementName = SidebarFilterName | "type" | "tags";
 
@@ -58,6 +60,7 @@ const emptyFacets: ArchiveSearchFacets = {
 };
 
 export default function ArchiveSearch() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedRecordType = useMemo(
     () => readRecordType(searchParams),
@@ -164,7 +167,7 @@ export default function ArchiveSearch() {
     0,
   );
   const facets = displayData?.facets || emptyFacets;
-  const selectedItems = getSelectedItems(facets, selectedRefinements);
+  const selectedItems = getSelectedItems(facets, selectedRefinements, t);
   const searchFilters = showFilters ? (
     isInitialLoading ? (
       <SearchFiltersSkeleton />
@@ -410,15 +413,17 @@ function ArchiveSearchResults({
 function getSelectedItems(
   facets: ArchiveSearchFacets,
   selected: Record<RefinementName, string[]>,
+  translate: (key: string) => string,
 ) {
   return (Object.keys(selected) as RefinementName[]).flatMap((name) =>
-    selected[name].map((value) => ({
-      name,
-      value,
-      label:
-        facets[name].find((item) => item.name === value)?.display_name ||
-        humanize(value),
-    })),
+    selected[name].map((value) => {
+      const facetItem = facets[name].find((item) => item.name === value) ?? {
+        name: value,
+        display_name: humanize(value),
+        count: 0,
+      };
+      return { name, value, label: getFacetItemLabel(name, facetItem, translate) };
+    }),
   );
 }
 

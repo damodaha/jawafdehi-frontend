@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -7,6 +9,7 @@ import type {
   ArchiveSearchType,
   SearchFacetItem,
 } from "@/types/search";
+import { getFacetItemLabel } from "@/utils/case-entities";
 
 export type SidebarFilterName = "entity_type" | "role" | "case_type";
 
@@ -195,6 +198,7 @@ function FilterGroup({
   selectedValues: string[];
   title: string;
 }>) {
+  const { t } = useTranslation();
   const displayItems = [...(items || [])];
   selectedValues.forEach((val) => {
     if (!displayItems.some((item) => item.name === val)) {
@@ -215,17 +219,18 @@ function FilterGroup({
       </legend>
       {displayItems.map((item) => {
         const isChecked = selectedValues.includes(item.name);
+        const label = getFacetItemLabel(name, item, t);
         return (
           <label
             className="flex min-h-8 cursor-pointer items-center gap-2 rounded-md px-1 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             key={item.name}
           >
             <Checkbox
-              aria-label={`${item.display_name}: ${item.count} results`}
+              aria-label={`${label}: ${item.count} results`}
               checked={isChecked}
               onCheckedChange={() => onToggle(name, item.name)}
             />
-            <span className="min-w-0 flex-1 truncate">{item.display_name}</span>
+            <span className="min-w-0 flex-1 truncate">{label}</span>
             <span className="text-xs tabular-nums">{item.count}</span>
           </label>
         );
