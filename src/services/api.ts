@@ -374,10 +374,12 @@ export async function getEntityCases(idOrSlug: string): Promise<Case[]> {
       id: c.id.toString(),
       entity_id: idOrSlug,
       name: c.title,
-      description: c.description,
+      // `c` is list-sourced, so the full `description` is absent; fall back to
+      // `short_description` (and ultimately '') for the required PAP field.
+      description: c.description ?? c.short_description ?? '',
       documents: (c.evidence ?? []).map(e => e.source_id.toString()),
       timeline: (c.timeline ?? []).map(t => ({
-        date: t.event_date,
+        date: t.date,
         event: t.title,
         description: t.description
       })),
