@@ -145,19 +145,26 @@ export interface Case {
   banner_url?: string | null; // URL for wide banner image on case detail page
   entities: JawafEntity[]; // Unified entity relationships with type field
   tags: string[]; // Tags for categorization (e.g., 'land-encroachment', 'national-interest')
-  description: string; // Rich text description (HTML or Markdown)
   key_allegations: string[]; // List of key allegation statements
-  timeline: TimelineEntry[];
-  evidence: EvidenceEntry[];
   court_cases: string[]; // Court case IDs (e.g., "special:081-CR-0060")
-  notes: string; // Internal notes (HTML or Markdown)
-  missing_details?: string | null;
   bigo?: number | null;
   created_at: string; // ISO datetime
   updated_at: string; // ISO datetime
+  // The following heavy body fields are returned only by the case DETAIL
+  // endpoint. The slim LIST endpoint (CaseListSerializer) omits them, so they
+  // are optional on the base shape and re-asserted as required on CaseDetail.
+  description?: string; // Rich text description (HTML or Markdown)
+  timeline?: TimelineEntry[];
+  evidence?: EvidenceEntry[];
+  notes?: string; // Internal notes (HTML or Markdown)
+  missing_details?: string | null;
 }
 
 export interface CaseDetail extends Case {
+  description: string;
+  timeline: TimelineEntry[];
+  evidence: EvidenceEntry[];
+  notes: string;
   bigo: number | null; // Embezzled/irregular amount in NPR (null if not applicable)
   court_cases: string[] | null;
 }

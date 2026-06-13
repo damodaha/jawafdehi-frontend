@@ -119,7 +119,7 @@ const Index = () => {
         entityNames,
         location: locationNames,
         status: "ongoing" as const, // All published cases shown as ongoing
-        description: caseItem.description.replace(/<[^>]*>/g, '').substring(0, 200),
+        description: (caseItem.short_description ?? '').replace(/<[^>]*>/g, '').substring(0, 200),
         allegations: caseItem.key_allegations, // Pass key allegations to CaseCard
         thumbnailUrl: caseItem.thumbnail_url ?? undefined,
         tags: caseItem.tags,

@@ -21,8 +21,13 @@ export function GuestCaseResultCard({
 }: GuestCaseResultCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  // The list payload is slim, so `description` may be absent; fall back to
+  // `short_description` (and ultimately an empty string) to avoid crashing.
   const descriptionPreview = decodeHtmlEntities(
-    result.caseItem.description.replace(/<[^>]*>/g, " "),
+    (result.caseItem.short_description ?? result.caseItem.description ?? "").replace(
+      /<[^>]*>/g,
+      " ",
+    ),
   );
 
   return (

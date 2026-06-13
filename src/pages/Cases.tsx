@@ -305,7 +305,7 @@ function CaseResults({
             location={getLocationNames(caseItem, resolvedEntities, currentLang)}
             status={mapCaseStatusToBadge(getCaseStatus(caseItem))}
             tags={caseItem.tags || []}
-            description={caseItem.description.replace(/<[^>]*>/g, '').substring(0, 200)}
+            description={(caseItem.short_description ?? '').replace(/<[^>]*>/g, '').substring(0, 200)}
             allegations={caseItem.key_allegations}
             entityIds={(caseItem.entities?.filter(e => e.type === 'accused') || []).map(e => e.id)}
             locationIds={(caseItem.entities?.filter(e => e.type === 'location') || []).map(e => e.id)}

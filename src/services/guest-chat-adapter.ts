@@ -80,7 +80,7 @@ function getCaseSearchText(caseItem: Case): string {
       caseItem.key_allegations.join(" "),
       caseItem.tags.join(" "),
       caseItem.entities.map((entity) => `${entity.display_name || ""} ${entity.notes || ""}`).join(" "),
-      caseItem.timeline
+      (caseItem.timeline ?? [])
         .map((entry) => `${entry.title} ${entry.description}`)
         .join(" "),
     ]
@@ -90,7 +90,7 @@ function getCaseSearchText(caseItem: Case): string {
 }
 
 function getRelevantCiaaTimelineEntries(caseItem: Case) {
-  return caseItem.timeline.filter((entry) => {
+  return (caseItem.timeline ?? []).filter((entry) => {
     const text = normalize(`${entry.title} ${entry.description}`);
     return (
       text.includes("ciaa") ||
@@ -459,7 +459,7 @@ function scoreCaseForTopic(caseItem: Case, topicId: GuestTopicId): number {
 
     return (
       baseScore +
-      caseItem.timeline.filter((entry) =>
+      (caseItem.timeline ?? []).filter((entry) =>
         normalize(`${entry.title} ${entry.description}`).includes("ciaa") ||
         normalize(`${entry.title} ${entry.description}`).includes("अख्तियार")
       ).length * 2
@@ -469,7 +469,7 @@ function scoreCaseForTopic(caseItem: Case, topicId: GuestTopicId): number {
   if (topicId === "big_corruption_cases") {
     const bigoScore =
       caseItem.bigo && caseItem.bigo > 0 ? Math.min(12, Math.log10(caseItem.bigo + 1) * 3) : 0;
-    const evidenceScore = Math.min(5, caseItem.evidence.length);
+    const evidenceScore = Math.min(5, (caseItem.evidence ?? []).length);
     const allegationScore = Math.min(5, caseItem.key_allegations.length);
     const seriousTagScore = caseItem.tags.reduce((total, tag) => {
       const normalizedTag = normalize(tag);
@@ -533,7 +533,7 @@ function summarizeCiaaHandling(caseItem: Case, language: GuestLanguage): string 
   }
 
   const timelineText = normalize(
-    caseItem.timeline.map((entry) => `${entry.title} ${entry.description}`).join(" ")
+    (caseItem.timeline ?? []).map((entry) => `${entry.title} ${entry.description}`).join(" ")
   );
   const descriptionText = getCaseSearchText(caseItem);
 
