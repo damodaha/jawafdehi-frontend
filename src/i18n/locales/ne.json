@@ -332,6 +332,13 @@
     "listView": "सूची दृश्य",
     "type": {
       "corruption": "भ्रष्टाचार",
+      "bribery": "घूस",
+      "forgery": "नक्कली",
+      "embezzlement": "अपचय",
+      "abuseOfOffice": "दुरुपयोग",
+      "moneyLaundering": "सम्पत्ति शुद्धीकरण",
+      "illegalProperty": "गैरकानूनी सम्पत्ति",
+      "examRigging": "परीक्षा अनियमितता",
       "taxEvasion": "कर छली",
       "misconduct": "दुर्व्यवहार",
       "breachOfTrust": "विश्वासको उल्लङ्घन",

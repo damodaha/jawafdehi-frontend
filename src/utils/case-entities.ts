@@ -35,6 +35,13 @@ export function getSubjectEntities<T>(
 // value. Single source of truth so every display site stays consistent.
 const CASE_TYPE_LABEL_KEYS: Record<string, string> = {
   CORRUPTION: "cases.type.corruption",
+  BRIBERY: "cases.type.bribery",
+  FORGERY: "cases.type.forgery",
+  EMBEZZLEMENT: "cases.type.embezzlement",
+  ABUSE_OF_OFFICE: "cases.type.abuseOfOffice",
+  MONEY_LAUNDERING: "cases.type.moneyLaundering",
+  ILLEGAL_PROPERTY: "cases.type.illegalProperty",
+  EXAM_RIGGING: "cases.type.examRigging",
   TAX_EVASION: "cases.type.taxEvasion",
 };
 

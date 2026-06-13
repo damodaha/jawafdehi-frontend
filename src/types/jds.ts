@@ -13,6 +13,13 @@
 
 export type CaseType =
   | 'CORRUPTION'
+  | 'BRIBERY'
+  | 'FORGERY'
+  | 'EMBEZZLEMENT'
+  | 'ABUSE_OF_OFFICE'
+  | 'MONEY_LAUNDERING'
+  | 'ILLEGAL_PROPERTY'
+  | 'EXAM_RIGGING'
   | 'TAX_EVASION';
 
 export type CaseState =
