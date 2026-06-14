@@ -179,7 +179,7 @@ export function Navbar() {
           {t("nav.skipToContent")}
         </a>
 
-        <div className="container mx-auto grid h-[76px] grid-cols-[1fr_auto] items-center gap-3 px-4 lg:grid-cols-[minmax(150px,1fr)_auto_minmax(310px,1fr)]">
+        <div className="container mx-auto grid h-[76px] grid-cols-[1fr_auto] items-center gap-3 px-4 xl:grid-cols-[auto_1fr_auto]">
           <Link
             to="/"
             aria-label={t("nav.homeAria")}
@@ -201,7 +201,7 @@ export function Navbar() {
             aria-label="Primary"
             onPointerLeave={() => setHoveredKey(null)}
             className={cn(
-              "relative hidden items-center justify-self-center rounded-full border p-1 transition-all duration-200 ease-out lg:flex",
+              "relative hidden items-center justify-self-center rounded-full border p-1 transition-all duration-200 ease-out xl:flex",
               isScrolled
                 ? "border-slate-200/70 bg-white/85 shadow-sm shadow-foreground/5 backdrop-blur-md dark:border-border/70 dark:bg-background/80"
                 : "border-transparent bg-transparent shadow-none backdrop-blur-0",
@@ -273,14 +273,14 @@ export function Navbar() {
             </DropdownMenu>
           </nav>
 
-          <div className="hidden min-w-[310px] items-center justify-end gap-2 justify-self-end lg:flex">
+          <div className="hidden items-center justify-end gap-2 justify-self-end xl:flex">
             <LanguageToggle quiet={!isScrolled} />
 
             <div
               className={cn(
-                "flex items-center gap-1 rounded-full border p-1 transition-all duration-200 ease-out",
+                "flex items-center gap-1 rounded-full transition-all duration-200 ease-out",
                 isScrolled
-                  ? "border-slate-200/70 bg-white/75 shadow-sm shadow-foreground/5 backdrop-blur-md dark:border-border/70 dark:bg-background/70"
+                  ? " dark:border-border/70 dark:bg-background/70"
                   : "border-transparent bg-transparent shadow-none backdrop-blur-0",
               )}
             >
@@ -303,9 +303,9 @@ export function Navbar() {
 
             <Button
               asChild
-              size="navCta"
+              variant="secondary"
               className={cn(
-                "min-w-0 bg-accent px-4 font-semibold text-accent-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-accent/90",
+                "min-w-0 bg-accent px-4 w-[8rem] font-semibold text-accent-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-accent/90",
                 isScrolled ? "shadow-md shadow-accent/20" : "shadow-none",
               )}
             >
@@ -320,7 +320,7 @@ export function Navbar() {
               variant="primary"
               size="navCta"
               className={cn(
-                "transition-all duration-200 ease-out hover:-translate-y-0.5",
+                "transition-all w-[12rem] duration-200 ease-out hover:-translate-y-0.5",
                 isScrolled ? "shadow-md shadow-primary/15" : "shadow-none",
               )}
             >
@@ -331,7 +331,7 @@ export function Navbar() {
             </Button>
           </div>
 
-          <div className="flex items-center gap-2 justify-self-end lg:hidden">
+          <div className="flex items-center gap-2 justify-self-end xl:hidden">
             <LanguageToggle quiet={!isScrolled} />
             <Button
               variant="navIcon"
