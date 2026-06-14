@@ -17,11 +17,17 @@ export const LanguageToggle = ({ quiet = false }: LanguageToggleProps) => {
       return;
     }
 
-    try {
+    const updateLanguage = async () => {
       await i18n.changeLanguage(lang);
       trackEvent('language_switch', { from_lang: currentLanguage, to_lang: lang });
-    } catch (error) {
-      console.error("[LanguageToggle] Failed to change language", error);
+    };
+
+    if (!document.startViewTransition) {
+      await updateLanguage();
+    } else {
+      document.startViewTransition(async () => {
+        await updateLanguage();
+      });
     }
     // Language preference is automatically persisted via localStorage by i18next-browser-languagedetector
   };
