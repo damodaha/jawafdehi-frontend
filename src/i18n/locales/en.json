@@ -344,18 +344,16 @@
       "description": "Give from inside Nepal with a digital wallet, send a bank transfer, or support us internationally. Every contribution, large or small, keeps the archive running.",
       "wallets": {
         "title": "Digital wallets (Nepal)",
-        "desc": "Scan or send to our eSewa, Khalti, or IME Pay account from anywhere in Nepal.",
+        "desc": "Scan or send to our eSewa or Khalti account from anywhere in Nepal.",
         "esewaLabel": "eSewa ID",
         "esewaId": "TODO_ESEWA_ID",
         "khaltiLabel": "Khalti ID",
         "khaltiId": "TODO_KHALTI_ID",
-        "imepayLabel": "IME Pay ID",
-        "imepayId": "TODO_IMEPAY_ID",
-        "qrNote": "Scan the QR code with your wallet app, or send to the IDs above."
+        "qrNote": "After sending, email us your name, amount, and screenshot if you need confirmation or a receipt."
       },
       "bank": {
         "title": "Bank transfer",
-        "desc": "For larger gifts or international wires, transfer directly to our bank account.",
+        "desc": "For larger gifts, local transfers, or institutional support.",
         "accountNameLabel": "Account name",
         "accountName": "TODO_ACCOUNT_NAME",
         "accountNumberLabel": "Account number",
@@ -368,9 +366,10 @@
         "swift": "TODO_SWIFT_CODE"
       },
       "international": {
-        "title": "International donors",
-        "desc": "Supporting us from outside Nepal? Give securely through our online donation platform — one-time or recurring.",
+        "title": "International supporters",
+        "desc": "Support us securely through our online donation platform.",
         "cta": "Donate online",
+        "note": "Use this option for international cards, recurring support, or giving from outside Nepal.",
         "url": "https://TODO_INTERNATIONAL_DONATE_URL"
       },
       "copy": "Copy",
