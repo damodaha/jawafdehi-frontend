@@ -36,7 +36,7 @@ export default function CaseworkReviewDetail() {
     if (!review) return;
     setRerunning(true);
     try {
-      const fresh = await submitReview(review.slug);
+      const fresh = await submitReview({ slug: review.slug });
       navigate(`/portal/reviews/${fresh.id}`);
     } finally {
       setRerunning(false);
