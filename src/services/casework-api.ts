@@ -134,7 +134,14 @@ export async function listReviews(params?: {
   if (Array.isArray(data)) {
     return { count: data.length, next: null, previous: null, results: data };
   }
-  return data;
+  // Defensively default each field so a malformed envelope can't crash callers
+  // that iterate `results` (e.g. mergeReviews).
+  return {
+    count: data?.count ?? 0,
+    next: data?.next ?? null,
+    previous: data?.previous ?? null,
+    results: data?.results ?? [],
+  };
 }
 
 export async function getReview(id: number): Promise<ReviewDetail> {

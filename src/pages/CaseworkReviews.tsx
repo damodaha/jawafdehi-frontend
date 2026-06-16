@@ -47,18 +47,22 @@ export default function CaseworkReviews() {
   const [err, setErr] = useState("");
   const [conflictId, setConflictId] = useState<number | null>(null);
 
-  // Load the first page (also used by polling to refresh in-progress rows).
-  const loadFirst = useCallback(async () => {
+  // Load the first page. When called by polling (isPoll), only merge the fresh
+  // page-1 rows — don't touch pagination/loading/error state, so a background
+  // refresh can't reset the user's "Load more" progress or clobber an error.
+  const loadFirst = useCallback(async (isPoll = false) => {
     try {
       const page = await listReviews({ page: 1, page_size: PAGE_SIZE });
-      setCount(page.count);
-      setHasNext(Boolean(page.next));
-      setNextPage(2);
+      if (!isPoll) {
+        setCount(page.count);
+        setHasNext(Boolean(page.next));
+        setNextPage(2);
+      }
       setItems((prev) => (prev.length ? mergeReviews(prev, page.results) : page.results));
     } catch {
-      setErr("Failed to load reviews.");
+      if (!isPoll) setErr("Failed to load reviews.");
     } finally {
-      setLoading(false);
+      if (!isPoll) setLoading(false);
     }
   }, []);
 
@@ -81,30 +85,35 @@ export default function CaseworkReviews() {
     loadFirst();
   }, [loadFirst]);
 
-  // Poll the first page while any loaded review is still in progress; newly
-  // submitted reviews sort to the top, so page 1 covers status changes.
+  // Poll the first page while a review on it is still in progress. The check is
+  // scoped to page 1 (the newest PAGE_SIZE rows, where freshly submitted reviews
+  // land) because polling only refreshes page 1 — scoping it avoids an endless
+  // poll when an in-progress review sits on an unrefreshed later page.
   useEffect(() => {
-    const anyRunning = items.some((i) => i.status === "pending" || i.status === "running");
+    const anyRunning = items
+      .slice(0, PAGE_SIZE)
+      .some((i) => i.status === "pending" || i.status === "running");
     if (!anyRunning) return;
-    const t = setInterval(loadFirst, 3000);
+    const t = setInterval(() => loadFirst(true), 3000);
     return () => clearInterval(t);
   }, [items, loadFirst]);
 
+  // Returns true on success (the component navigates away, so callers must not
+  // touch state afterward); on failure the error is set and false is returned.
   const runSubmit = async (
     payload: Parameters<typeof submitReview>[0],
-    onDone: () => void,
     fallback: string
-  ) => {
+  ): Promise<boolean> => {
     setErr("");
     setConflictId(null);
     try {
       const review = await submitReview(payload);
       navigate(`/portal/reviews/${review.id}`);
+      return true;
     } catch (e: unknown) {
       setErr(apiErrorMessage(e, fallback));
       if (errStatus(e) === 409) setConflictId(conflictReviewId(e) ?? null);
-    } finally {
-      onDone();
+      return false;
     }
   };
 
@@ -112,21 +121,15 @@ export default function CaseworkReviews() {
     e.preventDefault();
     if (!input.trim()) return;
     setSubmitting(true);
-    await runSubmit(
-      buildSubmitPayload(input),
-      () => {
-        setSubmitting(false);
-        setInput("");
-        loadFirst();
-      },
-      "Submit failed."
-    );
+    const ok = await runSubmit(buildSubmitPayload(input), "Submit failed.");
+    if (!ok) setSubmitting(false);
   };
 
   // Re-run: submit a fresh review for an already-reviewed case slug.
   const onRerun = async (gslug: string) => {
     setRerunningSlug(gslug);
-    await runSubmit({ slug: gslug }, () => setRerunningSlug(null), "Re-run failed.");
+    const ok = await runSubmit({ slug: gslug }, "Re-run failed.");
+    if (!ok) setRerunningSlug(null);
   };
 
   // Group reviews by case slug (stacked-by-case list).
