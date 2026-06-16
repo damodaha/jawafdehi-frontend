@@ -105,14 +105,36 @@ export async function getMe(): Promise<CaseworkUser> {
 
 // ---- Reviews ----
 
-function unwrap<T>(data: Paginated<T> | T[]): T[] {
-  if (Array.isArray(data)) return data;
-  return data.results ?? [];
+export interface SubmitReviewPayload {
+  slug?: string;
+  court_case_number?: string;
 }
 
-export async function listReviews(): Promise<ReviewListItem[]> {
-  const { data } = await client.get<Paginated<ReviewListItem> | ReviewListItem[]>("/reviews/");
-  return unwrap(data);
+// A court case ref is "<court>:<case_number>" (e.g. "special:081-CR-0079"):
+// lowercase-alnum court id, then a hyphen/alnum case number, no slashes/scheme.
+const COURT_REF_RE = /^[a-z0-9]+:[A-Za-z0-9-]+$/;
+
+// Classify free-text input from the submit box into the right field. A court
+// case ref goes to `court_case_number`; everything else (a bare slug or a full
+// case URL like https://jawafdehi.org/case/<slug>) goes to `slug`, which the
+// backend normalizes (it extracts the slug from a URL).
+export function buildSubmitPayload(raw: string): SubmitReviewPayload {
+  const value = raw.trim();
+  return COURT_REF_RE.test(value) ? { court_case_number: value } : { slug: value };
+}
+
+export async function listReviews(params?: {
+  page?: number;
+  page_size?: number;
+}): Promise<Paginated<ReviewListItem>> {
+  const { data } = await client.get<Paginated<ReviewListItem> | ReviewListItem[]>("/reviews/", {
+    params,
+  });
+  // Tolerate a non-paginated (plain array) response during rollout.
+  if (Array.isArray(data)) {
+    return { count: data.length, next: null, previous: null, results: data };
+  }
+  return data;
 }
 
 export async function getReview(id: number): Promise<ReviewDetail> {
@@ -120,8 +142,8 @@ export async function getReview(id: number): Promise<ReviewDetail> {
   return data;
 }
 
-export async function submitReview(slug: string): Promise<ReviewDetail> {
-  const { data } = await client.post<ReviewDetail>("/reviews/submit/", { slug });
+export async function submitReview(payload: SubmitReviewPayload): Promise<ReviewDetail> {
+  const { data } = await client.post<ReviewDetail>("/reviews/submit/", payload);
   return data;
 }
 
