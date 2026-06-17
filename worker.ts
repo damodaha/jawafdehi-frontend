@@ -200,7 +200,7 @@ export default {
       return new Response(null, {
         status: 301,
         headers: {
-          'Location': '/saptahik',
+          'Location': '/saptahik' + url.search,
           'Cache-Control': 'public, max-age=3600',
           ...secHeaders,
         },
