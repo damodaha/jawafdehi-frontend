@@ -40,16 +40,25 @@ function decodeXmlEntities(value: string): string {
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
     .replace(/&apos;/g, "'")
+    .replace(/&#(\d+);/g, (_, dec: string) => String.fromCodePoint(parseInt(dec, 10)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex: string) => String.fromCodePoint(parseInt(hex, 16)))
     .replace(/&amp;/g, '&');
 }
 
 // Returns the channel's most recent upload (id, title, watch URL, thumbnails)
 // by reading the public YouTube Atom feed server-side — no API key, and the
-// Worker hop sidesteps the feed's lack of CORS headers. Edge/browser cached so
-// it refreshes on its own each week with no rebuild or manual step.
-async function handleLatestVideo(): Promise<Response> {
+// Worker hop sidesteps the feed's lack of CORS headers. Successful responses are
+// cached at the Cloudflare edge (shared across users) so the feed is fetched at
+// most once per TTL regardless of traffic, and it refreshes on its own each week
+// with no rebuild or manual step.
+async function handleLatestVideo(request: Request): Promise<Response> {
+  const cache = caches.default;
+  const cached = await cache.match(request);
+  if (cached) {
+    return cached;
+  }
+
   const channelId = JAWAFDEHI_WEEKLY_SERIES.youtubeChannelId;
   try {
     const feedResponse = await fetch(
@@ -62,17 +71,17 @@ async function handleLatestVideo(): Promise<Response> {
     }
 
     const xml = await feedResponse.text();
-    const entry = xml.match(/<entry>[\s\S]*?<\/entry>/)?.[0];
+    const entry = xml.match(/<entry[^>]*>[\s\S]*?<\/entry>/)?.[0];
     const videoId = entry?.match(/<yt:videoId>([^<]+)<\/yt:videoId>/)?.[1];
 
     if (!entry || !videoId) {
       return jsonResponse({ error: 'No videos found' }, 404, 60);
     }
 
-    const rawTitle = entry.match(/<title>([\s\S]*?)<\/title>/)?.[1] ?? '';
+    const rawTitle = entry.match(/<title[^>]*>([\s\S]*?)<\/title>/)?.[1] ?? '';
     const published = entry.match(/<published>([^<]+)<\/published>/)?.[1] ?? null;
 
-    return jsonResponse(
+    const response = jsonResponse(
       {
         videoId,
         title: decodeXmlEntities(rawTitle).trim(),
@@ -84,6 +93,10 @@ async function handleLatestVideo(): Promise<Response> {
       200,
       1800,
     );
+
+    // Only successful responses are cached at the edge (errors use short TTLs).
+    await cache.put(request, response.clone());
+    return response;
   } catch {
     return jsonResponse({ error: 'Failed to fetch latest video' }, 502, 60);
   }
@@ -158,7 +171,10 @@ export default {
 
     // Latest YouTube upload for the Weekly Series page hero
     if (path === '/api/latest-video') {
-      return handleLatestVideo();
+      if (request.method !== 'GET' && request.method !== 'HEAD') {
+        return new Response('Method Not Allowed', { status: 405 });
+      }
+      return handleLatestVideo(request);
     }
 
     const isEmbedRoute = /^\/embed\/case\//.test(path);
