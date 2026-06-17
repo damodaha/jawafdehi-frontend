@@ -8,7 +8,7 @@ function countCells(line: string): number {
   let s = line.trim();
   if (s.startsWith("|")) s = s.slice(1);
   if (s.endsWith("|")) s = s.slice(0, -1);
-  return s.split("|").length;
+  return s.replace(/\\\|/g, "").split("|").length;
 }
 
 function isDelimiterRow(line: string): boolean {
@@ -29,6 +29,7 @@ function isDelimiterRow(line: string): boolean {
  * the table; rehypeColspan then applies the spans and drops the padding.
  */
 export function padColspanTableHeaders(markdown: string): string {
+  if (!markdown) return "";
   const lines = markdown.replace(/\r\n?/g, "\n").split("\n");
   for (let i = 1; i < lines.length; i++) {
     if (!isDelimiterRow(lines[i])) continue;
@@ -75,10 +76,21 @@ export default function rehypeColspan() {
     visit(tree, "element", (table: Element) => {
       if (table.tagName !== "table") return;
 
+      // Only this table's own rows — not rows of any nested table inside a
+      // cell (possible now that rehype-raw parses raw HTML).
       const rows: Element[] = [];
-      visit(table, "element", (el: Element) => {
-        if (el.tagName === "tr") rows.push(el);
-      });
+      for (const child of table.children) {
+        if (child.type !== "element") continue;
+        if (child.tagName === "tr") {
+          rows.push(child);
+        } else if (["thead", "tbody", "tfoot"].includes(child.tagName)) {
+          for (const grandChild of child.children) {
+            if (grandChild.type === "element" && grandChild.tagName === "tr") {
+              rows.push(grandChild);
+            }
+          }
+        }
+      }
 
       const columnCount = rows.reduce(
         (max, row) => Math.max(max, row.children.filter(isCell).length),
@@ -87,22 +99,25 @@ export default function rehypeColspan() {
       if (columnCount === 0) return;
 
       for (const row of rows) {
-        const kept: Element[] = [];
+        const kept: typeof row.children = [];
         let covered = 0;
-        for (const cell of row.children) {
-          if (!isCell(cell)) continue;
+        for (const node of row.children) {
+          if (!isCell(node)) {
+            kept.push(node);
+            continue;
+          }
           if (covered >= columnCount) continue; // trailing GFM padding cell
 
           let span = 1;
-          const text = firstTextNode(cell);
+          const text = firstTextNode(node);
           const match = text?.value.match(COLS_PREFIX);
           if (text && match) {
             span = Number(match[1]);
             text.value = text.value.replace(COLS_PREFIX, "");
-            cell.properties = { ...cell.properties, colSpan: span };
+            node.properties = { ...node.properties, colSpan: span };
           }
           covered += span;
-          kept.push(cell);
+          kept.push(node);
         }
         row.children = kept;
       }
