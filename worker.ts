@@ -9,6 +9,17 @@ interface Env {
 
 const JDS_API_BASE = 'https://portal.jawafdehi.org/api';
 
+const MAX_LATEST_VIDEOS = 6;
+
+interface FeedVideo {
+  videoId: string;
+  title: string;
+  published: string | null;
+  url: string;
+  thumbnail: string;
+  thumbnailMaxRes: string;
+}
+
 function securityHeaders(): Record<string, string> {
   return {
     'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://portal.jawafdehi.org https://jawafdehi.org https://nes.jawafdehi.org https://api.jawafdehi.org; worker-src blob:;",
@@ -46,13 +57,13 @@ function decodeXmlEntities(value: string): string {
     .replace(/&amp;/g, '&');
 }
 
-// Returns the channel's most recent upload (id, title, watch URL, thumbnails)
+// Returns the channel's most recent uploads (id, title, watch URL, thumbnails)
 // by reading the public YouTube Atom feed server-side — no API key, and the
 // Worker hop sidesteps the feed's lack of CORS headers. Successful responses are
 // cached at the Cloudflare edge (shared across users) so the feed is fetched at
 // most once per TTL regardless of traffic, and it refreshes on its own each week
 // with no rebuild or manual step.
-async function handleLatestVideo(request: Request): Promise<Response> {
+async function handleLatestVideos(request: Request): Promise<Response> {
   const cache = caches.default;
   const cached = await cache.match(request);
   if (cached) {
@@ -71,34 +82,38 @@ async function handleLatestVideo(request: Request): Promise<Response> {
     }
 
     const xml = await feedResponse.text();
-    const entry = xml.match(/<entry[^>]*>[\s\S]*?<\/entry>/)?.[0];
-    const videoId = entry?.match(/<yt:videoId>([^<]+)<\/yt:videoId>/)?.[1];
-
-    if (!entry || !videoId) {
-      return jsonResponse({ error: 'No videos found' }, 404, 60);
-    }
-
-    const rawTitle = entry.match(/<title[^>]*>([\s\S]*?)<\/title>/)?.[1] ?? '';
-    const published = entry.match(/<published>([^<]+)<\/published>/)?.[1] ?? null;
-
-    const response = jsonResponse(
-      {
+    const videos: FeedVideo[] = [];
+    for (const match of xml.matchAll(/<entry[^>]*>[\s\S]*?<\/entry>/g)) {
+      const entry = match[0];
+      const videoId = entry.match(/<yt:videoId>([^<]+)<\/yt:videoId>/)?.[1];
+      if (!videoId) {
+        continue;
+      }
+      const rawTitle = entry.match(/<title[^>]*>([\s\S]*?)<\/title>/)?.[1] ?? '';
+      const published = entry.match(/<published>([^<]+)<\/published>/)?.[1] ?? null;
+      videos.push({
         videoId,
         title: decodeXmlEntities(rawTitle).trim(),
         published,
         url: `https://www.youtube.com/watch?v=${videoId}`,
         thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
         thumbnailMaxRes: `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`,
-      },
-      200,
-      1800,
-    );
+      });
+      if (videos.length >= MAX_LATEST_VIDEOS) {
+        break;
+      }
+    }
 
+    if (videos.length === 0) {
+      return jsonResponse({ error: 'No videos found' }, 404, 60);
+    }
+
+    const response = jsonResponse({ videos }, 200, 1800);
     // Only successful responses are cached at the edge (errors use short TTLs).
     await cache.put(request, response.clone());
     return response;
   } catch {
-    return jsonResponse({ error: 'Failed to fetch latest video' }, 502, 60);
+    return jsonResponse({ error: 'Failed to fetch latest videos' }, 502, 60);
   }
 }
 
@@ -169,12 +184,12 @@ export default {
       return handleOembed(request);
     }
 
-    // Latest YouTube upload for the Weekly Series page hero
-    if (path === '/api/latest-video') {
+    // Latest YouTube uploads for the Weekly Series "Past presentations" section
+    if (path === '/api/latest-videos') {
       if (request.method !== 'GET' && request.method !== 'HEAD') {
         return new Response('Method Not Allowed', { status: 405 });
       }
-      return handleLatestVideo(request);
+      return handleLatestVideos(request);
     }
 
     const isEmbedRoute = /^\/embed\/case\//.test(path);
