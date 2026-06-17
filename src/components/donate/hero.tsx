@@ -1,7 +1,8 @@
-import { HeartHandshake, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { JAWAFDEHI_EMAIL } from "@/config/constants";
+
+const DONATION_INQUIRY_EMAIL = "inquiry@jawafdehi.org";
 
 export function DonateHero() {
   const { t } = useTranslation();
@@ -34,15 +35,9 @@ export function DonateHero() {
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button asChild size="lg" className="font-semibold">
-              <a href="#donate-ways">
-                <HeartHandshake className="h-5 w-5" aria-hidden="true" />
-                {t("donate.hero.giveNow")}
-              </a>
-            </Button>
-            <Button asChild variant="secondary" size="lg" className="font-semibold">
-              <a href={`mailto:${JAWAFDEHI_EMAIL}`}>
+              <a href={`mailto:${DONATION_INQUIRY_EMAIL}`}>
                 <Mail className="h-5 w-5" aria-hidden="true" />
-                {t("donate.hero.email")}
+                {t("donate.hero.giveNow")}
               </a>
             </Button>
           </div>
