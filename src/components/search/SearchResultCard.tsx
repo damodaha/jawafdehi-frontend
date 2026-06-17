@@ -21,6 +21,7 @@ export function SearchResultCard({ result }: Readonly<{ result: ArchiveSearchRes
   const metadata = resultMetadata(result);
   const caseSlug = result.result_type === "case" ? result.slug : undefined;
   const [imageFailed, setImageFailed] = useState(false);
+  const isCaseResult = result.result_type === "case";
   const { data: caseImageUrl, isFetching: isImageLoading } = useQuery({
     queryKey: ["case", caseSlug],
     queryFn: () => getCaseById(caseSlug!),
@@ -29,10 +30,7 @@ export function SearchResultCard({ result }: Readonly<{ result: ArchiveSearchRes
     select: (caseData) => caseData.thumbnail_url || caseData.banner_url || null,
     staleTime: 5 * 60 * 1000,
   });
-  const reserveImageSpace =
-    result.result_type === "case" &&
-    Boolean(caseSlug) &&
-    (isImageLoading || Boolean(caseImageUrl && !imageFailed));
+  const showCaseImage = Boolean(caseImageUrl && !imageFailed);
 
   useEffect(() => setImageFailed(false), [caseImageUrl]);
 
@@ -40,12 +38,14 @@ export function SearchResultCard({ result }: Readonly<{ result: ArchiveSearchRes
     <div
       className="group relative block overflow-hidden rounded-xl border bg-card p-4 transition-colors hover:border-primary/35 hover:bg-muted/35 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
     >
-      {reserveImageSpace ? (
+      {isCaseResult ? (
         <div
           aria-hidden="true"
           className="absolute inset-y-0 left-0 hidden w-64 overflow-hidden sm:block lg:w-72"
         >
-          {caseImageUrl && !imageFailed ? (
+          {isImageLoading ? (
+            <Skeleton className="h-full w-full rounded-none" />
+          ) : showCaseImage ? (
             <img
               alt=""
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -55,7 +55,7 @@ export function SearchResultCard({ result }: Readonly<{ result: ArchiveSearchRes
               src={caseImageUrl}
             />
           ) : (
-            <Skeleton className="h-full w-full rounded-none" />
+            <div className="h-full w-full bg-gradient-to-br from-slate-100 via-slate-200 to-slate-50 dark:from-slate-800 dark:via-slate-700 dark:to-slate-800" />
           )}
           <div className="absolute inset-y-0 right-0 w-2/5 bg-gradient-to-r from-transparent to-card" />
           <div className="absolute inset-0 bg-gradient-to-b from-card/5 to-card/10" />
@@ -65,7 +65,7 @@ export function SearchResultCard({ result }: Readonly<{ result: ArchiveSearchRes
       <article
         className={cn(
           "relative z-10 flex min-h-20 items-start gap-3 transition-[padding] duration-200",
-          reserveImageSpace && "sm:pl-64 lg:pl-72",
+          isCaseResult && "sm:pl-64 lg:pl-72",
         )}
       >
         <div className="min-w-0 flex-1">
