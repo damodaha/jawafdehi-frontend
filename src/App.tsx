@@ -16,6 +16,7 @@ import OurProcess from "./pages/OurProcess";
 import OurTeam from "./pages/OurTeam";
 import Volunteer from "./pages/Volunteer";
 import OurProducts from "./pages/OurProducts";
+import WeeklyMeetings from "./pages/WeeklyMeetings";
 import Information from "./pages/Information";
 import CaseDetail from "./pages/CaseDetail";
 import EntityProfile from "./pages/EntityProfile";
@@ -101,6 +102,7 @@ const App = () => (
             <Route path="/team" element={<OurTeam />} />
             <Route path="/volunteer" element={<Volunteer />} />
             <Route path="/products" element={<OurProducts />} />
+            <Route path="/weekly-series" element={<WeeklyMeetings />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<TermsOfService />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
