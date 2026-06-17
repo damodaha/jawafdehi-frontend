@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { updates } from "@/data/updates";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, FileText, Download } from "lucide-react";
-import Markdown from "react-markdown";
+import Markdown, { type Components } from "react-markdown";
 import NotFound from "./NotFound";
 import { useTranslation } from "react-i18next";
 import { stripMarkdown } from "@/utils/markdown";
@@ -25,6 +25,12 @@ const headingId = (children: ReactNode) =>
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "");
+
+const markdownComponents: Components = {
+    h1: ({ children }) => <h1 id={headingId(children)}>{children}</h1>,
+    h2: ({ children }) => <h2 id={headingId(children)}>{children}</h2>,
+    h3: ({ children }) => <h3 id={headingId(children)}>{children}</h3>,
+};
 
 type DocumentResourcesProps = {
     pdfs: NonNullable<(typeof updates)[number]["pdfs"]>;
