@@ -283,8 +283,34 @@
       "accountabilityArchive": "accountability archive",
       "alive": "alive",
       "description": "Jawafdehi is run by volunteers and funded by people who believe corruption should never be forgotten. Your donation pays for the servers, document archiving, and tooling that keep this public record permanent and free for everyone.",
-      "giveNow": "Ways to give",
+      "giveNow": "Contact us",
       "email": "Email us"
+    },
+    "fundTrack": {
+      "ariaLabel": "Monthly donation funding progress",
+      "currency": {
+        "label": "Display currency",
+        "npr": "Show amounts in Nepali rupees",
+        "usd": "Show amounts in US dollars"
+      },
+      "monthlyCost": {
+        "label": "Monthly operating cost",
+        "note": "Estimated monthly budget"
+      },
+      "covered": {
+        "label": "Covered this month",
+        "note": "{{covered}} of {{total}}",
+        "progressLabel": "{{percentage}} of this month's operating cost is covered"
+      },
+      "supporters": {
+        "label": "Active supporters",
+        "note": "People supporting this month"
+      },
+      "updated": {
+        "label": "Last updated",
+        "value": "May 2024",
+        "note": "We update this every month"
+      }
     },
     "impact": {
       "eyebrow": "Where your money goes",
@@ -351,21 +377,27 @@
       "title": "Transparent by default",
       "description": "Jawafdehi is open source and built in the public interest. We publish how funds are used and never sell or share donor information. If you would like a receipt or have questions about giving, just email us."
     },
+    "community": {
+      "eyebrow": "Our community",
+      "title": "For Nepali, by Nepali",
+      "description": "Jawafdehi is built and sustained by Nepali volunteers across Nepal and the wider diaspora. Every contribution helps keep public accountability infrastructure in Nepali hands, independent, open, and available to everyone."
+    },
     "faq": {
       "eyebrow": "Questions",
       "title": "Frequently asked questions",
+      "description": "A few practical notes about supporting Jawafdehi. For current contribution details, contact us directly.",
       "items": [
         {
-          "q": "Is my donation tax-deductible?",
-          "a": "TODO: Confirm Jawafdehi's legal/charitable status and update this answer with tax-deductibility details for Nepal and international donors."
-        },
-        {
           "q": "Can I give monthly instead of once?",
-          "a": "Yes — our international donation platform supports recurring gifts. For wallet or bank donations, you're welcome to give on any schedule that works for you."
+          "a": "Yes. Email us and we can share the current contribution options for one-time or recurring support."
         },
         {
           "q": "Where exactly does the money go?",
           "a": "Donations fund hosting, document archiving, verification tooling, and keeping the archive free and open. Jawafdehi is volunteer-run and takes no profit."
+        },
+        {
+          "q": "Can I support Jawafdehi without donating money?",
+          "a": "Yes. You can help with research, translation, design, engineering, documentation, outreach, or reviewing public records. Email us and tell us how you would like to contribute."
         },
         {
           "q": "Can I get a receipt?",
