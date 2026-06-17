@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
-import { Calendar, Lock, Video, Youtube } from "lucide-react";
+import { Calendar, Lock, Play, Video, Youtube } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -42,6 +42,14 @@ function zoneAbbrev(instant: Date, timeZone: string): string {
   return parts.find((part) => part.type === "timeZoneName")?.value ?? "";
 }
 
+type LatestVideo = {
+  videoId: string;
+  title: string;
+  url: string;
+  thumbnail: string;
+  thumbnailMaxRes: string;
+};
+
 const WeeklyMeetings = () => {
   const { t, i18n } = useTranslation();
   const {
@@ -60,6 +68,24 @@ const WeeklyMeetings = () => {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
     setNow(new Date());
+  }, []);
+
+  // Recent episodes, fetched at runtime so the list tracks the channel weekly
+  // with no rebuild. Worker route handles the YouTube feed + edge caching.
+  const [videos, setVideos] = useState<LatestVideo[]>([]);
+  useEffect(() => {
+    let active = true;
+    fetch("/api/latest-videos")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { videos?: LatestVideo[] } | null) => {
+        if (active && data?.videos?.length) {
+          setVideos(data.videos);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
   }, []);
 
   const meetingTimes = useMemo(() => {
@@ -197,6 +223,42 @@ const WeeklyMeetings = () => {
               </CardContent>
             </Card>
           </div>
+
+          {videos.length > 0 && (
+            <div className="mx-auto mt-12 max-w-4xl">
+              <h2 className="text-lg font-semibold text-foreground">
+                {t("weeklyMeetings.pastPresentations.heading")}
+              </h2>
+              <div className="mt-4 grid gap-5 sm:grid-cols-2 md:grid-cols-3">
+                {videos.map((video) => (
+                  <a
+                    key={video.videoId}
+                    href={video.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group block overflow-hidden rounded-2xl border bg-secondary/30 transition-shadow duration-200 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    <div className="relative aspect-video overflow-hidden bg-muted">
+                      <img
+                        src={video.thumbnail}
+                        alt={video.title}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                        loading="lazy"
+                      />
+                      <span className="absolute inset-0 flex items-center justify-center">
+                        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-black/60 text-white transition-colors duration-200 group-hover:bg-primary">
+                          <Play className="h-5 w-5 translate-x-0.5 fill-current" />
+                        </span>
+                      </span>
+                    </div>
+                    <p className="line-clamp-2 px-4 py-3 text-sm font-medium text-foreground md:line-clamp-3">
+                      {video.title}
+                    </p>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
 
           {youtubePlaylistId && (
             <div className="mx-auto mt-12 max-w-4xl">
