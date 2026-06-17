@@ -6,7 +6,6 @@
 // `Authorization: Bearer <access>`.
 import axios from "axios";
 import type {
-  CaseworkUser,
   ReviewListItem,
   ReviewDetail,
   CaseworkRule,
@@ -45,8 +44,11 @@ client.interceptors.response.use(
           return client.request(config);
         }
       } catch {
-        // Silent sign-in failed, redirect to login.
-        await getUserManager().signinRedirect();
+        // Silent sign-in failed; full redirect, preserving the current path so
+        // the user lands back where they were after re-authenticating.
+        await getUserManager().signinRedirect({
+          state: window.location.pathname + window.location.search,
+        });
       }
     }
     return Promise.reject(error);
@@ -68,13 +70,6 @@ export function apiErrorMessage(err: unknown, fallback: string): string {
     }
   }
   return fallback;
-}
-
-// ---- Auth ----
-
-export async function getMe(): Promise<CaseworkUser> {
-  const { data } = await client.get("/auth/me/");
-  return data;
 }
 
 // ---- Reviews ----

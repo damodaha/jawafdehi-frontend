@@ -8,9 +8,16 @@ function createUserManager(): UserManager {
   const authority =
     import.meta.env.VITE_ZITADEL_AUTHORITY || "https://auth.jawafdehi.org";
   const client_id = import.meta.env.VITE_ZITADEL_CLIENT_ID || "";
-  const projectAudience =
-    import.meta.env.VITE_ZITADEL_PROJECT_ID || "377590446026654060";
+  // The Zitadel project id is supplied via env (not hardcoded). When set, request
+  // its `:aud` scope so the access token's `aud` carries the project id the API
+  // validates against.
+  const projectId = import.meta.env.VITE_ZITADEL_PROJECT_ID || "";
   const origin = window.location.origin;
+
+  const scope = ["openid", "profile", "email"];
+  if (projectId) {
+    scope.push(`urn:zitadel:iam:org:project:id:${projectId}:aud`);
+  }
 
   userManager = new UserManager({
     authority,
@@ -18,7 +25,10 @@ function createUserManager(): UserManager {
     redirect_uri: `${origin}/portal/callback`,
     post_logout_redirect_uri: `${origin}/portal/login`,
     response_type: "code",
-    scope: `openid profile email urn:zitadel:iam:org:project:id:${projectAudience}:aud`,
+    scope: scope.join(" "),
+    // Pull the flattened `roles` claim (and profile) from the userinfo endpoint
+    // into user.profile so the SPA can gate the UI without a Django round-trip.
+    loadUserInfo: true,
     userStore: new WebStorageStateStore({ store: window.localStorage }),
     automaticSilentRenew: true,
   });
