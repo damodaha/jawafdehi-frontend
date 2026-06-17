@@ -112,10 +112,10 @@ const WeeklyMeetings = () => {
           name="description"
           content="Join Jawafdehi's weekly corruption series: a live public meeting on Zoom analyzing Nepal's corruption cases, also streamed on YouTube."
         />
-        <link rel="canonical" href="https://jawafdehi.org/weekly-series" />
+        <link rel="canonical" href="https://jawafdehi.org/saptahik" />
         <meta property="og:site_name" content="Jawafdehi Nepal" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://jawafdehi.org/weekly-series" />
+        <meta property="og:url" content="https://jawafdehi.org/saptahik" />
         <meta property="og:title" content="Weekly Corruption Series — Jawafdehi" />
         <meta
           property="og:description"

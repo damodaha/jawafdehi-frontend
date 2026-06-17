@@ -102,7 +102,7 @@ const App = () => (
             <Route path="/team" element={<OurTeam />} />
             <Route path="/volunteer" element={<Volunteer />} />
             <Route path="/products" element={<OurProducts />} />
-            <Route path="/weekly-series" element={<WeeklyMeetings />} />
+            <Route path="/saptahik" element={<WeeklyMeetings />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<TermsOfService />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

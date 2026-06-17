@@ -129,7 +129,7 @@ export const Footer = () => {
     { label: t("nav.about"), to: "/about" },
     { label: t("nav.team"), to: "/team" },
     { label: t("nav.products"), to: "/products" },
-    { label: t("nav.weeklySeries"), to: "/weekly-series" },
+    { label: t("nav.weeklySeries"), to: "/saptahik" },
     { label: t("nav.updates"), to: "/updates" },
     { label: t("footer.feedback"), to: "/feedback" },
   ];
