@@ -195,6 +195,18 @@ export default {
     const isEmbedRoute = /^\/embed\/case\//.test(path);
     const secHeaders = isEmbedRoute ? securityHeadersAllowFrame() : securityHeaders();
 
+    // Short alias: /weekly → /saptahik (301)
+    if (path === '/weekly' || path === '/weekly/') {
+      return new Response(null, {
+        status: 301,
+        headers: {
+          'Location': '/saptahik',
+          'Cache-Control': 'public, max-age=3600',
+          ...secHeaders,
+        },
+      });
+    }
+
     // Handle legacy numeric case redirects (301)
     const caseMatch = path.match(/^\/case\/(\d+)\/?$/);
     if (caseMatch) {
