@@ -1,4 +1,5 @@
 import { LEGACY_CASE_MAP } from './src/utils/legacyCaseMap';
+import { JAWAFDEHI_WEEKLY_SERIES } from './src/config/constants';
 
 interface Env {
   ASSETS: {
@@ -23,15 +24,69 @@ function securityHeadersAllowFrame(): Record<string, string> {
   return headers;
 }
 
-function jsonResponse(body: unknown, status = 200): Response {
+function jsonResponse(body: unknown, status = 200, maxAge = 300): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
       'Access-Control-Allow-Origin': '*',
-      'Cache-Control': 'public, max-age=300',
+      'Cache-Control': `public, max-age=${maxAge}`,
     },
   });
+}
+
+function decodeXmlEntities(value: string): string {
+  return value
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&amp;/g, '&');
+}
+
+// Returns the channel's most recent upload (id, title, watch URL, thumbnails)
+// by reading the public YouTube Atom feed server-side — no API key, and the
+// Worker hop sidesteps the feed's lack of CORS headers. Edge/browser cached so
+// it refreshes on its own each week with no rebuild or manual step.
+async function handleLatestVideo(): Promise<Response> {
+  const channelId = JAWAFDEHI_WEEKLY_SERIES.youtubeChannelId;
+  try {
+    const feedResponse = await fetch(
+      `https://www.youtube.com/feeds/videos.xml?channel_id=${encodeURIComponent(channelId)}`,
+      { headers: { Accept: 'application/atom+xml' } },
+    );
+
+    if (!feedResponse.ok) {
+      return jsonResponse({ error: 'Failed to fetch channel feed' }, 502, 60);
+    }
+
+    const xml = await feedResponse.text();
+    const entry = xml.match(/<entry>[\s\S]*?<\/entry>/)?.[0];
+    const videoId = entry?.match(/<yt:videoId>([^<]+)<\/yt:videoId>/)?.[1];
+
+    if (!entry || !videoId) {
+      return jsonResponse({ error: 'No videos found' }, 404, 60);
+    }
+
+    const rawTitle = entry.match(/<title>([\s\S]*?)<\/title>/)?.[1] ?? '';
+    const published = entry.match(/<published>([^<]+)<\/published>/)?.[1] ?? null;
+
+    return jsonResponse(
+      {
+        videoId,
+        title: decodeXmlEntities(rawTitle).trim(),
+        published,
+        url: `https://www.youtube.com/watch?v=${videoId}`,
+        thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+        thumbnailMaxRes: `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`,
+      },
+      200,
+      1800,
+    );
+  } catch {
+    return jsonResponse({ error: 'Failed to fetch latest video' }, 502, 60);
+  }
 }
 
 function extractCaseSlugFromUrl(caseUrl: string): string | null {
@@ -99,6 +154,11 @@ export default {
     // Handle oEmbed endpoint
     if (path === '/oembed') {
       return handleOembed(request);
+    }
+
+    // Latest YouTube upload for the Weekly Series page hero
+    if (path === '/api/latest-video') {
+      return handleLatestVideo();
     }
 
     const isEmbedRoute = /^\/embed\/case\//.test(path);

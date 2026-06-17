@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
-import { Calendar, Lock, Video, Youtube } from "lucide-react";
+import { Calendar, Lock, Play, Video, Youtube } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -42,6 +42,14 @@ function zoneAbbrev(instant: Date, timeZone: string): string {
   return parts.find((part) => part.type === "timeZoneName")?.value ?? "";
 }
 
+type LatestVideo = {
+  videoId: string;
+  title: string;
+  url: string;
+  thumbnail: string;
+  thumbnailMaxRes: string;
+};
+
 const WeeklyMeetings = () => {
   const { t, i18n } = useTranslation();
   const {
@@ -60,6 +68,24 @@ const WeeklyMeetings = () => {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
     setNow(new Date());
+  }, []);
+
+  // Latest episode thumbnail, fetched at runtime so it tracks the channel
+  // weekly with no rebuild. Worker route handles the YouTube feed + caching.
+  const [latest, setLatest] = useState<LatestVideo | null>(null);
+  useEffect(() => {
+    let active = true;
+    fetch("/api/latest-video")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: LatestVideo | null) => {
+        if (active && data?.videoId) {
+          setLatest(data);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
   }, []);
 
   const meetingTimes = useMemo(() => {
@@ -118,6 +144,48 @@ const WeeklyMeetings = () => {
               {t("weeklyMeetings.intro")}
             </p>
           </div>
+
+          {latest && (
+            <div className="mx-auto mt-10 max-w-3xl">
+              <a
+                href={latest.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block overflow-hidden rounded-2xl border bg-secondary/30 transition-shadow duration-200 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <div className="relative aspect-video overflow-hidden bg-muted">
+                  <img
+                    src={latest.thumbnailMaxRes}
+                    onError={(event) => {
+                      const img = event.currentTarget;
+                      if (img.src !== latest.thumbnail) {
+                        img.src = latest.thumbnail;
+                      }
+                    }}
+                    alt={latest.title}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                    loading="lazy"
+                  />
+                  <span className="absolute inset-0 flex items-center justify-center">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-black/60 text-white transition-colors duration-200 group-hover:bg-primary">
+                      <Play className="h-6 w-6 translate-x-0.5 fill-current" />
+                    </span>
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 px-5 py-4">
+                  <Youtube className="h-5 w-5 shrink-0 text-primary" />
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+                      {t("weeklyMeetings.latest.heading")}
+                    </p>
+                    <p className="truncate text-sm font-medium text-foreground">
+                      {latest.title}
+                    </p>
+                  </div>
+                </div>
+              </a>
+            </div>
+          )}
 
           <div className="mx-auto mt-10 max-w-md rounded-2xl border bg-secondary/30 px-5 py-4">
             <div className="flex items-center gap-2">

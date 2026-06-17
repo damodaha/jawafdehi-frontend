@@ -15,6 +15,8 @@ export const JAWAFDEHI_WEEKLY_SERIES = {
   zoomMeetingId: "977 9841 9283",
   zoomPasscode: "682332",
   youtubeChannel: JAWAFDEHI_SOCIALS.youtube,
+  // @Jawafdehi channel ID — used to fetch the latest episode for the page hero.
+  youtubeChannelId: "UCbfZ3pFAUi4hOTM-JXIPmbg",
   // Playlist not created yet — set once the corruption-series playlist exists
   // to switch the page from a channel link to an embedded player.
   youtubePlaylistId: "",
