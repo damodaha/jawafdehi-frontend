@@ -1,15 +1,14 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useEffect, useCallback } from "react";
+import { useAuth } from "react-oidc-context";
 import type { CaseworkUser } from "@/types/casework";
-import { getMe, login as apiLogin, logout as apiLogout, isLoggedIn } from "@/services/casework-api";
+import { getMe } from "@/services/casework-api";
+import { getUserManager } from "@/services/oidc";
 
-interface AuthState {
+interface AuthContextValue {
   user: CaseworkUser | null;
   loading: boolean;
   error: string | null;
-}
-
-interface AuthContextValue extends AuthState {
-  login: (username: string, password: string) => Promise<void>;
+  login: () => void;
   logout: () => void;
   isAdmin: boolean;
 }
@@ -17,53 +16,58 @@ interface AuthContextValue extends AuthState {
 const CaseworkAuthContext = createContext<AuthContextValue | null>(null);
 
 export function CaseworkAuthProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<AuthState>({ user: null, loading: true, error: null });
+  const auth = useAuth();
+  const [user, setUser] = React.useState<CaseworkUser | null>(null);
+  const [userLoading, setUserLoading] = React.useState(false);
+  const [userError, setUserError] = React.useState<string | null>(null);
 
   const fetchUser = useCallback(async () => {
-    if (!isLoggedIn()) {
-      setState({ user: null, loading: false, error: null });
+    if (!auth.isAuthenticated) {
+      setUser(null);
+      setUserLoading(false);
+      setUserError(null);
       return;
     }
-    try {
-      const user = await getMe();
-      setState({ user, loading: false, error: null });
-    } catch {
-      setState({ user: null, loading: false, error: null });
-    }
-  }, []);
 
-  useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
-
-  const login = async (username: string, password: string) => {
-    setState((s) => ({ ...s, loading: true, error: null }));
+    setUserLoading(true);
     try {
-      await apiLogin(username, password);
-      await fetchUser();
+      const caseworkUser = await getMe();
+      setUser(caseworkUser);
+      setUserLoading(false);
+      setUserError(null);
     } catch (err: unknown) {
       const e = err as { response?: { status?: number; data?: { detail?: string } } };
       const msg =
         e.response?.status === 403
           ? "Your account does not have the Contributor role required for the review system."
-          : e.response?.data?.detail ?? "Login failed. Check your credentials.";
-      setState((s) => ({ ...s, loading: false, error: msg }));
-      throw new Error(msg);
+          : e.response?.data?.detail ?? "Failed to load user profile.";
+      setUser(null);
+      setUserLoading(false);
+      setUserError(msg);
     }
+  }, [auth.isAuthenticated]);
+
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
+
+  const login = () => {
+    auth.signinRedirect();
   };
 
   const logout = () => {
-    apiLogout();
-    setState({ user: null, loading: false, error: null });
+    getUserManager().signoutRedirect();
   };
 
   return (
     <CaseworkAuthContext.Provider
       value={{
-        ...state,
+        user,
+        loading: auth.isLoading || userLoading,
+        error: userError,
         login,
         logout,
-        isAdmin: !!state.user?.is_admin,
+        isAdmin: !!user?.is_admin,
       }}
     >
       {children}

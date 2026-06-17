@@ -34,6 +34,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 // Casework portal (VOL-3) — mounted at /portal.
 import { CaseworkAuthProvider } from "./context/CaseworkAuthContext";
 import CaseworkLogin from "./pages/CaseworkLogin";
+import CaseworkCallback from "./pages/CaseworkCallback";
 import CaseworkReviews from "./pages/CaseworkReviews";
 import CaseworkReviewDetail from "./pages/CaseworkReviewDetail";
 import CaseworkRules from "./pages/CaseworkRules";
@@ -65,13 +66,14 @@ const App = () => (
           <Route path="/embed/case/:id" element={<EmbedCaseCard />} />
 
           {/* Casework portal (VOL-3) — standalone full-screen, mounted at /portal.
-              Auth: shared JWT + Contributor role. */}
+              Auth: Zitadel OIDC + Contributor role. */}
           <Route
             path="/portal/*"
             element={
               <CaseworkAuthProvider>
                 <Routes>
                   <Route path="login" element={<CaseworkLogin />} />
+                  <Route path="callback" element={<CaseworkCallback />} />
                   <Route path="reviews" element={<CaseworkReviews />} />
                   <Route path="reviews/:id" element={<CaseworkReviewDetail />} />
                   <Route path="rules" element={<CaseworkRules />} />
