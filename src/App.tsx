@@ -66,7 +66,7 @@ const App = () => (
           <Route path="/embed/case/:id" element={<EmbedCaseCard />} />
 
           {/* Casework portal (VOL-3) — standalone full-screen, mounted at /portal.
-              Auth: Zitadel OIDC + Contributor role. */}
+              Auth: OIDC + Contributor role. */}
           <Route
             path="/portal/*"
             element={

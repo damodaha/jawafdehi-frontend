@@ -34,7 +34,7 @@ const CaseworkLogin = () => {
             className="w-full"
             disabled={loading}
           >
-            {loading ? "Signing in…" : "Sign In with Zitadel"}
+            {loading ? "Signing in…" : "Login with Jawafdehi Auth"}
           </Button>
         </div>
       </div>

@@ -6,17 +6,18 @@ function createUserManager(): UserManager {
   if (userManager) return userManager;
 
   const authority =
-    import.meta.env.VITE_ZITADEL_AUTHORITY || "https://auth.jawafdehi.org";
-  const client_id = import.meta.env.VITE_ZITADEL_CLIENT_ID || "";
-  // The Zitadel project id is supplied via env (not hardcoded). When set, request
-  // its `:aud` scope so the access token's `aud` carries the project id the API
-  // validates against.
-  const projectId = import.meta.env.VITE_ZITADEL_PROJECT_ID || "";
+    import.meta.env.VITE_OIDC_AUTHORITY || "https://auth.jawafdehi.org";
+  const client_id = import.meta.env.VITE_OIDC_CLIENT_ID || "";
+  // The token audience (the IdP's project/resource id) is supplied via env, not
+  // hardcoded. When set, request its `:aud` scope so the access token's `aud`
+  // carries the id the API validates against. NOTE: the scope URN below is the
+  // current provider's (Zitadel) format — revisit if the IdP changes.
+  const audience = import.meta.env.VITE_OIDC_AUDIENCE || "";
   const origin = window.location.origin;
 
   const scope = ["openid", "profile", "email"];
-  if (projectId) {
-    scope.push(`urn:zitadel:iam:org:project:id:${projectId}:aud`);
+  if (audience) {
+    scope.push(`urn:zitadel:iam:org:project:id:${audience}:aud`);
   }
 
   userManager = new UserManager({

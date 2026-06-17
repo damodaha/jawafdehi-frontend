@@ -1,7 +1,7 @@
 // API client for the Casework Review System portal.
 //
 // Auth model: the casework review API (mounted at /api/casework/ on the
-// jawafdehi-api) is gated by a Zitadel access token (RS256 JWT) plus the
+// jawafdehi-api) is gated by an OIDC access token (RS256 JWT) plus the
 // Contributor role. The SPA obtains the token via OIDC PKCE and sends it as
 // `Authorization: Bearer <access>`.
 import axios from "axios";

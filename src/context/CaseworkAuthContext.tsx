@@ -14,9 +14,9 @@ interface AuthContextValue {
 
 const CaseworkAuthContext = createContext<AuthContextValue | null>(null);
 
-// Build the portal user straight from the Zitadel token claims. `roles` is the
-// flattened project-roles array (Zitadel role keys, lowercase); the API remains
-// the authorization authority — this is only for the header / UI gating.
+// Build the portal user straight from the OIDC token claims. `roles` is the
+// flattened roles array (role keys, lowercase); the API remains the
+// authorization authority — this is only for the header / UI gating.
 function toCaseworkUser(
   profile: Record<string, unknown> | undefined,
 ): CaseworkUser | null {
