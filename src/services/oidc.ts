@@ -5,14 +5,16 @@ let userManager: UserManager | null = null;
 function createUserManager(): UserManager {
   if (userManager) return userManager;
 
+  // OIDC config for the casework portal SPA. These are public values (they ship
+  // in the browser anyway), so they're baked in here with an env override for
+  // local/staging. NOTE: the audience scope URN below is the current provider's
+  // (Zitadel) format — revisit if the IdP changes.
   const authority =
     import.meta.env.VITE_OIDC_AUTHORITY || "https://auth.jawafdehi.org";
-  const client_id = import.meta.env.VITE_OIDC_CLIENT_ID || "";
-  // The token audience (the IdP's project/resource id) is supplied via env, not
-  // hardcoded. When set, request its `:aud` scope so the access token's `aud`
-  // carries the id the API validates against. NOTE: the scope URN below is the
-  // current provider's (Zitadel) format — revisit if the IdP changes.
-  const audience = import.meta.env.VITE_OIDC_AUDIENCE || "";
+  const client_id =
+    import.meta.env.VITE_OIDC_CLIENT_ID || "377887299569975664";
+  const audience =
+    import.meta.env.VITE_OIDC_AUDIENCE || "377760393168159088";
   const origin = window.location.origin;
 
   const scope = ["openid", "profile", "email"];
