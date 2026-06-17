@@ -34,57 +34,25 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
-function extractCaseSlugFromUrl(caseUrl: string): string | null {
-  try {
-    const parsed = new URL(caseUrl);
-    const match = parsed.pathname.match(/^\/case\/([^/?#]+)/);
-    return match ? decodeURIComponent(match[1]) : null;
-  } catch {
-    return null;
-  }
-}
-
 async function handleOembed(request: Request): Promise<Response> {
   const url = new URL(request.url);
-  const targetUrl = url.searchParams.get('url');
-
-  if (!targetUrl) {
-    return jsonResponse({ error: 'Missing url parameter' }, 400);
-  }
-
-  const slug = extractCaseSlugFromUrl(targetUrl);
-  if (!slug) {
-    return jsonResponse({ error: 'Invalid case URL. Expected format: https://jawafdehi.org/case/{slug}' }, 400);
-  }
+  const apiUrl = new URL(`${JDS_API_BASE}/oembed/`);
+  url.searchParams.forEach((value, key) => {
+    apiUrl.searchParams.set(key, value);
+  });
 
   try {
-    const apiUrl = `${JDS_API_BASE}/cases/${encodeURIComponent(slug)}/`;
-    const apiResponse = await fetch(apiUrl, {
+    const apiResponse = await fetch(apiUrl.toString(), {
       headers: { 'Accept': 'application/json' },
     });
 
-    if (!apiResponse.ok) {
-      return jsonResponse({ error: 'Case not found' }, 404);
-    }
-
-    const caseData = await apiResponse.json() as Record<string, unknown>;
-    const caseUrl = `https://jawafdehi.org/case/${slug}`;
-    const embedUrl = `https://jawafdehi.org/embed/case/${slug}`;
-    const title = (caseData.title as string) || 'Untitled Case';
-
-    return jsonResponse({
-      type: 'rich',
-      version: '1.0',
-      title,
-      author_name: 'Jawafdehi',
-      author_url: 'https://jawafdehi.org',
-      provider_name: 'Jawafdehi',
-      provider_url: 'https://jawafdehi.org',
-      cache_age: 86400,
-      thumbnail_url: (caseData.thumbnail_url as string) || (caseData.banner_url as string) || null,
-      html: `<iframe src="${embedUrl}" width="480" height="360" frameborder="0" title="${title}" style="max-width:100%;overflow:hidden;border:none;border-radius:8px" allowfullscreen></iframe>`,
-      width: 480,
-      height: 360,
+    return new Response(apiResponse.body, {
+      status: apiResponse.status,
+      headers: {
+        'Content-Type': apiResponse.headers.get('Content-Type') || 'application/json; charset=utf-8',
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': apiResponse.ok ? 'public, max-age=300' : 'no-store',
+      },
     });
   } catch {
     return jsonResponse({ error: 'Failed to fetch case data' }, 502);
@@ -97,7 +65,7 @@ export default {
     const path = url.pathname;
 
     // Handle oEmbed endpoint
-    if (path === '/oembed') {
+    if (path === '/oembed' || path === '/oembed/') {
       return handleOembed(request);
     }
 

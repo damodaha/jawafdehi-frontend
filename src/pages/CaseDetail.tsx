@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
@@ -17,13 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Banknote, Calendar, FileText, AlertTriangle, ArrowLeft, ExternalLink, AlertCircle, Info, Mail, MapPin, MessageCircle, Scale, StickyNote, User, Share2 } from "lucide-react";
+import { Banknote, Calendar, FileText, AlertTriangle, ArrowLeft, ExternalLink, AlertCircle, Info, Mail, MapPin, MessageCircle, Scale, StickyNote, User } from "lucide-react";
 import { getCaseById, getCourtCase, getDocumentSourceById } from "@/services/jds-api";
 import { getEntityById } from "@/services/api";
 import type { CourtCase, DocumentSource, JawafEntity } from "@/types/jds";
@@ -156,7 +150,6 @@ const CaseDetail = () => {
   const currentLang = i18n.language;
   const { id } = useParams();
   const trackedCaseIdRef = useRef<string | null>(null);
-  const [isShareOpen, setIsShareOpen] = useState(false);
   const isMobile = useIsMobile();
 
   // Legacy /case/<numeric> URLs: resolve to canonical slug and replace.
@@ -341,7 +334,7 @@ const CaseDetail = () => {
         <meta name="twitter:description" content={metaDescription} />
         <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
         <link rel="alternate" type="application/json" href={`https://portal.jawafdehi.org/api/cases/${id}/`} title="Case data (JSON API)" />
-        <link rel="alternate" type="application/json+oembed" href={`https://jawafdehi.org/oembed?url=${encodeURIComponent(canonicalUrl)}&format=json`} title={`${caseData.title} oEmbed`} />
+        <link rel="alternate" type="application/json+oembed" href={`https://jawafdehi.org/oembed/?url=${encodeURIComponent(canonicalUrl)}&format=json`} title={`${caseData.title} oEmbed`} />
       </Helmet>
       <CaseDetailBanner
         caseData={caseData}
@@ -357,8 +350,6 @@ const CaseDetail = () => {
                 url={canonicalUrl}
                 title={caseData.title}
                 description={plainDescription}
-                isOpen={isShareOpen}
-                onToggle={setIsShareOpen}
               />
 
               <Alert className="mb-6 border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800 no-print">
@@ -675,30 +666,6 @@ const CaseDetail = () => {
             showLabel={true}
             className="shadow-lg border-2 hover:shadow-xl"
           />
-        </div>
-      )}
-
-      {/* Share Sidebar Toggle Button (Desktop) */}
-      {!isMobile && (
-        <div className="pointer-events-auto fixed left-4 top-1/2 -translate-y-1/2 z-39 hidden lg:flex no-print">
-          {!isShareOpen && (
-            <Tooltip delayDuration={200}>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="rounded-lg shadow-lg border-2 hover:shadow-xl transition-all"
-                  onClick={() => setIsShareOpen(true)}
-                  aria-label={t("share.share")}
-                >
-                  <Share2 className="h-5 w-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="right">
-                <p>{t("share.share")}</p>
-              </TooltipContent>
-            </Tooltip>
-          )}
         </div>
       )}
 
