@@ -251,7 +251,7 @@ const WeeklyMeetings = () => {
                         </span>
                       </span>
                     </div>
-                    <p className="line-clamp-2 px-4 py-3 text-sm font-medium text-foreground">
+                    <p className="line-clamp-2 px-4 py-3 text-sm font-medium text-foreground md:line-clamp-3">
                       {video.title}
                     </p>
                   </a>
