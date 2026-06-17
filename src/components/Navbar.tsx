@@ -90,6 +90,7 @@ export function Navbar() {
       { key: "about", label: t("nav.about"), to: "/about", exact: true },
       { key: "team", label: t("nav.team"), to: "/team" },
       { key: "products", label: t("nav.products"), to: "/products" },
+      { key: "weeklySeries", label: t("nav.weeklySeries"), to: "/weekly-series" },
       { key: "updates", label: t("nav.updates"), to: "/updates" },
     ],
     [t],
@@ -98,7 +99,7 @@ export function Navbar() {
   const activeKey = useMemo(() => {
     const path = location.pathname;
 
-    if (["/about", "/team", "/products", "/updates"].includes(path) || path.startsWith("/updates/")) {
+    if (["/about", "/team", "/products", "/weekly-series", "/updates"].includes(path) || path.startsWith("/updates/")) {
       return "about";
     }
     if (path === "/cases" || path === "/search" || path.startsWith("/case/")) {
@@ -264,6 +265,9 @@ export function Navbar() {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild className="rounded-xl text-sm font-normal">
                   <Link to="/products">{t("nav.products")}</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="rounded-xl text-sm font-normal">
+                  <Link to="/weekly-series">{t("nav.weeklySeries")}</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild className="rounded-xl text-sm font-normal">
                   <Link to="/updates">{t("nav.updates")}</Link>

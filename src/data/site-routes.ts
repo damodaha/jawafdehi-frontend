@@ -143,6 +143,14 @@ export const PRE_RENDERED_STATIC_ROUTES = [
     sitemapTitle: "Products — Jawafdehi",
   },
   {
+    path: "/weekly-series",
+    titleKey: "nav.weeklySeries",
+    descriptionKey: "searchCommand.descriptions.weeklySeries",
+    keywords: ["weekly", "corruption", "series", "meeting", "zoom", "youtube", "live"],
+    icon: "Newspaper",
+    sitemapTitle: "Weekly Corruption Series — Jawafdehi",
+  },
+  {
     path: "/updates",
     titleKey: "nav.updates",
     descriptionKey: "searchCommand.descriptions.updates",
