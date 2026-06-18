@@ -7,6 +7,7 @@ import App from './App';
 import { ThemeProvider } from './components/ThemeProvider';
 import './i18n/config';
 import { getCaseById, getCases, getStatistics } from './services/jds-api';
+import { getArticleBySlug, getArticles } from './services/cms-api';
 import axios from 'axios';
 import type { JawafEntity } from './types/jds';
 
@@ -31,6 +32,23 @@ async function prefetch(url: string, queryClient: QueryClient): Promise<void> {
   // Cases list page
   if (url === '/cases') {
     await queryClient.prefetchQuery({ queryKey: ['cases', { page: 1 }], queryFn: () => getCases({ page: 1 }) });
+    return;
+  }
+
+  // Updates/News list page
+  if (url === '/updates') {
+    await queryClient.prefetchQuery({ queryKey: ['cms-articles'], queryFn: () => getArticles() });
+    return;
+  }
+
+  // Article detail page (slug is everything after /updates/ up to /?#)
+  const updateMatch = url.match(/^\/updates\/([^/?#]+)/);
+  if (updateMatch) {
+    const slug = decodeURIComponent(updateMatch[1]);
+    await queryClient.prefetchQuery({
+      queryKey: ['cms-article', slug],
+      queryFn: () => getArticleBySlug(slug),
+    });
     return;
   }
 
