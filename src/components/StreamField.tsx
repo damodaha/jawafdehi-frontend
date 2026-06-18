@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Download, FileText, ArrowRight } from "lucide-react";
+import DOMPurify from "isomorphic-dompurify";
 
 import type {
   StreamBlock,
@@ -9,36 +10,45 @@ import type {
   StreamImageValue,
 } from "@/types/cms";
 
+// CMS rich-text/oEmbed HTML is authored by staff, but we sanitize as
+// defense-in-depth before injecting it. isomorphic-dompurify works under SSR.
+const sanitize = (html: string) => DOMPurify.sanitize(html);
+
 const headingId = (text: string) =>
   text
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 
-const DocumentBlock = ({ value }: { value: StreamDocumentValue }) => (
-  <a
-    href={value.url}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="not-prose my-4 flex items-start gap-3 rounded-lg border border-border/70 bg-background p-3 no-underline transition-colors hover:border-primary/20 hover:bg-primary/[0.03]"
-  >
-    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
-      <FileText className="h-5 w-5" strokeWidth={1.6} aria-hidden="true" />
-    </span>
-    <span className="min-w-0 flex-1">
-      <span className="block text-sm font-semibold leading-5 text-foreground">
-        {value.title || value.filename}
+const DocumentBlock = ({ value }: { value: StreamDocumentValue }) => {
+  if (!value) {
+    return null;
+  }
+  return (
+    <a
+      href={value.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="not-prose my-4 flex items-start gap-3 rounded-lg border border-border/70 bg-background p-3 no-underline transition-colors hover:border-primary/20 hover:bg-primary/[0.03]"
+    >
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
+        <FileText className="h-5 w-5" strokeWidth={1.6} aria-hidden="true" />
       </span>
-      <span className="mt-1 inline-flex items-center text-xs font-semibold text-primary">
-        <Download className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
-        Download
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-semibold leading-5 text-foreground">
+          {value.title || value.filename}
+        </span>
+        <span className="mt-1 inline-flex items-center text-xs font-semibold text-primary">
+          <Download className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
+          Download
+        </span>
       </span>
-    </span>
-  </a>
-);
+    </a>
+  );
+};
 
 const CaseBlock = ({ value }: { value: StreamCaseValue }) => {
-  if (!value.case) {
+  if (!value?.case) {
     return null;
   }
   return (
@@ -65,7 +75,7 @@ const CaseBlock = ({ value }: { value: StreamCaseValue }) => {
 };
 
 const ImageBlock = ({ value }: { value: StreamImageValue }) => {
-  if (!value.image?.url) {
+  if (!value?.image?.url) {
     return null;
   }
   return (
@@ -82,10 +92,10 @@ const ImageBlock = ({ value }: { value: StreamImageValue }) => {
 };
 
 const EmbedBlock = ({ value }: { value: string | StreamEmbedValue }) => {
-  const html = typeof value === "object" ? value.html : undefined;
-  const url = typeof value === "string" ? value : value.url;
+  const html = value && typeof value === "object" ? value.html : undefined;
+  const url = typeof value === "string" ? value : value?.url;
   if (html) {
-    return <div dangerouslySetInnerHTML={{ __html: html }} />;
+    return <div dangerouslySetInnerHTML={{ __html: sanitize(html) }} />;
   }
   if (url) {
     return (
@@ -99,7 +109,7 @@ const EmbedBlock = ({ value }: { value: string | StreamEmbedValue }) => {
 
 /**
  * Renders a Wagtail StreamField body. Rich-text ("paragraph") and oEmbed HTML
- * come from trusted staff editors, so they are injected as HTML.
+ * are sanitized before injection (defense-in-depth — see `sanitize`).
  */
 export const StreamField = ({ blocks }: { blocks: StreamBlock[] }) => {
   if (!blocks?.length) {
@@ -121,7 +131,7 @@ export const StreamField = ({ blocks }: { blocks: StreamBlock[] }) => {
             return (
               <div
                 key={block.id}
-                dangerouslySetInnerHTML={{ __html: String(block.value) }}
+                dangerouslySetInnerHTML={{ __html: sanitize(String(block.value)) }}
               />
             );
           case "quote":
