@@ -33,6 +33,36 @@ export default function CaseworkLayout({ children }: { children: ReactNode }) {
     navigate("/portal/login");
   };
 
+  // Role gate: mirror the API's read-access roles (CanReadReview). A signed-in
+  // user without any of these can't use the portal, so show a clear message
+  // instead of letting them in to hit 403s on every call.
+  const READ_ACCESS_ROLES = [
+    "admin",
+    "moderator",
+    "contributor",
+    "readonly",
+    "review_assistant",
+  ];
+  const hasAccess = (user.roles ?? []).some((r) =>
+    READ_ACCESS_ROLES.includes(r.toLowerCase()),
+  );
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 text-center space-y-4">
+          <h1 className="text-xl font-bold text-slate-900">No portal access</h1>
+          <p className="text-sm text-slate-600">
+            Your account ({user.username}) doesn&apos;t have a role that grants access
+            to the Casework portal. Ask an admin to grant you a role, then sign in again.
+          </p>
+          <Button variant="outline" onClick={onLogout}>
+            <LogOut className="h-4 w-4 mr-1" /> Sign out
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="bg-white border-b sticky top-0 z-10">

@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, type ReactNode } from "react";
 import * as Sentry from "@sentry/react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -32,14 +32,26 @@ import ArchiveSearch from "./pages/ArchiveSearch";
 import NotFound from "./pages/NotFound";
 import { ScrollToTop } from "@/components/ScrollToTop";
 // Casework portal (VOL-3) — mounted at /portal.
+import { AuthProvider } from "react-oidc-context";
+import { getUserManager, onSigninCallback } from "./services/oidc";
 import { CaseworkAuthProvider } from "./context/CaseworkAuthContext";
 import CaseworkLogin from "./pages/CaseworkLogin";
+import CaseworkCallback from "./pages/CaseworkCallback";
 import CaseworkReviews from "./pages/CaseworkReviews";
 import CaseworkReviewDetail from "./pages/CaseworkReviewDetail";
 import CaseworkRules from "./pages/CaseworkRules";
 import CaseworkHow from "./pages/CaseworkHow";
 
 const GuestChat = lazy(() => import("./pages/GuestChat"));
+
+// Wraps the portal in the OIDC AuthProvider. Built as a component (not a spread
+// of a config object) so the UserManager is only constructed when this renders
+// — under <ClientOnly>, i.e. on the client after hydration, never during SSR.
+const PortalAuthProvider = ({ children }: { children: ReactNode }) => (
+  <AuthProvider userManager={getUserManager()} onSigninCallback={onSigninCallback}>
+    {children}
+  </AuthProvider>
+);
 
 const RouteLoadingFallback = () => (
   <div
@@ -65,20 +77,25 @@ const App = () => (
           <Route path="/embed/case/:id" element={<EmbedCaseCard />} />
 
           {/* Casework portal (VOL-3) — standalone full-screen, mounted at /portal.
-              Auth: shared JWT + Contributor role. */}
+              Auth: OIDC + Contributor role. */}
           <Route
             path="/portal/*"
             element={
-              <CaseworkAuthProvider>
-                <Routes>
-                  <Route path="login" element={<CaseworkLogin />} />
-                  <Route path="reviews" element={<CaseworkReviews />} />
-                  <Route path="reviews/:id" element={<CaseworkReviewDetail />} />
-                  <Route path="rules" element={<CaseworkRules />} />
-                  <Route path="how" element={<CaseworkHow />} />
-                  <Route path="" element={<CaseworkReviews />} />
-                </Routes>
-              </CaseworkAuthProvider>
+              <ClientOnly>
+                <PortalAuthProvider>
+                  <CaseworkAuthProvider>
+                    <Routes>
+                      <Route path="login" element={<CaseworkLogin />} />
+                      <Route path="callback" element={<CaseworkCallback />} />
+                      <Route path="reviews" element={<CaseworkReviews />} />
+                      <Route path="reviews/:id" element={<CaseworkReviewDetail />} />
+                      <Route path="rules" element={<CaseworkRules />} />
+                      <Route path="how" element={<CaseworkHow />} />
+                      <Route path="" element={<CaseworkReviews />} />
+                    </Routes>
+                  </CaseworkAuthProvider>
+                </PortalAuthProvider>
+              </ClientOnly>
             }
           />
 
