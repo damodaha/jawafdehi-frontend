@@ -30,7 +30,7 @@ function conflictReviewId(e: unknown): number | undefined {
 function mergeGroups(prev: GroupedCase[], fresh: GroupedCase[]): GroupedCase[] {
   const bySlug = new Map(prev.map((g) => [g.slug, g]));
   for (const g of fresh) bySlug.set(g.slug, g);
-  return [...bySlug.values()].sort((a, b) => b.latest.id - a.latest.id);
+  return [...bySlug.values()].sort((a, b) => (b.latest?.id ?? 0) - (a.latest?.id ?? 0));
 }
 
 // Distinct "provider·model" labels for the reviewer(s) that graded a run.
@@ -106,7 +106,7 @@ export default function CaseworkReviews() {
   useEffect(() => {
     const anyRunning = groups
       .slice(0, PAGE_SIZE)
-      .some((g) => g.latest.status === "pending" || g.latest.status === "running");
+      .some((g) => g.latest?.status === "pending" || g.latest?.status === "running");
     if (!anyRunning) return;
     const t = setInterval(() => loadFirst(true), 3000);
     return () => clearInterval(t);
@@ -146,7 +146,7 @@ export default function CaseworkReviews() {
     if (!ok) setRerunningSlug(null);
   };
 
-  const shownReviews = groups.reduce((n, g) => n + g.executions.length, 0);
+  const shownReviews = groups.reduce((n, g) => n + (g.executions?.length ?? 0), 0);
 
   return (
     <CaseworkLayout>
@@ -213,7 +213,8 @@ export default function CaseworkReviews() {
                   </div>
                   <div className="flex items-center gap-3 ml-3">
                     <span className="text-xs text-slate-500 whitespace-nowrap">
-                      {g.executions.length} review{g.executions.length === 1 ? "" : "s"}
+                      {g.executions?.length ?? 0} review
+                      {(g.executions?.length ?? 0) === 1 ? "" : "s"}
                     </span>
                     <Button
                       variant="outline"
@@ -232,7 +233,7 @@ export default function CaseworkReviews() {
                   </div>
                 </div>
                 <ul className="divide-y">
-                  {g.executions.map((r) => (
+                  {(g.executions ?? []).map((r) => (
                     <ReviewRow
                       key={r.id}
                       review={r}
