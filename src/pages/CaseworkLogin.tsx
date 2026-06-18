@@ -1,9 +1,17 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCaseworkAuth } from "@/context/CaseworkAuthContext";
 import { Button } from "@/components/ui/button";
 import { ClipboardCheck } from "lucide-react";
 
 const CaseworkLogin = () => {
-  const { login, loading, error } = useCaseworkAuth();
+  const { login, loading, error, user } = useCaseworkAuth();
+  const navigate = useNavigate();
+
+  // Already signed in (e.g. landed here after the OIDC round-trip) — go inside.
+  useEffect(() => {
+    if (user) navigate("/portal/reviews", { replace: true });
+  }, [user, navigate]);
 
   const handleSignIn = () => {
     login();

@@ -8,8 +8,6 @@ import "./i18n/config.ts";
 import { HelmetProvider } from "react-helmet-async";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
-import { AuthProvider } from "react-oidc-context";
-import { oidcConfig } from "./services/oidc";
 
 const queryClient = new QueryClient();
 
@@ -18,9 +16,7 @@ createRoot(document.getElementById("root")!).render(
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <AuthProvider {...oidcConfig}>
-            <App />
-          </AuthProvider>
+          <App />
         </BrowserRouter>
       </QueryClientProvider>
     </HelmetProvider>

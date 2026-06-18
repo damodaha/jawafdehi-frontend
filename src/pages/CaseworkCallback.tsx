@@ -1,24 +1,42 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "react-oidc-context";
 
 const CaseworkCallback = () => {
   const auth = useAuth();
   const navigate = useNavigate();
+  // Captured once: react-oidc-context strips ?code after processing, so we can't
+  // re-read it on later renders. Distinguishes "mid sign-in" from a stray visit.
+  const [hadAuthParams] = useState(() =>
+    new URLSearchParams(window.location.search).has("code"),
+  );
 
   useEffect(() => {
     if (auth.isLoading) return;
     if (auth.isAuthenticated) {
-      // Return to the pre-login path saved in the OIDC `state`, else the portal home.
+      // Return to the pre-login path saved in the OIDC `state`, but never back to
+      // the login/callback pages themselves — fall back to the portal home.
+      const saved = typeof auth.user?.state === "string" ? auth.user.state : "";
       const dest =
-        typeof auth.user?.state === "string" ? auth.user.state : "/portal/reviews";
+        saved &&
+        !saved.startsWith("/portal/login") &&
+        !saved.startsWith("/portal/callback")
+          ? saved
+          : "/portal/reviews";
       navigate(dest, { replace: true });
-    } else {
-      // Not authenticated (error, or a direct visit to /portal/callback with no
-      // pending sign-in) — don't get stuck on the loading screen.
+    } else if (auth.error || !hadAuthParams) {
+      // A real sign-in failure, or a stray visit with no pending sign-in. Don't
+      // bounce during the brief window where the sign-in is still settling.
       navigate("/portal/login", { replace: true });
     }
-  }, [auth.isLoading, auth.isAuthenticated, auth.user?.state, navigate]);
+  }, [
+    auth.isLoading,
+    auth.isAuthenticated,
+    auth.error,
+    auth.user?.state,
+    hadAuthParams,
+    navigate,
+  ]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-700 px-4">

@@ -12,7 +12,7 @@ import type {
   ReviewConfig,
   Paginated,
 } from "@/types/casework";
-import { getAccessToken, getUserManager } from "./oidc";
+import { getAccessToken } from "./oidc";
 
 const API_ROOT = import.meta.env.VITE_JDS_API_BASE_URL || "https://portal.jawafdehi.org/api";
 const BASE_URL = `${API_ROOT}/casework`;
@@ -29,28 +29,10 @@ client.interceptors.request.use(async (config) => {
 
 client.interceptors.response.use(
   (r) => r,
-  async (error) => {
-    const config = error.config ?? {};
-    // On a 401, try a silent renew once. The _retry flag guards against
-    // an infinite loop when the renewed token is itself rejected.
-    if (error.response?.status === 401 && !config._retry) {
-      config._retry = true;
-      try {
-        const um = getUserManager();
-        await um.signinSilent();
-        const token = await getAccessToken();
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-          return client.request(config);
-        }
-      } catch {
-        // Silent sign-in failed; full redirect, preserving the current path so
-        // the user lands back where they were after re-authenticating.
-        await getUserManager().signinRedirect({
-          state: window.location.pathname + window.location.search,
-        });
-      }
-    }
+  (error) => {
+    // Surface the error to the caller. We deliberately do NOT auto-redirect to
+    // re-auth on 401: silent renew uses an iframe Zitadel blocks, so redirecting
+    // here caused an endless login loop. The route guard handles signed-out users.
     return Promise.reject(error);
   }
 );

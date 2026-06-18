@@ -33,7 +33,9 @@ function createUserManager(): UserManager {
     // into user.profile so the SPA can gate the UI without a Django round-trip.
     loadUserInfo: true,
     userStore: new WebStorageStateStore({ store: window.localStorage }),
-    automaticSilentRenew: true,
+    // Silent renew uses a hidden iframe, which Zitadel blocks via
+    // frame-ancestors 'none'. Disabled; tokens are long-lived enough for now.
+    automaticSilentRenew: false,
   });
 
   return userManager;
@@ -43,17 +45,12 @@ export function getUserManager(): UserManager {
   return createUserManager();
 }
 
-export const oidcConfig = {
-  get userManager() {
-    return getUserManager();
-  },
-  onSigninCallback: () => {
-    // Strip the ?code&state query params so a refresh on /portal/callback does
-    // not re-process a spent authorization code. Path-level navigation is done
-    // by the CaseworkCallback component (which is React Router-aware).
-    window.history.replaceState({}, document.title, window.location.pathname);
-  },
-};
+export function onSigninCallback(): void {
+  // Strip the ?code&state query params so a refresh on /portal/callback does
+  // not re-process a spent authorization code. Path-level navigation is done
+  // by the CaseworkCallback component (which is React Router-aware).
+  window.history.replaceState({}, document.title, window.location.pathname);
+}
 
 export async function getAccessToken(): Promise<string | null> {
   const um = getUserManager();
