@@ -111,7 +111,7 @@ const App = () => (
             <Route path="/moderation" element={<ModerationDashboard />} />
             <Route path="/feedback" element={<Feedback />} />
             <Route path="/updates" element={<Updates />} />
-            <Route path="/updates/:id" element={<UpdateDetail />} />
+            <Route path="/updates/:slug" element={<UpdateDetail />} />
             <Route path="/information" element={<Information />} />
             <Route path="/about" element={<About />} />
             <Route path="/commitment" element={<Commitment />} />

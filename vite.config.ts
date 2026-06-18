@@ -56,6 +56,11 @@ export default defineConfig(({ mode, isSsrBuild }) => {
           target: "http://127.0.0.1:40173",
           changeOrigin: true,
         },
+        // Wagtail-managed media (uploaded images/renditions, documents).
+        "/media": {
+          target: "http://127.0.0.1:40173",
+          changeOrigin: true,
+        },
       },
     },
     plugins: [
