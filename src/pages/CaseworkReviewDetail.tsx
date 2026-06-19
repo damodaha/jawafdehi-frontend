@@ -372,7 +372,7 @@ export default function CaseworkReviewDetail() {
               </div>
             </div>
             <div className="p-4 overflow-auto text-sm">
-              {!source.markdown && source.conversion_note ? (
+              {!(source.conversion_status === "converted" || source.conversion_status === "attached") && source.conversion_note ? (
                 // No converted text — show WHY (e.g. "Conversion failed: ...").
                 <p className="text-amber-700 break-words">⚠ {source.conversion_note}</p>
               ) : showRaw ? (
