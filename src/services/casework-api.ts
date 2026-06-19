@@ -11,6 +11,7 @@ import type {
   CaseworkRule,
   ReviewConfig,
   Paginated,
+  GroupedCase,
 } from "@/types/casework";
 import { getAccessToken } from "./oidc";
 
@@ -87,6 +88,27 @@ export async function listReviews(params?: {
   }
   // Defensively default each field so a malformed envelope can't crash callers
   // that iterate `results` (e.g. mergeReviews).
+  return {
+    count: data?.count ?? 0,
+    next: data?.next ?? null,
+    previous: data?.previous ?? null,
+    results: data?.results ?? [],
+  };
+}
+
+// Reviews grouped by case, paginated BY CASE: each entry carries ALL of a
+// case's executions (so older runs that would fall on a later page of the flat
+// list still show under their case). Used by the review list page.
+export async function listReviewsGrouped(params?: {
+  page?: number;
+  page_size?: number;
+}): Promise<Paginated<GroupedCase>> {
+  const { data } = await client.get<Paginated<GroupedCase> | GroupedCase[]>("/reviews/grouped/", {
+    params,
+  });
+  if (Array.isArray(data)) {
+    return { count: data.length, next: null, previous: null, results: data };
+  }
   return {
     count: data?.count ?? 0,
     next: data?.next ?? null,

@@ -12,6 +12,16 @@ export interface CaseworkUser {
 export type ReviewStatus = "pending" | "running" | "done" | "failed";
 export type Disposition = "PASS" | "REVISE" | "REJECT";
 
+// Which reviewer (LLM harness) graded a run, per tier. Gate rules use the
+// premium tier, routine rules/narrative/source analysis the cheap tier, so a
+// single review usually lists more than one entry.
+export interface ReviewerInfo {
+  tier: string;
+  provider: string;
+  model: string;
+  calls: number;
+}
+
 export interface ReviewListItem {
   id: number;
   slug: string;
@@ -24,9 +34,19 @@ export interface ReviewListItem {
   overall_score: number | null;
   disposition: Disposition | null;
   case_type: string;
+  reviewers: ReviewerInfo[] | null;
   created_at: string;
   completed_at: string | null;
   duration_seconds: number | null;
+}
+
+// One case with ALL of its review executions (newest first), from the grouped
+// review list. The internal case_id is the grouping key and is not exposed.
+export interface GroupedCase {
+  slug: string;
+  case_title: string;
+  latest: ReviewListItem;
+  executions: ReviewListItem[];
 }
 
 export interface RuleResult {
@@ -90,6 +110,7 @@ export interface ReviewResult {
 export interface ReviewDetail extends ReviewListItem {
   error: string;
   result: ReviewResult | null;
+  reviewers: ReviewerInfo[] | null;
   updated_at: string;
   started_at: string | null;
 }

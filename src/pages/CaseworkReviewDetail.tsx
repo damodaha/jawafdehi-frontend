@@ -153,6 +153,23 @@ export default function CaseworkReviewDetail() {
                 <span className="text-slate-400">
                   sources {review.sources_converted}/{review.source_count}
                 </span>
+                {review.reviewers && review.reviewers.length > 0 && (
+                  <span
+                    className="text-slate-400 font-mono"
+                    title={review.reviewers
+                      .map((rv) => `${rv.tier}: ${rv.provider}·${rv.model || "?"} (${rv.calls})`)
+                      .join(", ")}
+                  >
+                    🤖{" "}
+                    {Array.from(
+                      new Set(
+                        review.reviewers.map((rv) =>
+                          rv.model ? `${rv.provider}·${rv.model}` : rv.provider
+                        )
+                      )
+                    ).join(", ")}
+                  </span>
+                )}
               </div>
             </div>
             <div className="flex items-start gap-3">
