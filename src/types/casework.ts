@@ -65,6 +65,8 @@ export interface RuleResult {
   variance: number;
   std: number;
   issues: string[];
+  // Optional: reviews created before the notes channel won't carry this field.
+  notes?: string[];
   suggestions: string[];
   rationale: string;
   description: string;
@@ -100,6 +102,9 @@ export interface ReviewResult {
   gate_failures: { key: string; title: string; score: number; gate_min: number }[];
   gates_pass: boolean;
   narrative: string;
+  // Informational, non-scoring notes (trivial / cosmetic findings) rolled up
+  // across rules. Surfaced separately from issues so they don't read as gaps.
+  info?: { rule: string; note: string }[];
   judge_error: string | null;
   llm_samples: number;
   thresholds: { pass: number; revise: number };
