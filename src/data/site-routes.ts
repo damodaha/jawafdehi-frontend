@@ -1,4 +1,3 @@
-import { updates } from "./updates.ts";
 
 export type SearchIconName =
   | "BookOpen"
@@ -151,6 +150,14 @@ export const PRE_RENDERED_STATIC_ROUTES = [
     sitemapTitle: "Products — Jawafdehi",
   },
   {
+    path: "/saptahik",
+    titleKey: "nav.weeklySeries",
+    descriptionKey: "searchCommand.descriptions.weeklySeries",
+    keywords: ["weekly", "corruption", "series", "meeting", "zoom", "youtube", "live"],
+    icon: "Newspaper",
+    sitemapTitle: "Weekly Corruption Series — Jawafdehi",
+  },
+  {
     path: "/updates",
     titleKey: "nav.updates",
     descriptionKey: "searchCommand.descriptions.updates",
@@ -192,10 +199,10 @@ export const PRE_RENDERED_STATIC_ROUTES = [
   },
 ] as const satisfies readonly StaticSiteRoute[];
 
-export const UPDATE_ROUTE_ENTRIES = updates.map(({ id, title }) => ({
-  id,
-  title: `${title} — Jawafdehi`,
-})) satisfies readonly UpdateRouteEntry[];
+// Updates/news now live in the Wagtail CMS and are fetched at runtime, so there
+// are no longer static per-article entries here. Build-time sitemap/prerender of
+// individual articles should source these from the CMS API (`getArticles`).
+export const UPDATE_ROUTE_ENTRIES: readonly UpdateRouteEntry[] = [];
 
 export function staticRouteToSearchEntry(route: StaticSiteRoute): SearchIndexEntry {
   return {

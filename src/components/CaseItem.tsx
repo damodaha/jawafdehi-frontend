@@ -64,7 +64,7 @@ const CaseItem = ({ case: caseData }: CaseItemProps) => {
             <div className="space-y-2 pl-4 border-l-2 border-muted">
               {caseData.timeline.slice(0, 3).map((event, index) => (
                 <div key={index} className="pl-4">
-                  <div className="text-sm font-medium">{event.event}</div>
+                  <div className="text-sm font-medium">{event.title}</div>
                   <div className="text-xs text-muted-foreground">
                     {formatDate(event.date)}
                   </div>

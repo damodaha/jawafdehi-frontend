@@ -10,12 +10,40 @@
     "products": "Our Products",
     "ourProcess": "Our Process",
     "volunteer": "Volunteer",
+    "weeklySeries": "Weekly Series",
     "donate": "Donate",
     "ourCommitment": "Our Commitment",
     "skipToContent": "Skip to content",
     "searchCases": "Search cases",
     "homeAria": "Jawafdehi home",
     "menu": "Menu"
+  },
+  "weeklyMeetings": {
+    "eyebrow": "Live every week",
+    "title": "Weekly Corruption Series",
+    "intro": "Each week we hold a live public session breaking down Nepal's corruption cases — the records, the people, and what accountability should look like. Join us live on Zoom or watch the series on YouTube.",
+    "pastPresentations": {
+      "heading": "Past presentations"
+    },
+    "schedule": {
+      "heading": "When we meet — every Friday",
+      "nepal": "Nepal",
+      "pacific": "Pacific (US)",
+      "eastern": "Eastern (US)"
+    },
+    "zoom": {
+      "heading": "Join the live meeting",
+      "description": "Hop into the live discussion on Zoom and take part in the conversation.",
+      "meetingId": "Meeting ID",
+      "passcode": "Passcode",
+      "cta": "Join Zoom Meeting"
+    },
+    "youtube": {
+      "heading": "Watch on YouTube",
+      "description": "Catch up on past sessions and follow the series on our YouTube channel.",
+      "cta": "Open YouTube channel",
+      "playlistTitle": "Weekly Corruption Series playlist"
+    }
   },
   "header": {
     "title": "Jawafdehi.org",
@@ -59,6 +87,7 @@
       "about": "Learn about Jawafdehi and its mission.",
       "team": "Meet the people behind Jawafdehi.",
       "products": "Explore Jawafdehi tools and products.",
+      "weeklySeries": "Join the weekly corruption series live on Zoom or watch on YouTube.",
       "updates": "Read recent platform updates.",
       "ask": "Ask questions with Jawafdehi's assistant.",
       "report": "Submit an allegation or public-interest corruption lead.",
@@ -463,6 +492,14 @@
     "listView": "List view",
     "type": {
       "corruption": "Corruption",
+      "bribery": "Bribery",
+      "forgery": "Forgery",
+      "embezzlement": "Embezzlement",
+      "abuseOfOffice": "Abuse of Office",
+      "moneyLaundering": "Money Laundering",
+      "illegalProperty": "Illegal Property",
+      "examRigging": "Exam Rigging",
+      "taxEvasion": "Tax Evasion",
       "misconduct": "Misconduct",
       "breachOfTrust": "Breach of Trust",
       "mediaTrial": "Media Trial"

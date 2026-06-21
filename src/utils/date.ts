@@ -6,7 +6,7 @@
 
 import { parseISO } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
-import { adToBS } from './bs-calendar';
+import { adToBS, formatBSString } from './bs-calendar';
 
 const KATHMANDU_TZ = 'Asia/Kathmandu';
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
@@ -77,10 +77,22 @@ function convertToBS(dateString: string | null | undefined) {
 
 // ── Combined AD + BS formatting ──────────────────────────────────────────
 
-/** Format a date as "AD date | BS date". */
-export function formatDateWithBS(dateString: string | null | undefined, fmt = 'PP'): string {
+/**
+ * Format a date as "AD date | BS date".
+ *
+ * When `bsOverride` (a "YYYY-MM-DD" Bikram Sambat string) is supplied it is used
+ * verbatim instead of recomputing the BS date, so curated source dates are
+ * preserved exactly.
+ */
+export function formatDateWithBS(
+  dateString: string | null | undefined,
+  fmt = 'PP',
+  bsOverride?: string | null
+): string {
   if (!dateString) return 'N/A';
   const ad = formatDate(dateString, fmt);
+  const overrideFormatted = formatBSString(bsOverride);
+  if (overrideFormatted) return `${ad} | ${overrideFormatted}`;
   const bs = convertToBS(dateString);
   return bs ? `${ad} | ${bs.formatted}` : ad;
 }

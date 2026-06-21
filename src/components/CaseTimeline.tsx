@@ -30,7 +30,9 @@ export function CaseTimeline({ timeline, title, className }: CaseTimelineProps) 
               aria-hidden="true"
             />
             <p className="text-xs font-semibold text-primary print:text-sm print:text-foreground">
-              {formatDateWithBS(item.date)}
+              {item.end_date
+                ? `${formatDateWithBS(item.date, "PP", item.date_bs)} – ${formatDateWithBS(item.end_date, "PP", item.end_date_bs)}`
+                : formatDateWithBS(item.date, "PP", item.date_bs)}
             </p>
             <p className="mt-1 text-sm font-medium leading-snug text-muted-foreground print:text-foreground">
               {item.title}

@@ -6,6 +6,8 @@ import { DocumentSourceCard } from "@/components/DocumentSourceCard";
 import { ResponsiveTable } from "@/components/ResponsiveTable";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import rehypeColspan, { padColspanTableHeaders } from "@/utils/rehype-colspan";
 import { CourtCaseCard } from "@/components/CourtCaseCard";
 import { FloatingShareSidebar } from "@/components/FloatingShareSidebar";
 import { ShareButton } from "@/components/ShareButton";
@@ -31,6 +33,7 @@ import type { Entity } from "@/types/nes";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { formatCaseDateRange } from "@/utils/date";
 import { stripMarkdown } from "@/utils/markdown";
+import { getSubjectEntities } from "@/utils/case-entities";
 import { ReportCaseDialog } from "@/components/ReportCaseDialog";
 import { DisqusComments } from "@/components/DisqusComments";
 import { JAWAFDEHI_WHATSAPP_NUMBER, JAWAFDEHI_EMAIL } from "@/config/constants";
@@ -170,11 +173,13 @@ const CaseDetail = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  const accusedEntities = caseData?.entities.filter(e => e.type === 'accused') ?? [];
-  const accusedCount = accusedEntities.length;
+  // Subject entities: accused for CORRUPTION cases, else any named (non-location)
+  // entity so cases without an accused (e.g. TAX_EVASION) still name a subject.
+  const bannerEntities = getSubjectEntities(caseData?.entities, e => e.type);
+  const accusedCount = bannerEntities.length;
   const BANNER_ACCUSED_LIMIT = 5;
   const collapsedAccused = accusedCount > BANNER_ACCUSED_LIMIT;
-  const visibleAccusedEntities = collapsedAccused ? accusedEntities.slice(0, BANNER_ACCUSED_LIMIT) : accusedEntities;
+  const visibleAccusedEntities = collapsedAccused ? bannerEntities.slice(0, BANNER_ACCUSED_LIMIT) : bannerEntities;
   const hiddenAccusedCount = accusedCount - visibleAccusedEntities.length;
 
   const sourceQueries = useQueries({
@@ -536,8 +541,8 @@ const CaseDetail = () => {
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="overflow-hidden">
-                        <div className="prose-content text-foreground leading-relaxed [&_p]:mb-3 [&_p:last-child]:mb-0 [&_ul]:space-y-2 [&_ul]:my-4 [&_li]:ml-6 [&_li]:pl-2 [&_a]:underline [&_strong]:font-semibold [&_em]:italic [&_h1]:text-xl [&_h1]:font-bold [&_h1]:mb-2 [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mb-2 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mb-1 [&_table]:my-4 [&_table]:w-full [&_table]:border-collapse [&_table]:border [&_table]:border-border [&_th]:border [&_th]:border-border [&_th]:px-3 [&_th]:py-3 [&_th]:text-left [&_th]:bg-gradient-to-b [&_th]:from-muted [&_th]:to-muted/80 [&_th]:font-semibold [&_th]:text-sm [&_th]:text-foreground [&_td]:border [&_td]:border-border [&_td]:px-3 [&_td]:py-2.5 [&_td]:text-sm [&_td]:text-foreground [&_tr:nth-child(even)]:bg-muted/40 [&_tr:hover]:bg-muted/60 [&_tr]:transition-colors [&_caption]:text-sm [&_caption]:font-semibold [&_caption]:mb-3 [&_caption]:text-foreground">
-                          <Markdown remarkPlugins={[remarkGfm]}>{caseData.description}</Markdown>
+                        <div className="prose-content text-foreground leading-relaxed [&_p]:mb-3 [&_p:last-child]:mb-0 [&_ul]:space-y-2 [&_ul]:my-4 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:space-y-2 [&_ol]:my-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:pl-1 [&_a]:underline [&_strong]:font-semibold [&_em]:italic [&_h1]:text-xl [&_h1]:font-bold [&_h1]:mb-2 [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mb-2 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mb-1 [&_table]:my-4 [&_table]:w-full [&_table]:border-collapse [&_table]:border [&_table]:border-border [&_th]:border [&_th]:border-border [&_th]:px-3 [&_th]:py-3 [&_th]:text-left [&_th]:bg-gradient-to-b [&_th]:from-muted [&_th]:to-muted/80 [&_th]:font-semibold [&_th]:text-sm [&_th]:text-foreground [&_td]:border [&_td]:border-border [&_td]:px-3 [&_td]:py-2.5 [&_td]:text-sm [&_td]:text-foreground [&_tr:nth-child(even)]:bg-muted/40 [&_tr:hover]:bg-muted/60 [&_tr]:transition-colors [&_caption]:text-sm [&_caption]:font-semibold [&_caption]:mb-3 [&_caption]:text-foreground">
+                          <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, rehypeColspan]}>{padColspanTableHeaders(caseData.description)}</Markdown>
                         </div>
                       </CardContent>
                     </Card>
