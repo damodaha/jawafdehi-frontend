@@ -448,6 +448,17 @@ function RuleCard({
         </div>
       )}
 
+      {rr.notes && rr.notes.length > 0 && (
+        <div className="mt-2">
+          <div className="text-xs font-medium text-slate-500">Notes (informational, not scored)</div>
+          <ul className="list-disc pl-4 text-xs text-slate-500 space-y-0.5">
+            {rr.notes.map((n, i) => (
+              <li key={i}>{n}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {rr.suggestions.length > 0 && (
         <div className="mt-2">
           <div className="text-xs font-medium text-green-700">Suggestions to address</div>
