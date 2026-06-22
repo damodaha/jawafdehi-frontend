@@ -15,6 +15,20 @@
   40%            { transform: translateY(-6px); opacity: 1; }
 }
 
+@keyframes donate-heart-rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0.75rem, 0) scale(0.65) rotate(-8deg);
+  }
+  22% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--heart-drift), -2.25rem, 0) scale(1) rotate(8deg);
+  }
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */
@@ -81,5 +95,58 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
     font-family: Helvetica, Arial, 'Noto Sans Devanagari', sans-serif;
+  }
+}
+
+@layer components {
+  .donate-heart {
+    position: absolute;
+    bottom: -0.125rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    color: hsl(var(--primary-foreground) / 0.72);
+    fill: currentColor;
+    opacity: 0;
+  }
+
+  .donate-heart-button:hover .donate-heart,
+  .donate-heart-button:focus-visible .donate-heart {
+    animation: donate-heart-rise 1.05s ease-out both;
+  }
+
+  .donate-heart-1 {
+    left: 18%;
+    --heart-drift: -0.35rem;
+  }
+
+  .donate-heart-2 {
+    left: 35%;
+    --heart-drift: 0.2rem;
+    animation-delay: 90ms !important;
+  }
+
+  .donate-heart-3 {
+    left: 52%;
+    --heart-drift: -0.15rem;
+    animation-delay: 180ms !important;
+  }
+
+  .donate-heart-4 {
+    left: 69%;
+    --heart-drift: 0.4rem;
+    animation-delay: 40ms !important;
+  }
+
+  .donate-heart-5 {
+    left: 83%;
+    --heart-drift: -0.25rem;
+    animation-delay: 230ms !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .donate-heart-button:hover .donate-heart,
+    .donate-heart-button:focus-visible .donate-heart {
+      animation: none;
+    }
   }
 }
