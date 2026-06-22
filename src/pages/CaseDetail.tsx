@@ -26,7 +26,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Banknote, Calendar, FileText, AlertTriangle, ArrowLeft, ExternalLink, AlertCircle, Info, Mail, MapPin, MessageCircle, Scale, StickyNote, User, Share2 } from "lucide-react";
-import { getCaseById, getCourtCase, getDocumentSourceById } from "@/services/jds-api";
+import { getCaseById, getCaseByCourtRef, getCourtCase, getDocumentSourceById } from "@/services/jds-api";
 import { getEntityById } from "@/services/api";
 import type { CourtCase, DocumentSource, JawafEntity } from "@/types/jds";
 import type { Entity } from "@/types/nes";
@@ -42,6 +42,7 @@ import { trackEvent } from "@/utils/analytics";
 import { cn } from "@/lib/utils";
 import { formatBigo } from "@/utils/number";
 import { resolveLegacyCaseSlug } from "@/utils/legacyCaseMap";
+import { isCourtCaseRef } from "@/utils/courtCaseRef";
 import { useIsMobile } from "@/hooks/use-mobile";
 import "@/styles/print.css";
 
@@ -166,9 +167,13 @@ const CaseDetail = () => {
   // (local dev, preview deploys, direct hits that bypass the worker).
   const legacyTargetSlug = resolveLegacyCaseSlug(id);
 
+  // /case/<court-ref> URLs (e.g. /case/081-CR-0116): resolved via the by-court-ref
+  // API, then replaced with the canonical slug below once the case loads.
+  const isCourtRef = isCourtCaseRef(id);
+
   const { data: caseData, isLoading, isError } = useQuery({
     queryKey: ['case', id],
-    queryFn: () => getCaseById(id!),
+    queryFn: () => (isCourtRef ? getCaseByCourtRef(id!) : getCaseById(id!)),
     enabled: id != null && legacyTargetSlug == null,
     staleTime: 5 * 60 * 1000,
   });
@@ -265,6 +270,12 @@ const CaseDetail = () => {
   // happen after all hooks have run so we don't violate rules-of-hooks.
   if (legacyTargetSlug) {
     return <Navigate to={`/case/${legacyTargetSlug}`} replace />;
+  }
+
+  // /case/<court-ref> URLs: once the case resolves, replace with its canonical
+  // slug. Cases without a slug stay on the court-ref URL.
+  if (isCourtRef && caseData?.slug && caseData.slug !== id) {
+    return <Navigate to={`/case/${caseData.slug}`} replace />;
   }
 
   if (isLoading) {
