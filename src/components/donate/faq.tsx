@@ -59,7 +59,7 @@ export function DonationFaq() {
           >
             {faqItems.map((item, index) => (
               <AccordionItem
-                key={item.q}
+                key={`donate-faq-${index}`}
                 value={`donate-faq-${index}`}
                 className={cn(
                   "overflow-hidden rounded-2xl border-0 bg-muted/45 transition-colors duration-200 hover:bg-muted/65",
