@@ -3,8 +3,6 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import fs from "node:fs";
 import { componentTagger } from "lovable-tagger";
-import { VitePluginRadar } from "vite-plugin-radar";
-import { JAWAFDEHI_GA_MEASUREMENT_ID } from "./src/config/analytics-config";
 
 function serveGeneratedSearchIndex() {
   return {
@@ -67,12 +65,9 @@ export default defineConfig(({ mode, isSsrBuild }) => {
       react(),
       mode === "development" && serveGeneratedSearchIndex(),
       mode === "development" && componentTagger(),
-      // Only enable analytics in production with a configured GA ID
-      mode === "production" && JAWAFDEHI_GA_MEASUREMENT_ID && VitePluginRadar({
-        analytics: {
-          id: JAWAFDEHI_GA_MEASUREMENT_ID,
-        },
-      }),
+      // Google Analytics is loaded at runtime only after the visitor opts in
+      // via the cookie consent banner (see src/lib/ga.ts). Do not inject a GA
+      // tag here — doing so would load analytics before consent.
     ].filter(Boolean),
     resolve: {
       alias: {

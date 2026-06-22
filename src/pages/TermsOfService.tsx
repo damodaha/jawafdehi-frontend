@@ -4,18 +4,18 @@ const TermsOfService = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Helmet>
-        <title>Terms of Service | Jawafdehi Nepal</title>
+        <title>Jawafdehi Initiative Terms of Service</title>
         <meta name="description" content="Jawafdehi's terms of service — guidelines for using Nepal's open corruption accountability platform and public case archive." />
         <link rel="canonical" href="https://jawafdehi.org/terms" />
         <meta property="og:site_name" content="Jawafdehi Nepal" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://jawafdehi.org/terms" />
-        <meta property="og:title" content="Terms of Service | Jawafdehi Nepal" />
+        <meta property="og:title" content="Jawafdehi Initiative Terms of Service" />
         <meta property="og:description" content="Jawafdehi's terms of service — guidelines for using Nepal's open corruption accountability platform and public case archive." />
         <meta property="og:image" content="https://jawafdehi.org/og-favicon.png" />
         <meta property="og:locale" content="en_US" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Terms of Service | Jawafdehi Nepal" />
+        <meta name="twitter:title" content="Jawafdehi Initiative Terms of Service" />
         <meta name="twitter:description" content="Jawafdehi's terms of service — guidelines for using Nepal's open corruption accountability platform and public case archive." />
         <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
       </Helmet>
@@ -25,10 +25,10 @@ const TermsOfService = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl">
               <h1 className="text-4xl md:text-5xl font-bold text-primary-foreground mb-4">
-                Terms of Service
+                Jawafdehi Initiative Terms of Service
               </h1>
               <p className="text-xl text-primary-foreground/80 leading-relaxed">
-                Last updated: May 2026
+                Last updated: June 2026
               </p>
             </div>
           </div>
@@ -44,10 +44,10 @@ const TermsOfService = () => {
 
               <h2 id="about-jawafdehi">2. About Jawafdehi</h2>
               <p>
-                Jawafdehi is Nepal's open corruption accountability platform. We document, simplify, and permanently archive CIAA (Commission for the Investigation of Abuse of Authority) corruption cases. All published case data is in the public domain and is provided for public interest, transparency, and accountability purposes.
+                The Platform is operated by Jawafdehi Initiative Inc., a Michigan public benefit nonprofit corporation. Jawafdehi is Nepal's open corruption accountability platform. We document, simplify, and permanently archive CIAA (Commission for the Investigation of Abuse of Authority) corruption cases. All published case data is in the public domain and is provided for public interest, transparency, and accountability purposes.
               </p>
               <p>
-                Jawafdehi is a volunteer-run, open-source project. We are not a government entity, law firm, or legal authority. We do not provide legal advice.
+                Jawafdehi is an open-source project run with the help of volunteers. We are not a government entity, law firm, or legal authority. We do not provide legal advice.
               </p>
 
               <h2 id="platform-use">3. Use of the Platform</h2>
@@ -126,7 +126,7 @@ const TermsOfService = () => {
 
               <h2 id="governing-law">12. Governing Law</h2>
               <p>
-                These Terms are governed by the laws of Nepal. Any disputes arising from these Terms shall be subject to the jurisdiction of Nepali courts.
+                These Terms are governed by the laws of the State of Michigan, United States, without regard to its conflict-of-laws principles. Any disputes arising from these Terms shall be subject to the jurisdiction of the state and federal courts located in Michigan.
               </p>
 
               <h2 id="contact">13. Contact</h2>

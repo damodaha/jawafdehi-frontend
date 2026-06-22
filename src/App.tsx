@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ClientOnly } from "@/components/ClientOnly";
+import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { SentryErrorFallback } from "@/components/SentryErrorFallback";
 import { Routes, Route } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
@@ -69,6 +70,7 @@ const App = () => (
       <ClientOnly>
         <Toaster />
         <Sonner />
+        <CookieConsentBanner />
       </ClientOnly>
       <Suspense fallback={<RouteLoadingFallback />}>
         <ScrollToTop />
