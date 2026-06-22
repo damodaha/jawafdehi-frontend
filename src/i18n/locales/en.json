@@ -11,6 +11,7 @@
     "ourProcess": "Our Process",
     "volunteer": "Volunteer",
     "weeklySeries": "Weekly Series",
+    "donate": "Donate",
     "ourCommitment": "Our Commitment",
     "skipToContent": "Skip to content",
     "searchCases": "Search cases",
@@ -82,6 +83,7 @@
       "process": "See how records are reviewed and documented.",
       "commitment": "Read the principles behind the archive.",
       "volunteer": "Help build the accountability archive.",
+      "donate": "Support Jawafdehi with a donation.",
       "about": "Learn about Jawafdehi and its mission.",
       "team": "Meet the people behind Jawafdehi.",
       "products": "Explore Jawafdehi tools and products.",
@@ -301,6 +303,153 @@
         "Investigate what legally and ethically constitutes corruption in each context",
         "Analyse the role of corruption in Nepali governance structures",
         "Evaluate the effectiveness of anti-corruption policy and institutional frameworks"
+      ]
+    }
+  },
+  "donate": {
+    "hero": {
+      "support": "Keep Nepal's",
+      "accountabilityArchive": "accountability archive",
+      "alive": "alive",
+      "description": "Jawafdehi is run by volunteers and funded by people who believe corruption should never be forgotten. Your donation pays for the servers, document archiving, and tooling that keep this public record permanent and free for everyone.",
+      "giveNow": "Ways to contribute",
+      "contactUs": "Contact us",
+      "email": "Email us"
+    },
+    "fundTrack": {
+      "ariaLabel": "Monthly donation funding progress",
+      "currency": {
+        "label": "Display currency",
+        "npr": "Show amounts in Nepali rupees",
+        "usd": "Show amounts in US dollars"
+      },
+      "monthlyCost": {
+        "label": "Monthly operating cost",
+        "note": "Estimated monthly budget"
+      },
+      "covered": {
+        "label": "Covered this month",
+        "note": "{{covered}} of {{total}}",
+        "progressLabel": "{{percentage}} of this month's operating cost is covered"
+      },
+      "supporters": {
+        "label": "Active supporters",
+        "note": "People supporting this month"
+      },
+      "updated": {
+        "label": "Last updated",
+        "value": "May 2024",
+        "note": "We update this every month"
+      }
+    },
+    "impact": {
+      "eyebrow": "Where your money goes",
+      "title": "Every rupee funds the public record",
+      "description": "Jawafdehi takes no profit. Donations cover the direct costs of keeping a permanent, openly accessible corruption archive online.",
+      "items": [
+        {
+          "title": "Hosting & infrastructure",
+          "desc": "Servers, databases, and bandwidth that keep the archive fast and available to anyone, anywhere, around the clock."
+        },
+        {
+          "title": "Document archiving",
+          "desc": "Scraping, digitising, and permanently storing government filings, court orders, and media reports so they cannot disappear."
+        },
+        {
+          "title": "Verification & research",
+          "desc": "Tooling and resources that help volunteers verify cases accurately before they are published to the public."
+        },
+        {
+          "title": "Open access for all",
+          "desc": "Keeping every case, entity, and document free to read, search, and reuse — with no paywalls and no ads."
+        }
+      ]
+    },
+    "international": {
+      "eyebrow": "Ways to give",
+      "title": "Support Jawafdehi",
+      "description": "Donate via PayPal. Scan the QR code or continue to PayPal to complete your donation securely.",
+      "primaryCta": "Continue to PayPal",
+      "secondaryCta": "Copy donation link",
+      "copyCopied": "Copied",
+      "copyAria": "Copy PayPal donation link",
+      "trustNote": "Payments are processed by PayPal. Jawafdehi does not store payment details.",
+      "qrLabel": "Scan to donate",
+      "qrHelper": "Opens PayPal",
+      "qrAlt": "Open PayPal donation checkout"
+    },
+    "ways": {
+      "eyebrow": "Ways to contribute",
+      "title": "Ways to contribute",
+      "description": "Give from inside Nepal with a digital wallet, use PayPal for cards or recurring support, or send a bank transfer. Every contribution, large or small, keeps the archive running.",
+      "wallets": {
+        "title": "Digital wallets (Nepal)",
+        "desc": "Scan or send to our eSewa or Khalti account from anywhere in Nepal.",
+        "esewaLabel": "eSewa ID",
+        "esewaId": "TODO_ESEWA_ID",
+        "khaltiLabel": "Khalti ID",
+        "khaltiId": "TODO_KHALTI_ID",
+        "qrNote": "After sending, email us your name, amount, and screenshot if you need confirmation or a receipt."
+      },
+      "bank": {
+        "title": "Bank transfer",
+        "desc": "For larger gifts, local transfers, or institutional support.",
+        "accountNameLabel": "Account name",
+        "accountName": "TODO_ACCOUNT_NAME",
+        "accountNumberLabel": "Account number",
+        "accountNumber": "TODO_ACCOUNT_NUMBER",
+        "bankNameLabel": "Bank",
+        "bankName": "TODO_BANK_NAME",
+        "branchLabel": "Branch",
+        "branch": "TODO_BRANCH",
+        "swiftLabel": "SWIFT / BIC",
+        "swift": "TODO_SWIFT_CODE"
+      },
+      "paypal": {
+        "eyebrow": "Secure PayPal donation",
+        "title": "PayPal",
+        "desc": "Donate securely through PayPal. You can choose your amount, frequency, and payment method before confirming.",
+        "qrAlt": "Open PayPal donation checkout",
+        "qrTitle": "Scan to donate",
+        "qrDescription": "Use your phone camera to open the PayPal donation checkout, or continue on this device.",
+        "cta": "Continue to PayPal",
+        "note": "You will leave Jawafdehi and complete payment securely on PayPal.",
+        "highlights": [
+          "Works for international supporters",
+          "Supports cards and recurring donations",
+          "Useful for sharing on social media"
+        ]
+      },
+      "copy": "Copy",
+      "copied": "Copied"
+    },
+    "transparency": {
+      "eyebrow": "Our promise",
+      "title": "Transparent by default",
+      "description": "Jawafdehi is open source and built in the public interest. We publish how funds are used and never sell or share donor information. If you would like a receipt or have questions about giving, just email us."
+    },
+    "community": {
+      "eyebrow": "Our community",
+      "title": "For Nepali, by Nepali",
+      "description": "Jawafdehi is built and sustained by Nepali volunteers across Nepal and the wider diaspora. Every contribution helps keep public accountability infrastructure in Nepali hands, independent, open, and available to everyone."
+    },
+    "faq": {
+      "eyebrow": "Questions",
+      "title": "Frequently asked questions",
+      "description": "A few practical notes about supporting Jawafdehi. For receipts or donation questions, contact us directly.",
+      "items": [
+        {
+          "q": "Can I give monthly instead of once?",
+          "a": "Yes. PayPal supports recurring gifts, so you can choose one-time or monthly support before confirming your donation."
+        },
+        {
+          "q": "Where exactly does the money go?",
+          "a": "Donations fund hosting, document archiving, verification tooling, and keeping the archive free and open. Jawafdehi is volunteer-run and takes no profit."
+        },
+        {
+          "q": "Can I support Jawafdehi without donating money?",
+          "a": "Yes. You can help with research, translation, design, engineering, documentation, outreach, or reviewing public records. Email us and tell us how you would like to contribute."
+        }
       ]
     }
   },
