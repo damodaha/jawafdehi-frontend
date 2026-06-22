@@ -309,7 +309,7 @@ export function Navbar() {
               asChild
               variant="secondary"
               className={cn(
-                "min-w-0 bg-accent px-4 w-[8rem] font-semibold text-accent-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-accent/90",
+                "min-w-[8rem] whitespace-nowrap bg-accent px-4 font-semibold text-accent-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-accent/90",
                 isScrolled ? "shadow-md shadow-accent/20" : "shadow-none",
               )}
             >
@@ -324,7 +324,7 @@ export function Navbar() {
               variant="primary"
               size="navCta"
               className={cn(
-                "transition-all w-[12rem] duration-200 ease-out hover:-translate-y-0.5",
+                "min-w-[12rem] whitespace-nowrap transition-all duration-200 ease-out hover:-translate-y-0.5",
                 isScrolled ? "shadow-md shadow-primary/15" : "shadow-none",
               )}
             >

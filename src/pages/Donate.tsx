@@ -25,13 +25,13 @@ const Donate = () => {
         <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
       </Helmet>
 
-      <main id="main-content" className="flex-1">
+      <section className="flex-1">
         <DonateHero />
         <DonationDescription />
         <PayPalDonation />
         <Community />
         <DonationFaq />
-      </main>
+      </section>
     </div>
   );
 };

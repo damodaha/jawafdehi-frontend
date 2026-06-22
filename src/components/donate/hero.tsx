@@ -8,8 +8,10 @@ export function DonateHero() {
   const { t } = useTranslation();
 
   const scrollToDonationOptions = () => {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     document.getElementById("donate")?.scrollIntoView({
-      behavior: "smooth",
+      behavior: prefersReducedMotion ? "auto" : "smooth",
       block: "start",
     });
   };

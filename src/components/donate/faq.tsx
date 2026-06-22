@@ -1,26 +1,32 @@
-import { useState } from "react";
-import { Minus, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { cn } from "@/lib/utils";
+
 type FaqItem = { q: string; a: string };
-type IndexedFaqItem = FaqItem & { index: number };
+
+const isFaqItem = (item: unknown): item is FaqItem =>
+  typeof item === "object" &&
+  item !== null &&
+  "q" in item &&
+  "a" in item &&
+  typeof item.q === "string" &&
+  typeof item.a === "string";
 
 export function DonationFaq() {
   const { t } = useTranslation();
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-  const faqItems = t("donate.faq.items", {
+  const rawFaqItems = t("donate.faq.items", {
     returnObjects: true,
-  }) as FaqItem[];
-  const indexedItems = faqItems.map((item, index) => ({ ...item, index }));
-  const columnBreak = Math.ceil(indexedItems.length / 2);
-  const columns = [
-    indexedItems.slice(0, columnBreak),
-    indexedItems.slice(columnBreak),
-  ];
-
-  const toggleItem = (index: number) => {
-    setOpenIndex((current) => (current === index ? null : index));
-  };
+  });
+  const faqItems = Array.isArray(rawFaqItems)
+    ? rawFaqItems.filter(isFaqItem)
+    : [];
+  const hasOddFaqItems = faqItems.length % 2 === 1;
 
   return (
     <section
@@ -45,78 +51,32 @@ export function DonationFaq() {
             </p>
           </div>
 
-          <div className="mt-12 grid items-start gap-4 md:mt-14 md:grid-cols-2 md:gap-5">
-            {columns.map((column, columnIndex) => (
-              <div
-                key={columnIndex}
-                className="flex flex-col gap-4"
+          <Accordion
+            type="single"
+            collapsible
+            defaultValue={faqItems.length > 0 ? "donate-faq-0" : undefined}
+            className="mt-12 grid items-start gap-4 md:mt-14 md:grid-cols-2 md:gap-5"
+          >
+            {faqItems.map((item, index) => (
+              <AccordionItem
+                key={item.q}
+                value={`donate-faq-${index}`}
+                className={cn(
+                  "overflow-hidden rounded-2xl border-0 bg-muted/45 transition-colors duration-200 hover:bg-muted/65",
+                  hasOddFaqItems && index === faqItems.length - 1 ? "md:col-span-2" : undefined,
+                )}
               >
-                {column.map((item) => (
-                  <FaqEntry
-                    key={item.q}
-                    item={item}
-                    isOpen={openIndex === item.index}
-                    onToggle={() => toggleItem(item.index)}
-                  />
-                ))}
-              </div>
+                <AccordionTrigger className="min-h-16 gap-5 px-6 py-5 text-left text-base font-semibold leading-6 text-foreground no-underline transition-colors hover:text-primary hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring [&>svg]:h-5 [&>svg]:w-5 [&>svg]:text-foreground/55">
+                  {item.q}
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-6 pr-12 text-sm leading-7 text-muted-foreground md:text-base">
+                  {item.a}
+                </AccordionContent>
+              </AccordionItem>
             ))}
-          </div>
+          </Accordion>
         </div>
       </div>
     </section>
-  );
-}
-
-function FaqEntry({
-  item,
-  isOpen,
-  onToggle,
-}: Readonly<{
-  item: IndexedFaqItem;
-  isOpen: boolean;
-  onToggle: () => void;
-}>) {
-  const answerId = `donate-faq-${item.index}-answer`;
-  const questionId = `donate-faq-${item.index}-question`;
-
-  return (
-    <article className="overflow-hidden rounded-2xl bg-muted/45 transition-colors duration-200 hover:bg-muted/65">
-      <h3 id={questionId}>
-        <button
-          type="button"
-          className="flex min-h-16 w-full items-center justify-between gap-5 px-6 py-5 text-left text-base font-semibold leading-6 text-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
-          aria-expanded={isOpen}
-          aria-controls={answerId}
-          onClick={onToggle}
-        >
-          <span>{item.q}</span>
-          {isOpen ? (
-            <Minus
-              aria-hidden="true"
-              className="h-5 w-5 shrink-0 text-foreground/55"
-              strokeWidth={1.6}
-            />
-          ) : (
-            <Plus
-              aria-hidden="true"
-              className="h-5 w-5 shrink-0 text-foreground/55"
-              strokeWidth={1.6}
-            />
-          )}
-        </button>
-      </h3>
-
-      <div
-        id={answerId}
-        role="region"
-        aria-labelledby={questionId}
-        hidden={!isOpen}
-      >
-        <p className="px-6 pb-6 pr-12 text-sm leading-7 text-muted-foreground md:text-base">
-          {item.a}
-        </p>
-      </div>
-    </article>
   );
 }

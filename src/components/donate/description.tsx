@@ -6,11 +6,22 @@ type ImpactItem = { title: string; desc: string };
 
 const impactIcons = [Globe, Search, ShieldCheck, TbBrandOpenSource];
 
+const isImpactItem = (item: unknown): item is ImpactItem =>
+  typeof item === "object" &&
+  item !== null &&
+  "title" in item &&
+  "desc" in item &&
+  typeof item.title === "string" &&
+  typeof item.desc === "string";
+
 export function DonationDescription() {
   const { t } = useTranslation();
-  const impactItems = t("donate.impact.items", {
+  const rawImpactItems = t("donate.impact.items", {
     returnObjects: true,
-  }) as ImpactItem[];
+  });
+  const impactItems = Array.isArray(rawImpactItems)
+    ? rawImpactItems.filter(isImpactItem)
+    : [];
 
   return (
     <section

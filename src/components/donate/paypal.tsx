@@ -106,7 +106,7 @@ export function PayPalDonation() {
                 <QRCodeSVG
                   value={PAYPAL_DONATE_URL}
                   size={196}
-                  marginSize={1}
+                  includeMargin={true}
                   level="M"
                   title={t("donate.international.qrAlt")}
                 />
