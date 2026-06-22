@@ -10,6 +10,7 @@
  */
 
 import axios, { AxiosError, AxiosInstance } from 'axios';
+import { courtRefCandidates } from '@/utils/courtCaseRef';
 import type {
   Case,
   CaseDetail,
@@ -171,6 +172,26 @@ export async function getCaseById(id: string | number): Promise<CaseDetail> {
   } catch (error) {
     handleApiError(error, `/cases/${id}/`);
   }
+}
+
+/**
+ * Resolve a bare court case number (e.g. "081-CR-0116") to its case by probing
+ * the known court identifiers (special:, supreme:). Returns the first match;
+ * rethrows the last error if none resolve.
+ */
+export async function getCaseByCourtRef(ref: string): Promise<CaseDetail> {
+  const identifiers = courtRefCandidates(ref);
+  let lastError: unknown;
+  for (const identifier of identifiers) {
+    try {
+      return await getCaseById(identifier);
+    } catch (error) {
+      lastError = error;
+      if (error instanceof JDSApiError && error.statusCode === 404) continue;
+      throw error;
+    }
+  }
+  throw lastError;
 }
 
 /**

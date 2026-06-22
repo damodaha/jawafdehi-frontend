@@ -1,4 +1,5 @@
 import { LEGACY_CASE_MAP } from './src/utils/legacyCaseMap';
+import { courtRefCandidates } from './src/utils/courtCaseRef';
 import { JAWAFDEHI_WEEKLY_SERIES } from './src/config/constants';
 
 interface Env {
@@ -127,6 +128,29 @@ function extractCaseSlugFromUrl(caseUrl: string): string | null {
   }
 }
 
+// Resolve a bare court case number (e.g. "081-CR-0116") to its canonical slug
+// by probing the known court identifiers against the cases API. Returns null if
+// no case resolves (or the resolved case has no slug), so the caller falls
+// through to normal handling.
+async function resolveCourtRefSlug(ref: string): Promise<string | null> {
+  for (const identifier of courtRefCandidates(ref)) {
+    try {
+      const apiUrl = `${JDS_API_BASE}/cases/${encodeURIComponent(identifier)}/`;
+      const apiResponse = await fetch(apiUrl, { headers: { Accept: 'application/json' } });
+      if (!apiResponse.ok) {
+        continue;
+      }
+      const caseData = (await apiResponse.json()) as { slug?: string | null };
+      if (caseData.slug) {
+        return caseData.slug;
+      }
+    } catch {
+      // Network/parse failure: fall through to the next identifier.
+    }
+  }
+  return null;
+}
+
 async function handleOembed(request: Request): Promise<Response> {
   const url = new URL(request.url);
   const targetUrl = url.searchParams.get('url');
@@ -212,6 +236,22 @@ export default {
     if (caseMatch) {
       const legacyId = caseMatch[1];
       const targetSlug = LEGACY_CASE_MAP[legacyId];
+      if (targetSlug) {
+        return new Response(null, {
+          status: 301,
+          headers: {
+            'Location': `/case/${targetSlug}`,
+            'Cache-Control': 'public, max-age=3600',
+            ...secHeaders,
+          },
+        });
+      }
+    }
+
+    // Court-case-ref case URLs: /case/081-CR-0116 → canonical slug (301)
+    const courtRefMatch = path.match(/^\/case\/(\d+-[A-Za-z]+-\d+)\/?$/);
+    if (courtRefMatch) {
+      const targetSlug = await resolveCourtRefSlug(courtRefMatch[1]);
       if (targetSlug) {
         return new Response(null, {
           status: 301,
