@@ -28,7 +28,7 @@ const TermsOfService = () => {
                 Jawafdehi Initiative Terms of Service
               </h1>
               <p className="text-xl text-primary-foreground/80 leading-relaxed">
-                Last updated: June 2026
+                Last updated: June 22, 2026
               </p>
             </div>
           </div>
