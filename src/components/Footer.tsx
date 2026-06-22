@@ -138,7 +138,8 @@ export const Footer = () => {
     { label: t("footer.contributorPortal"), to: "https://portal.jawafdehi.org", external: true },
     { label: t("footer.githubRepo"), to: "https://github.com/Jawafdehi/Jawafdehi", external: true },
     { label: t("footer.siteStatus"), to: "https://status.jawafdehi.org/status/public", external: true },
-
+    { label: t("footer.privacy"), to: "/privacy" },
+    { label: t("footer.terms"), to: "/terms" },
   ];
 
   const socialLinks: FooterSocialLink[] = [
