@@ -26,10 +26,10 @@ export function CaseSectionJumpNav({
       aria-label="Jump to case section"
       className={cn("no-print min-w-0", className)}
     >
-      <p className="mb-3 text-sm font-semibold leading-5 text-primary">
+      <p className="mb-4 text-base font-semibold leading-6 text-primary">
         Jump To
       </p>
-      <div className="flex gap-5 overflow-x-auto border-b border-primary/10 pb-3 lg:block lg:space-y-3 lg:overflow-visible lg:border-b-0 lg:border-l lg:pb-0 lg:pl-4">
+      <div className="flex gap-5 overflow-x-auto pb-3 lg:block lg:space-y-4 lg:overflow-visible lg:pb-0">
         {sections.map((section) => {
           const isActive = section.id === activeSection;
 
@@ -40,10 +40,10 @@ export function CaseSectionJumpNav({
               aria-current={isActive ? "true" : undefined}
               onClick={onJump(section.id)}
               className={cn(
-                "block max-w-44 whitespace-nowrap text-sm font-medium leading-6 transition-colors lg:max-w-none lg:whitespace-normal",
+                "block max-w-48 whitespace-nowrap text-base font-medium leading-7 transition-colors lg:max-w-none lg:whitespace-normal",
                 isActive
                   ? "font-semibold text-primary"
-                  : "text-primary/50 hover:text-primary"
+                  : "text-primary/55 hover:text-primary"
               )}
             >
               {section.label}

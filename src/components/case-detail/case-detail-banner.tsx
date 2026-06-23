@@ -134,7 +134,7 @@ export function CaseDetailBanner({
 
   return (
     <section className="w-full text-slate-950 no-print">
-      <div className="container mx-auto px-4">
+      <div className="mx-auto w-full max-w-8xl px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           <img
             src={imageSrc}

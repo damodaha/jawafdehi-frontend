@@ -407,7 +407,7 @@ const CaseDetail = () => {
 
                 <Separator className="mb-8 hidden print:block" />
 
-                <div className="grid gap-8 print:block lg:grid-cols-[10rem_minmax(0,48rem)] lg:justify-center lg:gap-10 xl:grid-cols-[12rem_minmax(0,48rem)]">
+                <div className="grid gap-8 print:block lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[13rem_minmax(0,1fr)]">
                   <aside className="min-w-0 lg:col-start-1 lg:row-start-1">
                     <CaseSectionJumpNav
                       activeSection={activeSection}
