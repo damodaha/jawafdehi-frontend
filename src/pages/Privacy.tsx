@@ -28,7 +28,7 @@ const Privacy = () => {
                 Jawafdehi Initiative Privacy Policy
               </h1>
               <p className="text-xl text-primary-foreground/80 leading-relaxed">
-                Last updated: June 22, 2026
+                Last updated: June 23, 2026
               </p>
             </div>
           </div>
@@ -86,6 +86,11 @@ const Privacy = () => {
               <h3 id="error-monitoring">2.4 Error Monitoring</h3>
               <p>
                 We use Sentry to detect and diagnose technical errors so we can keep the Platform working. Sentry captures error and diagnostic data when something goes wrong. We have configured Sentry to minimize personal data: we do not send IP addresses or other personal identifiers by default, text is masked, and media is blocked in any captured diagnostics. We rely on this strictly for reliability and security (our legitimate interest) and do not use it to profile or track you.
+              </p>
+
+              <h3 id="social-media-integration">2.5 Social Media Account Integration</h3>
+              <p>
+                To publish Jawafdehi Initiative's own content, we connect our organization's own social media accounts (including TikTok) to a self-hosted social media scheduling tool. Through a platform's official API, and only for accounts we ourselves own and connect, we may access basic profile information (such as account ID, display name, and avatar), account statistics (such as follower, like, and video counts), and the list of our own published videos, and we may upload videos we create as drafts for further editing and publishing on the platform. We do not access, collect, or store information belonging to any other users of those platforms. Information obtained through these integrations is used solely to manage our own accounts and is also subject to the terms and privacy policies of the relevant platform, including those of TikTok.
               </p>
 
               <h2 id="cookies">3. Cookies</h2>

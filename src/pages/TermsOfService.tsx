@@ -28,7 +28,7 @@ const TermsOfService = () => {
                 Jawafdehi Initiative Terms of Service
               </h1>
               <p className="text-xl text-primary-foreground/80 leading-relaxed">
-                Last updated: June 22, 2026
+                Last updated: June 23, 2026
               </p>
             </div>
           </div>
@@ -72,6 +72,11 @@ const TermsOfService = () => {
                 <li>Impersonate any person or entity, or misrepresent your affiliation</li>
                 <li>Use the Platform for any unlawful purpose</li>
               </ul>
+
+              <h3 id="connected-social-accounts">3.3 Connected Social Media Accounts</h3>
+              <p>
+                We use third-party tools to manage and publish content to social media accounts that we operate (including TikTok). Our use of those accounts and the platforms' developer interfaces is additionally subject to the terms of service and policies of each platform, including those of TikTok. Information accessed through these integrations is described in our <a href="/privacy" className="text-primary hover:underline">Privacy Policy</a>.
+              </p>
 
               <h2 id="public-domain-data">4. Public Domain Data</h2>
               <p>
