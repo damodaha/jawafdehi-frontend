@@ -198,25 +198,47 @@ const CaseDetail = () => {
 
     if (sectionElements.length === 0) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleEntries = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((entryA, entryB) => entryA.boundingClientRect.top - entryB.boundingClientRect.top);
+    let animationFrame = 0;
 
-        if (visibleEntries[0]?.target.id) {
-          setActiveSection(visibleEntries[0].target.id);
+    const updateActiveSection = () => {
+      animationFrame = 0;
+
+      const readingLine = window.innerHeight * 0.5;
+      let currentSectionId = sectionElements[0].id;
+
+      for (const element of sectionElements) {
+        if (element.getBoundingClientRect().top <= readingLine) {
+          currentSectionId = element.id;
+        } else {
+          break;
         }
-      },
-      {
-        rootMargin: "-30% 0px -55% 0px",
-        threshold: [0, 0.1, 0.25, 0.5],
       }
-    );
 
-    sectionElements.forEach((element) => observer.observe(element));
+      const isAtPageBottom =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8;
+      if (isAtPageBottom) {
+        currentSectionId = sectionElements[sectionElements.length - 1].id;
+      }
 
-    return () => observer.disconnect();
+      setActiveSection((currentSection) =>
+        currentSection === currentSectionId ? currentSection : currentSectionId
+      );
+    };
+
+    const scheduleUpdate = () => {
+      if (animationFrame) return;
+      animationFrame = window.requestAnimationFrame(updateActiveSection);
+    };
+
+    updateActiveSection();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+
+    return () => {
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+    };
   }, [caseData, jumpSections]);
 
   const handleJumpToSection = (sectionId: string) => (event: MouseEvent<HTMLAnchorElement>) => {
@@ -462,7 +484,6 @@ const CaseDetail = () => {
                   <aside className="min-w-0 lg:col-start-1 lg:row-start-1">
                     <CaseSectionJumpNav
                       activeSection={activeSection}
-                      className="lg:sticky lg:top-1/2 lg:-translate-y-1/2"
                       onJump={handleJumpToSection}
                       sections={jumpSections}
                     />
