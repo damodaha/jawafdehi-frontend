@@ -416,8 +416,6 @@
   },
   "documentSource": {
     "fallbackTitle": "Source {{id}}",
-    "sourceLinks": "Source links",
-    "sourceDomain": "Source: {{host}}",
     "more": "More",
     "viewSource": "View Source",
     "viewSourceN": "View Source {{n}}",
@@ -447,18 +445,33 @@
     }
   },
   "documentPreview": {
+    "backToJawafdehi": "Back to Jawafdehi",
+    "close": "Close preview",
+    "currentPage": "Current page",
+    "defaultTitle": "Document preview",
     "download": "Download",
     "loading": "Loading preview...",
     "markdownDescription": "Previewing the extracted text version. Download is available below.",
     "markdownError": "We could not load this text preview. You can still open or download the file.",
+    "nextPage": "Next page",
     "openInNewTab": "Open in new tab",
+    "page": "Page",
+    "pdfFile": "PDF file",
     "pdfDescription": "Previewing this PDF. Download is available below.",
     "pdfError": "We could not load this PDF preview. You can still open or download the file.",
-    "previewAria": "Preview {{title}}"
+    "previewAria": "Preview {{title}}",
+    "previousPage": "Previous page",
+    "textVersion": "Text version",
+    "thumbnails": "Page thumbnails",
+    "unavailableDescription": "This preview link is missing a valid document URL.",
+    "unavailableTitle": "Preview unavailable",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out"
   },
   "sourceType": {
     "LEGAL_COURT_ORDER": "Legal: Court Order/Verdict",
     "LEGAL_PROCEDURAL": "Legal: Procedural/Law Enforcement",
+    "AG_ABHIYOG_PATRA": "Abhiyog Patra",
     "OFFICIAL_GOVERNMENT": "Official (Government)",
     "FINANCIAL_FORENSIC": "Financial/Forensic Record",
     "INTERNAL_CORPORATE": "Internal Corporate Doc",

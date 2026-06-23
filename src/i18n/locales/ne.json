@@ -416,8 +416,6 @@
   },
   "documentSource": {
     "fallbackTitle": "स्रोत {{id}}",
-    "sourceLinks": "स्रोत लिङ्कहरू",
-    "sourceDomain": "स्रोत: {{host}}",
     "more": "थप",
     "viewSource": "स्रोत हेर्नुहोस्",
     "viewSourceN": "स्रोत {{n}} हेर्नुहोस्",
@@ -447,18 +445,33 @@
     }
   },
   "documentPreview": {
+    "backToJawafdehi": "जवाफदेहीमा फर्कनुहोस्",
+    "close": "पूर्वावलोकन बन्द गर्नुहोस्",
+    "currentPage": "हालको पृष्ठ",
+    "defaultTitle": "कागजात पूर्वावलोकन",
     "download": "डाउनलोड गर्नुहोस्",
     "loading": "पूर्वावलोकन लोड हुँदैछ...",
     "markdownDescription": "निकालिएको पाठ संस्करणको पूर्वावलोकन। डाउनलोड विकल्प तल छ।",
     "markdownError": "यो पाठ पूर्वावलोकन लोड गर्न सकिएन। तपाईं फाइल खोल्न वा डाउनलोड गर्न सक्नुहुन्छ।",
+    "nextPage": "अर्को पृष्ठ",
     "openInNewTab": "नयाँ ट्याबमा खोल्नुहोस्",
+    "page": "पृष्ठ",
+    "pdfFile": "PDF फाइल",
     "pdfDescription": "यो PDF को पूर्वावलोकन। डाउनलोड विकल्प तल छ।",
     "pdfError": "यो PDF पूर्वावलोकन लोड गर्न सकिएन। तपाईं फाइल खोल्न वा डाउनलोड गर्न सक्नुहुन्छ।",
-    "previewAria": "{{title}} पूर्वावलोकन गर्नुहोस्"
+    "previewAria": "{{title}} पूर्वावलोकन गर्नुहोस्",
+    "previousPage": "अघिल्लो पृष्ठ",
+    "textVersion": "पाठ संस्करण",
+    "thumbnails": "पृष्ठ थम्बनेलहरू",
+    "unavailableDescription": "यो पूर्वावलोकन लिङ्कमा मान्य कागजात URL छैन।",
+    "unavailableTitle": "पूर्वावलोकन उपलब्ध छैन",
+    "zoomIn": "जुम बढाउनुहोस्",
+    "zoomOut": "जुम घटाउनुहोस्"
   },
   "sourceType": {
     "LEGAL_COURT_ORDER": "कानूनी: अदालतको आदेश/फैसला",
     "LEGAL_PROCEDURAL": "कानूनी: प्रक्रियागत/कानून प्रवर्तन",
+    "AG_ABHIYOG_PATRA": "अभियोग पत्र",
     "OFFICIAL_GOVERNMENT": "आधिकारिक (सरकारी)",
     "FINANCIAL_FORENSIC": "वित्तीय/फोरेन्सिक रेकर्ड",
     "INTERNAL_CORPORATE": "आन्तरिक कर्पोरेट कागजात",
