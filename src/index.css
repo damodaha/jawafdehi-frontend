@@ -21,13 +21,13 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 36 100% 99%;
+    --background: 48 29.4% 96.7%; /* #F9F8F4 */
     --foreground: 215 28% 17%;
 
-    --card: 36 100% 99%;
+    --card: 0 0% 100%; /* #ffffff */
     --card-foreground: 215 28% 17%;
 
-    --popover: 36 100% 99%;
+    --popover: 48 29.4% 96.7%; /* #F9F8F4 */
     --popover-foreground: 215 28% 17%;
 
     /* Navy blue - trust and authority | #0E1F3B */
