@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 
 import { Badge } from "@/components/ui/badge";
+import { getCaseBadgeClassName } from "@/lib/case-badges";
 import { Skeleton } from "@/components/ui/skeleton";
 import type {
   ArchiveSearchResult,
@@ -99,7 +100,11 @@ export function SearchResultCard({ result }: Readonly<{ result: ArchiveSearchRes
                       toggleArchiveSearchParam(searchParams, "tags", tag),
                     );
                   }}
-                  className="relative z-10 rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-semibold text-secondary-foreground hover:bg-secondary/80 transition-colors"
+                  className={getCaseBadgeClassName(
+                    "tag",
+                    undefined,
+                    "relative z-10 px-2.5 py-0.5 text-[10px] transition-colors",
+                  )}
                 >
                   {tag}
                 </button>
