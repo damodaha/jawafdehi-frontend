@@ -1,9 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Document, Page, pdfjs } from "react-pdf";
-import "react-pdf/dist/Page/AnnotationLayer.css";
-import "react-pdf/dist/Page/TextLayer.css";
 import {
   ChevronLeft,
   ChevronRight,
@@ -11,7 +8,6 @@ import {
   ExternalLink,
   FileText,
   Minus,
-  PanelLeft,
   Plus,
   X,
 } from "lucide-react";
@@ -24,13 +20,14 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+import { ClientOnly } from "@/components/ClientOnly";
 import { getDocumentProxyUrl, getDocumentViewerUrl } from "@/utils/document-preview-url";
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.mjs",
-  import.meta.url,
-).toString();
+const PdfDocumentPreview = lazy(() =>
+  import("@/components/PdfDocumentPreview").then((module) => ({
+    default: module.PdfDocumentPreview,
+  })),
+);
 
 export type PreviewDocument = {
   title: string;
@@ -337,48 +334,8 @@ export function DocumentPreviewViewer({
       )}
 
       <div ref={previewContainerRef} className="flex min-h-0 flex-1 overflow-hidden bg-[#050505]">
-        {!isMarkdown && (
-          <aside className="hidden w-24 shrink-0 overflow-y-auto border-r border-white/10 bg-[#111214] px-3 py-4 md:block">
-            <div className="mb-3 flex items-center gap-2 text-xs font-medium text-white/70">
-              <PanelLeft className="h-4 w-4" aria-hidden="true" />
-              <span className="sr-only">{t("documentPreview.thumbnails")}</span>
-            </div>
-            <Document file={previewUrl} loading={null} error={null}>
-              {Array.from({ length: pageCount }, (_, index) => {
-                const pageNumber = index + 1;
-
-                return (
-                  <button
-                    key={`thumbnail-${previewUrl}-${pageNumber}`}
-                    type="button"
-                    className={cn(
-                      "mb-3 block w-full rounded-md border bg-white p-1 text-left text-black transition",
-                      currentPage === pageNumber
-                        ? "border-blue-400 ring-2 ring-blue-400"
-                        : "border-white/20 hover:border-white/70",
-                    )}
-                    onClick={() => goToPage(pageNumber)}
-                  >
-                    <span className="mb-1 block text-center text-xs font-semibold">{pageNumber}</span>
-                    {shouldRenderThumbnail(pageNumber) ? (
-                      <Page pageNumber={pageNumber} width={64} renderAnnotationLayer={false} renderTextLayer={false} />
-                    ) : (
-                      <div
-                        className="flex w-16 items-center justify-center bg-slate-100 text-[10px] font-semibold text-slate-400"
-                        style={{ height: getPageHeight(pageNumber, 64) }}
-                      >
-                        {pageNumber}
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
-            </Document>
-          </aside>
-        )}
-
-        <div ref={scrollContainerRef} className="min-h-0 flex-1 overflow-auto px-4 py-6">
-          {isMarkdown ? (
+        {isMarkdown ? (
+          <div ref={scrollContainerRef} className="min-h-0 flex-1 overflow-auto px-4 py-6">
             <div className="mx-auto min-h-full max-w-4xl rounded-sm bg-white px-6 py-8 text-slate-950 shadow-2xl sm:px-10">
               {isLoadingMarkdown && (
                 <p className="text-sm text-slate-500">
@@ -398,82 +355,42 @@ export function DocumentPreviewViewer({
                 </div>
               )}
             </div>
-          ) : (
-            <div className="flex min-h-full justify-center">
-              <Document
-                key={previewUrl}
-                file={previewUrl}
-                loading={
-                  <p className="text-sm text-white/70">
-                    {t("documentPreview.loading")}
-                  </p>
-                }
-                error={
-                  <div className="rounded-lg border border-dashed border-white/20 bg-white/5 p-4 text-sm text-white/70">
-                    {t("documentPreview.pdfError")}
-                  </div>
-                }
-                onLoadSuccess={(pdf) => {
-                  setPdfError(false);
-                  setPageCount(pdf.numPages);
-                  const loadId = pdfLoadIdRef.current;
-
-                  Promise.all(
-                    Array.from({ length: pdf.numPages }, async (_, index) => {
-                      const page = await pdf.getPage(index + 1);
-                      const viewport = page.getViewport({ scale: 1 });
-
-                      return [index + 1, { height: viewport.height, width: viewport.width }] as const;
-                    }),
-                  )
-                    .then((sizes) => {
-                      if (pdfLoadIdRef.current !== loadId) return;
-                      setPageSizes(Object.fromEntries(sizes));
-                    })
-                    .catch(() => {
-                      if (pdfLoadIdRef.current !== loadId) return;
-                      setPageSizes({});
-                    });
-                }}
-                onLoadError={() => setPdfError(true)}
-                className="flex flex-col items-center gap-6"
-              >
-                {!pdfError &&
-                  Array.from({ length: pageCount }, (_, index) => {
-                    const pageNumber = index + 1;
-
-                    return (
-                      <div
-                        key={`${previewUrl}-${pageNumber}`}
-                        className="overflow-hidden"
-                        ref={(node) => {
-                          pageRefs.current[pageNumber] = node;
-                        }}
-                      >
-                        {shouldRenderPage(pageNumber) ? (
-                          <Page
-                            pageNumber={pageNumber}
-                            width={renderedPageWidth}
-                            className="overflow-hidden bg-white shadow-2xl ring-1 ring-black/60"
-                          />
-                        ) : (
-                          <div
-                            className="flex items-center justify-center bg-white text-sm font-medium text-slate-300 shadow-2xl ring-1 ring-black/60"
-                            style={{
-                              height: getPageHeight(pageNumber, renderedPageWidth),
-                              width: renderedPageWidth,
-                            }}
-                          >
-                            {pageNumber}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-              </Document>
-            </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <ClientOnly
+            fallback={
+              <div className="flex min-h-0 flex-1 items-center justify-center px-4 py-6">
+                <p className="text-sm text-white/70">{t("documentPreview.loading")}</p>
+              </div>
+            }
+          >
+            <Suspense
+              fallback={
+                <div className="flex min-h-0 flex-1 items-center justify-center px-4 py-6">
+                  <p className="text-sm text-white/70">{t("documentPreview.loading")}</p>
+                </div>
+              }
+            >
+              <PdfDocumentPreview
+                currentPage={currentPage}
+                getPageHeight={getPageHeight}
+                goToPage={goToPage}
+                pageCount={pageCount}
+                pageRefs={pageRefs}
+                pdfError={pdfError}
+                pdfLoadIdRef={pdfLoadIdRef}
+                previewUrl={previewUrl}
+                renderedPageWidth={renderedPageWidth}
+                scrollContainerRef={scrollContainerRef}
+                setPageCount={setPageCount}
+                setPageSizes={setPageSizes}
+                setPdfError={setPdfError}
+                shouldRenderPage={shouldRenderPage}
+                shouldRenderThumbnail={shouldRenderThumbnail}
+              />
+            </Suspense>
+          </ClientOnly>
+        )}
       </div>
     </div>
   );
