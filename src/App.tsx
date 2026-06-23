@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react";
+import { Suspense } from "react";
 import * as Sentry from "@sentry/react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -37,8 +37,6 @@ import CaseworkReviews from "./pages/CaseworkReviews";
 import CaseworkReviewDetail from "./pages/CaseworkReviewDetail";
 import CaseworkRules from "./pages/CaseworkRules";
 import CaseworkHow from "./pages/CaseworkHow";
-
-const GuestChat = lazy(() => import("./pages/GuestChat"));
 
 const RouteLoadingFallback = () => (
   <div
@@ -88,7 +86,6 @@ const App = () => (
             <Route path="/entities" element={<Entities />} />
             <Route path="/search" element={<ArchiveSearch />} />
             <Route path="/entity/:id" element={<EntityProfile />} />
-            <Route path="/ask" element={<GuestChat />} />
             <Route path="/entity-response/:id" element={<EntityResponse />} />
             <Route path="/moderation" element={<ModerationDashboard />} />
             <Route path="/feedback" element={<Feedback />} />
