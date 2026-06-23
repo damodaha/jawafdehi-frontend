@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { TransitionsTooltip } from "@/components/TransitionsTooltip";
+import { TransitionsTooltip } from "@/components/ui/TransitionsTooltip";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
