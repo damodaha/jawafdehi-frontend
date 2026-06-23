@@ -1,23 +1,23 @@
-import { useEffect, useRef } from "react";
+import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
-import { DocumentSourceCard } from "@/components/DocumentSourceCard";
-import { ResponsiveTable } from "@/components/ResponsiveTable";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { CourtCaseCard } from "@/components/CourtCaseCard";
 import { FloatingShareSidebar } from "@/components/FloatingShareSidebar";
 import { ShareButton } from "@/components/ShareButton";
-import { CaseDetailBanner } from "@/components/CaseDetailBanner";
-import { CaseTimeline } from "@/components/CaseTimeline";
-import { CaseEntityChips } from "@/components/CaseEntityChips";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Banknote, Calendar, FileText, AlertTriangle, ArrowLeft, ExternalLink, AlertCircle, Info, Mail, MapPin, MessageCircle, Scale, StickyNote, User } from "lucide-react";
+import { Banknote, Calendar, AlertTriangle, ArrowLeft, ExternalLink, AlertCircle, Info, Mail, MapPin, MessageCircle, StickyNote, User } from "lucide-react";
+import { CaseDetailBanner } from "@/components/case-detail/case-detail-banner";
+import { CaseOverviewSection } from "@/components/case-detail/case-overview-section";
+import { CaseSectionJumpNav, type CaseJumpSection } from "@/components/case-detail/case-section-jump-nav";
+import { CaseSupplementarySection } from "@/components/case-detail/case-supplementary-section";
+import { CaseTimelineSection } from "@/components/case-detail/case-timeline-section";
+import { CourtCasesSection } from "@/components/case-detail/court-cases-section";
+import { EvidenceSection } from "@/components/case-detail/evidence-section";
+import { InvolvedPartiesSection } from "@/components/case-detail/involved-parties-section";
+import { KeyAllegationsSection } from "@/components/case-detail/key-allegations-section";
 import { getCaseById, getCourtCase, getDocumentSourceById } from "@/services/jds-api";
 import { getEntityById } from "@/services/api";
 import type { CourtCase, DocumentSource, JawafEntity } from "@/types/jds";
@@ -31,21 +31,10 @@ import { DisqusComments } from "@/components/DisqusComments";
 import { JAWAFDEHI_WHATSAPP_NUMBER, JAWAFDEHI_EMAIL } from "@/config/constants";
 import { translateDynamicText } from "@/lib/translate-dynamic-content";
 import { trackEvent } from "@/utils/analytics";
-import { cn } from "@/lib/utils";
 import { formatBigo } from "@/utils/number";
 import { resolveLegacyCaseSlug } from "@/utils/legacyCaseMap";
 import { useIsMobile } from "@/hooks/use-mobile";
 import "@/styles/print.css";
-
-const RELATION_PRIORITY: Record<string, number> = {
-  accused: 1,
-  alleged: 2,
-  victim: 3,
-  witness: 4,
-  related: 5,
-  opposition: 6,
-  unknown: 10,
-};
 
 function getGroupedEntities(entities: JawafEntity[]) {
   const seen = new Set<number>();
@@ -62,95 +51,13 @@ function getGroupedEntities(entities: JawafEntity[]) {
   }, {} as Record<string, JawafEntity[]>);
 }
 
-// Evidence tier grouping types and constants
-type EvidenceGroup = 'primary' | 'legal' | 'secondary';
-
-const PRIMARY_TYPES: readonly string[] = [
-  'OFFICIAL_GOVERNMENT',
-  'FINANCIAL_FORENSIC',
-  'INTERNAL_CORPORATE',
-  'INVESTIGATIVE_REPORT'
-] as const;
-
-const LEGAL_TYPES: readonly string[] = [
-  'LEGAL_COURT_ORDER',
-  'LEGAL_PROCEDURAL',
-  'LEGISLATIVE_DOC'
-] as const;
-
-const SECONDARY_TYPES: readonly string[] = [
-  'MEDIA_NEWS',
-  'PUBLIC_COMPLAINT',
-  'SOCIAL_MEDIA',
-  'OTHER_VISUAL'
-] as const;
-
-/**
- * Classifies a document source into an evidentiary tier based on source_type.
- * 
- * @param sourceType - The source_type field from DocumentSource (can be null/undefined)
- * @returns The evidence group: 'primary', 'legal', or 'secondary'
- */
-function getEvidenceGroup(sourceType: string | null | undefined): EvidenceGroup {
-  if (!sourceType) return 'secondary';
-  
-  if (PRIMARY_TYPES.includes(sourceType)) return 'primary';
-  if (LEGAL_TYPES.includes(sourceType)) return 'legal';
-  if (SECONDARY_TYPES.includes(sourceType)) return 'secondary';
-  
-  // Unknown source_type defaults to secondary
-  return 'secondary';
-}
-
-interface SectionHeaderProps {
-  group: EvidenceGroup;
-  count: number;
-  t: (key: string, options?: { count?: number }) => string;
-}
-
-/**
- * Section header component for evidence tier grouping.
- * Displays a badge with tier-specific colors and document count.
- */
-const SectionHeader: React.FC<SectionHeaderProps> = ({ group, count, t }) => {
-  const config = {
-    primary: {
-      bgColor: 'bg-[#E6F1FB] dark:bg-blue-950/30',
-      textColor: 'text-[#0C447C] dark:text-blue-300',
-      labelKey: 'caseDetail.evidenceGroups.primary'
-    },
-    legal: {
-      bgColor: 'bg-[#EEEDFE] dark:bg-purple-950/30',
-      textColor: 'text-[#3C3489] dark:text-purple-300',
-      labelKey: 'caseDetail.evidenceGroups.legal'
-    },
-    secondary: {
-      bgColor: 'bg-[#F1EFE8] dark:bg-gray-800/30',
-      textColor: 'text-[#5F5E5A] dark:text-gray-300',
-      labelKey: 'caseDetail.evidenceGroups.secondary'
-    }
-  };
-
-  const { bgColor, textColor, labelKey } = config[group];
-
-  return (
-    <div className="flex items-center gap-3 mb-3 pb-2 border-b border-border">
-      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${bgColor} ${textColor}`}>
-        {t(labelKey)}
-      </span>
-      <span className="text-sm text-muted-foreground">
-        {t('caseDetail.evidenceGroups.documentCount', { count })}
-      </span>
-    </div>
-  );
-};
-
 const CaseDetail = () => {
   const { t, i18n } = useTranslation();
   const currentLang = i18n.language;
   const { id } = useParams();
   const trackedCaseIdRef = useRef<string | null>(null);
   const isMobile = useIsMobile();
+  const [activeSection, setActiveSection] = useState("allegations");
 
   // Legacy /case/<numeric> URLs: resolve to canonical slug and replace.
   // Mirrors worker.ts behaviour for environments without the Cloudflare edge
@@ -235,22 +142,81 @@ const CaseDetail = () => {
     : {};
 
   const hasInvolvedParties = Object.keys(groupedEntities).length > 0;
+  const hasTimeline = (caseData?.timeline || []).length > 0;
+  const hasCourtCases = (caseData?.court_cases ?? []).length > 0;
+  const hasEvidence = (caseData?.evidence ?? []).length > 0;
+  const hasMissingDetails = Boolean(caseData?.missing_details);
+  const hasNotes = Boolean(caseData?.notes);
 
-  // Group evidence by tier
-  const groupedEvidence: Record<EvidenceGroup, Array<typeof caseData.evidence[0] & { originalIndex: number }>> = {
-    primary: [],
-    legal: [],
-    secondary: []
+  const jumpSections = useMemo<CaseJumpSection[]>(() => {
+    const sections: Array<CaseJumpSection | false> = [
+      { id: "allegations", label: t("caseDetail.allegations") },
+      hasInvolvedParties && { id: "parties-involved", label: t("caseDetail.partiesInvolved") },
+      hasTimeline && { id: "timeline", label: t("caseDetail.timeline") },
+      { id: "overview", label: t("caseDetail.overview") },
+      hasCourtCases && { id: "court-case", label: t("caseDetail.courtCase", "Court Case") },
+      hasEvidence && { id: "evidence", label: t("caseDetail.evidence") },
+      hasMissingDetails && { id: "missing-details", label: t("caseDetail.missingDetails") },
+      hasNotes && { id: "notes", label: t("caseDetail.notes") },
+    ];
+
+    return sections.filter((section): section is CaseJumpSection => Boolean(section));
+  }, [
+    hasCourtCases,
+    hasEvidence,
+    hasInvolvedParties,
+    hasMissingDetails,
+    hasNotes,
+    hasTimeline,
+    t,
+  ]);
+
+  useEffect(() => {
+    if (!caseData || jumpSections.length === 0) return;
+
+    setActiveSection((currentSection) =>
+      jumpSections.some((section) => section.id === currentSection)
+        ? currentSection
+        : jumpSections[0].id
+    );
+
+    const sectionElements = jumpSections
+      .map((section) => document.getElementById(section.id))
+      .filter((element): element is HTMLElement => Boolean(element));
+
+    if (sectionElements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntries = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((entryA, entryB) => entryA.boundingClientRect.top - entryB.boundingClientRect.top);
+
+        if (visibleEntries[0]?.target.id) {
+          setActiveSection(visibleEntries[0].target.id);
+        }
+      },
+      {
+        rootMargin: "-30% 0px -55% 0px",
+        threshold: [0, 0.1, 0.25, 0.5],
+      }
+    );
+
+    sectionElements.forEach((element) => observer.observe(element));
+
+    return () => observer.disconnect();
+  }, [caseData, jumpSections]);
+
+  const handleJumpToSection = (sectionId: string) => (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+
+    const target = document.getElementById(sectionId);
+    if (!target) return;
+
+    setActiveSection(sectionId);
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.history.replaceState(null, "", `#${sectionId}`);
   };
-
-  (caseData?.evidence ?? []).forEach((evidence, index) => {
-    const source = resolvedSources[evidence.source_id];
-    const group = getEvidenceGroup(source?.source_type);
-    groupedEvidence[group].push({ ...evidence, originalIndex: index });
-  });
-
-  // Render order: primary -> legal -> secondary
-  const renderOrder: EvidenceGroup[] = ['primary', 'legal', 'secondary'];
 
   // Legacy /case/<numeric> URLs: replace with the canonical slug. This must
   // happen after all hooks have run so we don't violate rules-of-hooks.
@@ -343,7 +309,7 @@ const CaseDetail = () => {
       />
 
       <main id="main-content" className="flex-1 py-8">
-        <div className="container mx-auto max-w-8xl px-4">
+        <div className="container mx-auto px-4">
           <div>
             <div className="min-w-0">
               <FloatingShareSidebar
@@ -441,177 +407,81 @@ const CaseDetail = () => {
 
                 <Separator className="mb-8 hidden print:block" />
 
-                <div className={cn(
-                  "grid gap-8 transition-[grid-template-columns] duration-300 ease-out print:block",
-                  (caseData.timeline || []).length > 0 && "lg:grid-cols-[minmax(0,1fr)_20rem] xl:grid-cols-[minmax(0,1fr)_24rem]"
-                )}>
-                  <div className="min-w-0 lg:col-start-1 mx-auto max-w-4xl w-full">
-                    <Card className="mb-6 sm:mb-8">
-                      <CardHeader className="px-4 py-4 sm:px-6 sm:py-6">
-                        <CardTitle id="allegations" className="flex items-center text-xl sm:text-2xl">
-                          <AlertTriangle className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                          {t("caseDetail.allegations")}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
-                        <ul className="space-y-3 sm:space-y-4">
-                          {(caseData.key_allegations || []).map((allegation, index) => (
-                            <li
-                              key={index}
-                              className="flex items-start gap-3 rounded-2xl bg-muted/35 p-3 sm:bg-transparent sm:p-0"
-                            >
-                              <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-xs font-semibold text-destructive sm:h-6 sm:w-6 sm:text-sm">
-                                {index + 1}
-                              </span>
-                              <p className="text-sm leading-7 text-foreground sm:text-base">
-                                {allegation}
-                              </p>
-                            </li>
-                          ))}
-                          {(caseData.key_allegations || []).length === 0 && (
-                            <li className="text-sm text-muted-foreground italic">
-                              {t("common.notAvailable")}
-                            </li>
-                          )}
-                        </ul>
-                      </CardContent>
-                    </Card>
+                <div className="grid gap-8 print:block lg:grid-cols-[10rem_minmax(0,48rem)] lg:justify-center lg:gap-10 xl:grid-cols-[12rem_minmax(0,48rem)]">
+                  <aside className="min-w-0 lg:col-start-1 lg:row-start-1">
+                    <CaseSectionJumpNav
+                      activeSection={activeSection}
+                      className="lg:sticky lg:top-24"
+                      onJump={handleJumpToSection}
+                      sections={jumpSections}
+                    />
+                  </aside>
+
+                  <div className="min-w-0 w-full lg:col-start-2">
+                    <KeyAllegationsSection
+                      allegations={caseData.key_allegations || []}
+                      emptyLabel={t("common.notAvailable")}
+                      title={t("caseDetail.allegations")}
+                    />
 
                     {hasInvolvedParties && (
-                      <section id="parties-involved">
-                        <h2 className="mb-5 text-2xl font-semibold text-foreground">
-                          {t("caseDetail.partiesInvolved")}
-                        </h2>
-
-                        <div className="space-y-8">
-                          {(() => {
-                            const unknownLabel = t("caseDetail.relationTypes.unknown");
-                            return Object.entries(groupedEntities)
-                              .sort(([typeA], [typeB]) => (RELATION_PRIORITY[typeA] ?? 99) - (RELATION_PRIORITY[typeB] ?? 99))
-                              .map(([type, entities]) => {
-                                const typeKey = `caseDetail.relationTypes.${type}`;
-                                const label = t(typeKey, { defaultValue: unknownLabel });
-
-                                return (
-                                  <div key={type} className="space-y-4">
-                                    <div className="flex items-center gap-3">
-                                    <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">
-                                      {label}
-                                    </h3>
-                                    <div className="h-px w-full bg-border/60" />
-                                  </div>
-                                  <CaseEntityChips
-                                    entities={entities}
-                                    resolvedEntities={resolvedEntities}
-                                    language={currentLang}
-                                    initialLimit={8}
-                                  />
-                                </div>
-                              );
-                            });
-                          })()}
-                        </div>
-                      </section>
-                    )}
-                  </div>
-
-                  <CaseTimeline
-                    timeline={caseData.timeline || []}
-                    title={t("caseDetail.timeline")}
-                    className="mb-8 text-foreground print:static print:mb-8 lg:col-start-2 lg:row-start-1 lg:row-span-2"
-                  />
-
-                  <div className="min-w-0 lg:col-start-1 mx-auto max-w-4xl w-full">
-                    <Card className="mb-8">
-                      <CardHeader>
-                        <CardTitle id="overview" className="flex items-center">
-                          <FileText className="mr-2 h-5 w-5" />
-                          {t("caseDetail.overview")}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="overflow-hidden">
-                        <div className="prose-content text-foreground leading-relaxed [&_p]:mb-3 [&_p:last-child]:mb-0 [&_ul]:space-y-2 [&_ul]:my-4 [&_li]:ml-6 [&_li]:pl-2 [&_a]:underline [&_strong]:font-semibold [&_em]:italic [&_h1]:text-xl [&_h1]:font-bold [&_h1]:mb-2 [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mb-2 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mb-1 [&_table]:my-4 [&_table]:w-full [&_table]:border-collapse [&_table]:border [&_table]:border-border [&_th]:border [&_th]:border-border [&_th]:px-3 [&_th]:py-3 [&_th]:text-left [&_th]:bg-gradient-to-b [&_th]:from-muted [&_th]:to-muted/80 [&_th]:font-semibold [&_th]:text-sm [&_th]:text-foreground [&_td]:border [&_td]:border-border [&_td]:px-3 [&_td]:py-2.5 [&_td]:text-sm [&_td]:text-foreground [&_tr:nth-child(even)]:bg-muted/40 [&_tr:hover]:bg-muted/60 [&_tr]:transition-colors [&_caption]:text-sm [&_caption]:font-semibold [&_caption]:mb-3 [&_caption]:text-foreground">
-                          <Markdown remarkPlugins={[remarkGfm]}>{caseData.description}</Markdown>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {(caseData.court_cases ?? []).length > 0 && (
-                      <Card className="mb-8">
-                        <CardHeader>
-                          <CardTitle id="court-case" className="flex items-center">
-                            <Scale className="mr-2 h-5 w-5" />
-                            {t("caseDetail.courtCase", "Court Case")}
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-4">
-                            {(caseData.court_cases ?? []).map((courtCaseId, index) => {
-                              const query = courtCaseQueries[index];
-                              return (
-                                <CourtCaseCard
-                                  key={courtCaseId}
-                                  courtCaseId={courtCaseId}
-                                  courtCase={query?.data as CourtCase | undefined}
-                                  isLoading={query?.isLoading ?? false}
-                                />
-                              );
-                            })}
-                          </div>
-                        </CardContent>
-                      </Card>
+                      <InvolvedPartiesSection
+                        groupedEntities={groupedEntities}
+                        language={currentLang}
+                        resolvedEntities={resolvedEntities}
+                        title={t("caseDetail.partiesInvolved")}
+                        translateRelation={(relationType) =>
+                          t(`caseDetail.relationTypes.${relationType}`, {
+                            defaultValue: t("caseDetail.relationTypes.unknown"),
+                          })
+                        }
+                      />
                     )}
 
-                    {caseData.evidence.length > 0 && (
-                      <Card className="mb-8">
-                        <CardHeader>
-                          <CardTitle id="evidence" className="flex items-center">
-                            <FileText className="mr-2 h-5 w-5" />
-                            {t("caseDetail.evidence")}
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div>
-                            {caseData.evidence.map((evidence, index) => {
-                              const source = resolvedSources[evidence.source_id] ?? null;
-                              return (
-                                <DocumentSourceCard
-                                  key={`${evidence.source_id}-${index}`}
-                                  source={source}
-                                  sourceId={evidence.source_id}
-                                  itemNumber={index + 1}
-                                  evidenceDescription={evidence.description}
-                                />
-                              );
-                            })}
-                          </div>
-                        </CardContent>
-                      </Card>
+                    {hasTimeline && (
+                      <CaseTimelineSection
+                        className="mb-12 print:static print:mb-8"
+                        timeline={caseData.timeline || []}
+                        title={t("caseDetail.timeline")}
+                      />
                     )}
 
-                    {caseData.missing_details && (
-                      <section id="missing-details" className="mb-8 border-t border-border pt-5">
-                        <h2 className="mb-3 flex items-center text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                          <Info className="mr-2 h-4 w-4" />
-                          {t("caseDetail.missingDetails")}
-                        </h2>
-                        <div className="overflow-hidden text-sm leading-7 text-muted-foreground">
-                          <ResponsiveTable html={caseData.missing_details} />
-                        </div>
-                      </section>
-                    )}
+                    <CaseOverviewSection
+                      description={caseData.description}
+                      title={t("caseDetail.overview")}
+                    />
 
-                    {caseData.notes && (
-                      <section id="notes" className="mb-8 border-t border-border pt-5">
-                        <h2 className="mb-3 flex items-center text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                          <StickyNote className="mr-2 h-4 w-4" />
-                          {t("caseDetail.notes")}
-                        </h2>
-                        <div className="overflow-hidden text-sm leading-7 text-muted-foreground">
-                          <ResponsiveTable html={caseData.notes} />
-                        </div>
-                      </section>
-                    )}
+                    <CourtCasesSection
+                      courtCases={(caseData.court_cases ?? []).map((courtCaseId, index) => {
+                        const query = courtCaseQueries[index];
+                        return {
+                          courtCase: query?.data as CourtCase | undefined,
+                          id: courtCaseId,
+                          isLoading: query?.isLoading ?? false,
+                        };
+                      })}
+                      title={t("caseDetail.courtCase", "Court Case")}
+                    />
+
+                    <EvidenceSection
+                      evidence={caseData.evidence}
+                      resolvedSources={resolvedSources}
+                      title={t("caseDetail.evidence")}
+                    />
+
+                    <CaseSupplementarySection
+                      Icon={Info}
+                      html={caseData.missing_details}
+                      id="missing-details"
+                      title={t("caseDetail.missingDetails")}
+                    />
+
+                    <CaseSupplementarySection
+                      Icon={StickyNote}
+                      html={caseData.notes}
+                      id="notes"
+                      title={t("caseDetail.notes")}
+                    />
                   </div>
                 </div>
               </div>

@@ -134,7 +134,7 @@ export function CaseDetailBanner({
 
   return (
     <section className="w-full text-slate-950 no-print">
-      <div className="mx-auto w-full max-w-8xl px-6">
+      <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           <img
             src={imageSrc}
@@ -171,7 +171,7 @@ export function CaseDetailBanner({
 
                 <span className="shrink-0 text-white/40">/</span>
 
-                <span className="truncate text-white/80">{title}</span>
+                <span className="min-w-0 truncate text-white/80">{title}</span>
               </nav>
 
               <h1 className="max-w-4xl text-xl font-bold leading-snug text-white sm:text-2xl lg:text-[24px]">
