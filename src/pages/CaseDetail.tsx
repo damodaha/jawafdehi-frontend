@@ -441,6 +441,7 @@ const CaseDetail = () => {
                     {hasTimeline && (
                       <CaseTimelineSection
                         className="mb-12 print:static print:mb-8"
+                        language={currentLang}
                         timeline={caseData.timeline || []}
                         title={t("caseDetail.timeline")}
                       />

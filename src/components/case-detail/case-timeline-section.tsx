@@ -1,19 +1,90 @@
-import { formatDateWithBS } from "@/utils/date";
+import ChangelogContent from "@/components/ui/timeline-component-05";
+import type { Release } from "@/components/ui/timeline-component-05";
+import { formatDateRangeForLanguage } from "@/utils/date";
+import type { LocalizedDatePair } from "@/utils/date";
 import type { TimelineEntry } from "@/types/jds";
 import { cn } from "@/lib/utils";
 
 interface CaseTimelineSectionProps {
   className?: string;
+  language: string;
   timeline: TimelineEntry[];
   title: string;
 }
 
+function splitSingleDateLabel(value: string, calendar: "AD" | "BS") {
+  if (calendar === "AD") {
+    const match = /^(.*?),\s*(\d{4})$/.exec(value);
+    return {
+      label: match?.[1] || value,
+      year: match?.[2] || null,
+    };
+  }
+
+  const [year, ...dateParts] = value.split(/\s+/);
+
+  return {
+    label: dateParts.join(" ") || value,
+    year: year || null,
+  };
+}
+
+function getCompactDateLabel(
+  value: string | null,
+  calendar: LocalizedDatePair["primaryCalendar"] | LocalizedDatePair["secondaryCalendar"]
+) {
+  if (!value || !calendar) return null;
+
+  const parts = value.split(" - ").map((part) =>
+    splitSingleDateLabel(part, calendar)
+  );
+  const year = parts[0]?.year || null;
+  const label = parts
+    .map((part) => {
+      if (!part.year || part.year === year) return part.label;
+      return calendar === "AD" ? `${part.label}, ${part.year}` : `${part.year} ${part.label}`;
+    })
+    .join(" - ");
+
+  return { label, year };
+}
+
 export function CaseTimelineSection({
   className,
+  language,
   timeline,
   title,
 }: Readonly<CaseTimelineSectionProps>) {
   if (timeline.length === 0) return null;
+
+  const releases: Release[] = timeline.map((item) => {
+    const date = formatDateRangeForLanguage(
+      item.date,
+      item.end_date,
+      "PP",
+      item.date_bs,
+      item.end_date_bs,
+      language
+    );
+    const primaryDate = getCompactDateLabel(date.primary, date.primaryCalendar);
+    const secondaryDate = getCompactDateLabel(date.secondary, date.secondaryCalendar);
+
+    return {
+      version: primaryDate?.label || date.primary,
+      date: secondaryDate?.label || "",
+      year: primaryDate?.year || undefined,
+      content: (
+        <div className="space-y-3">
+          <h3 className="text-xl font-semibold leading-8 text-primary">
+            {item.title}
+          </h3>
+          <p className="text-base leading-7 text-primary/75">
+            {item.description}
+          </p>
+        </div>
+      ),
+    };
+  });
 
   return (
     <section
@@ -21,34 +92,7 @@ export function CaseTimelineSection({
       className={cn("scroll-mt-28 no-page-break", className)}
       aria-label={title}
     >
-      <h2 className="mb-6 text-2xl font-semibold text-primary">
-        {title}
-      </h2>
-
-      <ol className="relative ml-3 border-l border-primary/30 pl-7 print:border-border">
-        {timeline.map((item, index) => (
-          <li key={`${item.date}-${item.title}-${index}`} className="relative pb-8 last:pb-0">
-            <span
-              className={cn(
-                "absolute -left-[35px] top-1.5 h-3.5 w-3.5 rounded-full border-2 bg-background",
-                index === 0 ? "border-primary" : "border-primary/35"
-              )}
-              aria-hidden="true"
-            />
-            <p className="text-[15px] font-semibold leading-6 text-primary">
-              {item.end_date
-                ? `${formatDateWithBS(item.date, "PP", item.date_bs)} - ${formatDateWithBS(item.end_date, "PP", item.end_date_bs)}`
-                : formatDateWithBS(item.date, "PP", item.date_bs)}
-            </p>
-            <p className="mt-1 text-lg font-semibold leading-7 text-primary">
-              {item.title}
-            </p>
-            <p className="mt-1 text-base leading-7 text-primary/75">
-              {item.description}
-            </p>
-          </li>
-        ))}
-      </ol>
+      <ChangelogContent description="" heading={title} releases={releases} />
     </section>
   );
 }
