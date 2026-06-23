@@ -26,9 +26,7 @@ export function CaseSectionJumpNav({
       aria-label="Jump to case section"
       className={cn("no-print min-w-0", className)}
     >
-      <p className="mb-4 text-base font-semibold leading-6 text-primary">
-        Jump To
-      </p>
+     
       <div className="flex gap-5 overflow-x-auto pb-3 lg:block lg:space-y-4 lg:overflow-visible lg:pb-0">
         {sections.map((section) => {
           const isActive = section.id === activeSection;
