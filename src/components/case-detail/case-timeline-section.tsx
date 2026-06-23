@@ -75,10 +75,10 @@ export function CaseTimelineSection({
       year: primaryDate?.year || undefined,
       content: (
         <div className="space-y-1">
-          <h3 className="text-md md:text-xl font-semibold leading-8 text-primary/90">
+          <h3 className="text-base md:text-lg font-semibold leading-snug tracking-tight text-primary/90">
             {item.title}
           </h3>
-          <p className="text-base md:text-md leading-7 text-primary/75">
+          <p className="max-w-4xl text-sm md:text-base leading-[1.7] text-primary/75">
             {item.description}
           </p>
         </div>
@@ -89,7 +89,7 @@ export function CaseTimelineSection({
   return (
     <section
       id="timeline"
-      className={cn("scroll-mt-28 no-page-break", className)}
+      className={cn("scroll-mt-28 no-page-break max-w-4xl", className)}
       aria-label={title}
     >
       <ChangelogContent description="" heading={title} releases={releases} />

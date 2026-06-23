@@ -127,10 +127,10 @@ export function CaseDetailBanner({
     return translateDynamicText(displayName, currentLang);
   };
 
-  const metaTitleClass = "mb-1 text-lg font-bold leading-6 text-primary";
-  const metaValueClass = "text-[15px] leading-6 text-primary/85";
+  const metaTitleClass = "text-xs font-semibold uppercase tracking-wider text-primary/65 mb-0.5";
+  const metaValueClass = "text-base font-medium leading-relaxed text-primary";
   const metaLinkClass =
-    "font-medium text-primary/85 underline underline-offset-4 transition-colors hover:text-primary";
+    "font-semibold text-primary underline underline-offset-4 transition-colors hover:text-primary/80";
 
   return (
     <section className="w-full text-slate-950 no-print">
@@ -174,7 +174,7 @@ export function CaseDetailBanner({
                 <span className="min-w-0 truncate text-white/80">{title}</span>
               </nav>
 
-              <h1 className="max-w-4xl text-xl font-bold leading-snug text-white sm:text-2xl lg:text-[24px]">
+              <h1 className="max-w-4xl text-2xl font-bold tracking-tight leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl">
                 {title}
               </h1>
             </div>
@@ -227,7 +227,7 @@ export function CaseDetailBanner({
                     <p className={metaTitleClass}>
                       {t("caseDetail.embezzledAmount")}:
                     </p>
-                    <p className="text-[15px] font-bold leading-6 text-accent">
+                    <p className="text-lg font-bold leading-relaxed text-accent">
                       {formatBigo(caseData.bigo)}
                     </p>
                   </div>

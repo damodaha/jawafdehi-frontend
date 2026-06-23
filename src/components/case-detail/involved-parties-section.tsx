@@ -31,8 +31,8 @@ export function InvolvedPartiesSection({
   translateRelation,
 }: Readonly<InvolvedPartiesSectionProps>) {
   return (
-    <section id="parties-involved" className={cn("mb-12 scroll-mt-28", className)}>
-      <h2 className="mb-5 text-xl font-semibold text-primary">
+    <section id="parties-involved" className={cn("mb-12 scroll-mt-28 max-w-4xl", className)}>
+      <h2 className="mb-5 text-2xl md:text-3xl font-semibold tracking-tight text-primary">
         {title}
       </h2>
 
@@ -42,7 +42,7 @@ export function InvolvedPartiesSection({
           .map(([type, entities]) => (
             <div key={type} className="space-y-4">
               <div className="flex items-center gap-3">
-                <h3 className="whitespace-nowrap text-[13px] font-semibold uppercase tracking-wide text-primary">
+                <h3 className="whitespace-nowrap text-xs font-semibold uppercase tracking-wider text-primary/75">
                   {translateRelation(type)}
                 </h3>
                 <div className="h-px w-full bg-border/60" />
