@@ -13,15 +13,13 @@ import {
   Calendar,
   AlertTriangle,
   ArrowLeft,
-  ExternalLink,
   AlertCircle,
-  Mail,
   MapPin,
-  MessageCircle,
   StickyNote,
   User,
 } from "lucide-react";
 import { CaseDetailBanner } from "@/components/case-detail/case-detail-banner";
+import { CaseContactStrip } from "@/components/case-detail/case-contact-strip";
 import { CaseDisclaimerBanner } from "@/components/case-detail/case-disclaimer-banner";
 import { CaseOverviewSection } from "@/components/case-detail/case-overview-section";
 import { CaseSectionJumpNav, type CaseJumpSection } from "@/components/case-detail/case-section-jump-nav";
@@ -547,68 +545,15 @@ const CaseDetail = () => {
                 </div>
               </div>
 
-              <div className="no-print flex flex-col gap-5 rounded-lg border border-border/80 bg-background/90 p-4 shadow-sm ring-1 ring-primary/5 sm:p-5 md:flex-row md:items-center md:justify-between">
-                <div className="min-w-0 space-y-3">
-                  <div className="space-y-1">
-                    <h3 className="text-base font-semibold tracking-tight text-primary sm:text-lg">
-                      {t("caseDetail.contact")}
-                    </h3>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {t("caseDetail.contactHelp", "Send verified updates, source links, or correction requests.")}
-                    </p>
-                  </div>
-
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    <a
-                      href={`mailto:${JAWAFDEHI_EMAIL}`}
-                      className="group flex min-w-0 items-center gap-3 rounded-md border border-border/70 bg-muted/25 px-3 py-2.5 text-sm transition-colors hover:border-primary/30 hover:bg-muted/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    >
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/8 text-primary group-hover:bg-primary/12">
-                        <Mail className="h-4 w-4" />
-                      </span>
-                      <span className="min-w-0">
-                        <span className="block text-xs font-medium text-muted-foreground">
-                          {t("caseDetail.emailLabel")}
-                        </span>
-                        <span className="block truncate font-medium text-primary/80">
-                          {JAWAFDEHI_EMAIL}
-                        </span>
-                      </span>
-                    </a>
-
-                    <a
-                      href={`https://wa.me/${JAWAFDEHI_WHATSAPP_NUMBER.replace(/\D/g, "")}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group flex min-w-0 items-center gap-3 rounded-md border border-border/70 bg-muted/25 px-3 py-2.5 text-sm transition-colors hover:border-primary/30 hover:bg-muted/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    >
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/8 text-primary group-hover:bg-primary/12">
-                        <MessageCircle className="h-4 w-4" />
-                      </span>
-                      <span className="min-w-0">
-                        <span className="block text-xs font-medium text-muted-foreground">
-                          {t("caseDetail.whatsappLabel")}
-                        </span>
-                        <span className="block truncate font-medium text-primary/80">
-                          {JAWAFDEHI_WHATSAPP_NUMBER}
-                        </span>
-                      </span>
-                    </a>
-                  </div>
-                </div>
-
-                <Button variant="outline" size="lg" asChild className="h-11 w-full shrink-0 border-primary/20 bg-primary text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 hover:text-primary-foreground sm:w-auto">
-                  <a
-                    href={`https://portal.jawafdehi.org/admin/cases/case/${id}/change/`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                    <span>{t("caseDetail.editCase")}</span>
-                  </a>
-                </Button>
-              </div>
+              <CaseContactStrip
+                email={JAWAFDEHI_EMAIL}
+                whatsappNumber={JAWAFDEHI_WHATSAPP_NUMBER}
+                editUrl={`https://portal.jawafdehi.org/admin/cases/case/${id}/change/`}
+                emailLabel={t("caseDetail.emailLabel")}
+                whatsappLabel={t("caseDetail.whatsappLabel")}
+                editLabel={t("caseDetail.editCase")}
+                title={t("caseDetail.contact")}
+              />
 
               <DisqusComments caseId={id || ""} caseTitle={caseData.title} caseUrl={canonicalUrl} />
             </div>

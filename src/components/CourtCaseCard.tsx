@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { Scale, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import type { CourtCase, CourtCaseHearing } from "@/types/jds";
 import { formatDateWithBS } from "@/utils/date";
@@ -86,17 +87,16 @@ export function CourtCaseCard({ courtCaseId, courtCase, isLoading }: CourtCaseCa
   const { courtName, caseNumber } = parseCourtIdentifier(courtCaseId, lang);
 
   return (
-    <div className="rounded-lg border border-border p-4">
+    <div className="rounded-lg border border-border  p-4">
       {/* Court name + case number header */}
-      <div className="mb-3 space-y-0.5">
-        <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-          <Scale className="h-4 w-4 shrink-0 text-muted-foreground" />
+      <div className="mb-3 min-w-0">
+        <h3 className="break-words text-lg font-semibold leading-snug text-primary/90 md:text-xl">
           {courtName}
-        </div>
+        </h3>
         {caseNumber && (
-          <div className="pl-6 text-xs font-mono text-muted-foreground">
+          <p className="mt-1 break-words text-sm font-normal leading-relaxed text-primary/65">
             {t("caseDetail.courtCaseNumber", "Case No.")}: {caseNumber}
-          </div>
+          </p>
         )}
       </div>
 
@@ -106,36 +106,36 @@ export function CourtCaseCard({ courtCaseId, courtCase, isLoading }: CourtCaseCa
           <Skeleton className="h-4 w-1/2" />
         </div>
       ) : courtCase ? (
-        <div className="space-y-3 text-sm">
+        <div className="space-y-3">
           {/* Metadata row */}
-          <div className="flex flex-wrap gap-x-6 gap-y-1 text-muted-foreground">
+          <div className="flex flex-wrap gap-x-5 gap-y-1 text-base md:text-md font-normal leading-[1.7] text-primary/75 break-words">
             {courtCase.case_type && (
-              <span>
-                <span className="font-medium text-foreground">{t("caseDetail.courtCaseType", "Case Type")}:</span>{" "}
+              <span className="break-words">
+                <span className="font-medium text-primary/90">{t("caseDetail.courtCaseType", "Case Type")}:</span>{" "}
                 {courtCase.case_type}
               </span>
             )}
             {courtCase.category && (
-              <span>
-                <span className="font-medium text-foreground">{t("caseDetail.courtCategory", "Category")}:</span>{" "}
+              <span className="break-words">
+                <span className="font-medium text-primary/90">{t("caseDetail.courtCategory", "Category")}:</span>{" "}
                 {courtCase.category}
               </span>
             )}
             {courtCase.division && (
-              <span>
-                <span className="font-medium text-foreground">{t("caseDetail.courtDivision", "Division")}:</span>{" "}
+              <span className="break-words">
+                <span className="font-medium text-primary/90">{t("caseDetail.courtDivision", "Division")}:</span>{" "}
                 {courtCase.division}
               </span>
             )}
             {courtCase.registration_date_ad && (
-              <span>
-                <span className="font-medium text-foreground">{t("caseDetail.courtRegistered", "Registered")}:</span>{" "}
+              <span className="break-words">
+                <span className="font-medium text-primary/90">{t("caseDetail.courtRegistered", "Registered")}:</span>{" "}
                 {formatDateWithBS(courtCase.registration_date_ad)}
               </span>
             )}
             {courtCase.case_status && (
-              <span>
-                <span className="font-medium text-foreground">{t("caseDetail.courtStatus", "Status")}:</span>{" "}
+              <span className="break-words">
+                <span className="font-medium text-primary/90">{t("caseDetail.courtStatus", "Status")}:</span>{" "}
                 {courtCase.case_status}
               </span>
             )}
@@ -146,16 +146,16 @@ export function CourtCaseCard({ courtCaseId, courtCase, isLoading }: CourtCaseCa
             const { plaintiffs, defendants } = getPartiesByRole(courtCase);
             if (plaintiffs.length === 0 && defendants.length === 0) return null;
             return (
-              <div className="flex flex-wrap gap-x-6 gap-y-1 text-muted-foreground">
+              <div className="flex flex-wrap gap-x-5 gap-y-1 text-base md:text-md font-normal leading-[1.7] text-primary/75 break-words">
                 {plaintiffs.length > 0 && (
-                  <span>
-                    <span className="font-medium text-foreground">{t("caseDetail.courtPlaintiff", "Plaintiff")}:</span>{" "}
+                  <span className="break-words">
+                    <span className="font-medium text-primary/90">{t("caseDetail.courtPlaintiff", "Plaintiff")}:</span>{" "}
                     {plaintiffs.join(", ")}
                   </span>
                 )}
                 {defendants.length > 0 && (
-                  <span>
-                    <span className="font-medium text-foreground">{t("caseDetail.courtDefendant", "Defendant")}:</span>{" "}
+                  <span className="break-words">
+                    <span className="font-medium text-primary/90">{t("caseDetail.courtDefendant", "Defendant")}:</span>{" "}
                     {defendants.join(", ")}
                   </span>
                 )}
@@ -166,27 +166,32 @@ export function CourtCaseCard({ courtCaseId, courtCase, isLoading }: CourtCaseCa
           {/* Hearings collapsible */}
           {courtCase.hearings.length > 0 && (
             <Collapsible className="mt-3">
-              <CollapsibleTrigger className="flex items-center gap-1.5 rounded-md border border-border bg-muted/50 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted transition-colors">
-                <ChevronDown className="h-4 w-4 transition-transform duration-200 [[data-state=open]_&]:rotate-180" />
-                <span>
+              <CollapsibleTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 rounded-full px-2.5 text-xs font-medium text-muted-foreground hover:bg-muted/70 hover:text-foreground"
+                >
+                  <ChevronDown className="h-3.5 w-3.5 transition-transform duration-200 [[data-state=open]_&]:rotate-180" />
                   {t("caseDetail.courtHearings", "Hearings")} ({courtCase.hearings.length})
-                </span>
+                </Button>
               </CollapsibleTrigger>
               <CollapsibleContent className="mt-2">
                 <div className="table-scroll-wrapper overflow-x-auto">
                   <table className="w-full border-collapse text-sm">
                     <thead>
                       <tr className="border-b border-border bg-muted/50">
-                        <th className="px-3 py-3 text-left font-semibold text-foreground whitespace-nowrap">
+                        <th className="whitespace-nowrap px-3 py-2.5 text-left text-sm font-semibold text-primary/90">
                           {t("caseDetail.courtHearingDate", "सुनवाइ मिती")}
                         </th>
-                        <th className="px-3 py-3 text-left font-semibold text-foreground">
+                        <th className="px-3 py-2.5 text-left text-sm font-semibold text-primary/90">
                           {t("caseDetail.courtHearingJudges", "Judges")}
                         </th>
-                        <th className="px-3 py-3 text-left font-semibold text-foreground whitespace-nowrap">
+                        <th className="whitespace-nowrap px-3 py-2.5 text-left text-sm font-semibold text-primary/90">
                           {t("caseDetail.courtHearingStatus", "Status")}
                         </th>
-                        <th className="px-3 py-3 text-left font-semibold text-foreground whitespace-nowrap">
+                        <th className="whitespace-nowrap px-3 py-2.5 text-left text-sm font-semibold text-primary/90">
                           {t("caseDetail.courtHearingDecision", "Decision")}
                         </th>
                       </tr>
@@ -196,10 +201,10 @@ export function CourtCaseCard({ courtCaseId, courtCase, isLoading }: CourtCaseCa
                         .sort((a, b) => a.hearing_date_ad.localeCompare(b.hearing_date_ad))
                         .map((hearing: CourtCaseHearing) => (
                           <tr key={hearing.id} className="border-b border-border/50 last:border-0">
-                            <td className="px-3 py-3 text-base md:text-lg font-normal leading-[1.7] text-primary/75 whitespace-nowrap">
+                            <td className="whitespace-nowrap px-3 py-2.5 text-sm font-normal leading-relaxed text-primary/75">
                               {formatDateWithBS(hearing.hearing_date_ad)}
                             </td>
-                            <td className="px-3 py-3 text-base md:text-lg font-normal leading-[1.7] text-primary/75">
+                            <td className="px-3 py-2.5 text-sm font-normal leading-relaxed text-primary/75">
                               {hearing.judge_names
                                 ? hearing.judge_names.split("\n").map((line, i, arr) => (
                                     <span key={i}>
@@ -209,10 +214,10 @@ export function CourtCaseCard({ courtCaseId, courtCase, isLoading }: CourtCaseCa
                                   ))
                                 : null}
                             </td>
-                            <td className="px-3 py-3 text-base md:text-lg font-normal leading-[1.7] text-primary/75 whitespace-nowrap">
+                            <td className="whitespace-nowrap px-3 py-2.5 text-sm font-normal leading-relaxed text-primary/75">
                               {hearing.case_status}
                             </td>
-                            <td className="px-3 py-3 text-base md:text-lg font-normal leading-[1.7] text-primary/75 whitespace-nowrap">
+                            <td className="whitespace-nowrap px-3 py-2.5 text-sm font-normal leading-relaxed text-primary/75">
                               {hearing.decision_type || ""}
                             </td>
                           </tr>

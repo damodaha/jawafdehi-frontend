@@ -14,10 +14,7 @@ export function NotesSection({
 
   return (
     <section id="notes" className="mb-12 scroll-mt-28 border-t border-border pt-5 max-w-4xl">
-      <h2 className="mb-4 flex items-center text-xl md:text-2xl font-semibold tracking-tight text-primary">
-
-        {title}
-      </h2>
+      
       <div className="overflow-hidden max-w-4xl text-base md:text-lg leading-[1.7] text-primary/75">
         <ResponsiveTable html={html} />
       </div>
