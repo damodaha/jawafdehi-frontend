@@ -26,44 +26,110 @@ function parseHtmlContent(html: string): ParsedContent {
 }
 
 function convertMarkdownToHtml(markdown: string): string {
-  let html = markdown;
+  const escapeHtml = (value: string) =>
+    value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
 
-  html = html.replace(/&/g, '&amp;');
-  html = html.replace(/</g, '&lt;');
-  html = html.replace(/>/g, '&gt;');
+  const renderInline = (value: string) =>
+    escapeHtml(value)
+      .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>')
+      .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>');
 
-  html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  html = html.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
+  const isCustomMarkerLine = (line: string) =>
+    /^\s*([A-Za-z]|[०-९0-9]+|[क-ह])[.)]+\s+/.test(line);
 
-  html = html.replace(/#### (.+)/g, '<h4>$1</h4>');
-  html = html.replace(/### (.+)/g, '<h3>$1</h3>');
-  html = html.replace(/## (.+)/g, '<h2>$1</h2>');
-  html = html.replace(/# (.+)/g, '<h1>$1</h1>');
+  const renderCustomMarkerLine = (line: string) => {
+    const match = line.match(/^\s*((?:[A-Za-z]|[०-९0-9]+|[क-ह])[.)]+)\s+(.+)$/);
+    if (!match) return '';
 
-  html = html.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    return (
+      '<div class="custom-marker-list-item">' +
+      `<span class="custom-marker-list-marker">${renderInline(match[1])}</span>` +
+      `<span class="custom-marker-list-content">${renderInline(match[2])}</span>` +
+      '</div>'
+    );
+  };
 
-  html = html.replace(/^- (.+)/gm, '<li>$1</li>');
-  html = html.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
+  const lines = markdown.replace(/\r\n/g, '\n').split('\n');
+  const blocks: string[] = [];
 
-  html = html.replace(/^\d+\. (.+)/gm, '<li>$1</li>');
-  html = html.replace(/((?:<li>.*<\/li>\n?)+)/g, (match) => {
-    if (match.includes('<ul>')) return match;
-    return `<ol>${match}</ol>`;
-  });
+  for (let i = 0; i < lines.length;) {
+    const line = lines[i];
 
-  html = html.replace(/^>\s?(.+)/gm, '<blockquote>$1</blockquote>');
+    if (!line.trim()) {
+      i += 1;
+      continue;
+    }
 
-  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+    const heading = line.match(/^(#{1,4})\s+(.+)$/);
+    if (heading) {
+      blocks.push(`<h${heading[1].length}>${renderInline(heading[2])}</h${heading[1].length}>`);
+      i += 1;
+      continue;
+    }
 
-  html = html.replace(/\n\n+/g, '</p><p>');
-  html = html.replace(/\n/g, '<br>');
+    if (/^\s*-\s+/.test(line)) {
+      const items: string[] = [];
+      while (i < lines.length && /^\s*-\s+/.test(lines[i])) {
+        items.push(`<li>${renderInline(lines[i].replace(/^\s*-\s+/, ''))}</li>`);
+        i += 1;
+      }
+      blocks.push(`<ul>${items.join('')}</ul>`);
+      continue;
+    }
 
-  html = '<p>' + html + '</p>';
+    if (/^\s*\d+\.\s+/.test(line)) {
+      const items: string[] = [];
+      while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i])) {
+        items.push(`<li>${renderInline(lines[i].replace(/^\s*\d+\.\s+/, ''))}</li>`);
+        i += 1;
+      }
+      blocks.push(`<ol>${items.join('')}</ol>`);
+      continue;
+    }
 
-  html = html.replace(/<p>\s*<\/p>/g, '');
+    if (isCustomMarkerLine(line)) {
+      const items: string[] = [];
+      while (i < lines.length && isCustomMarkerLine(lines[i])) {
+        items.push(renderCustomMarkerLine(lines[i]));
+        i += 1;
+      }
+      blocks.push(`<div class="custom-marker-list">${items.join('')}</div>`);
+      continue;
+    }
 
-  return html;
+    if (/^>\s?/.test(line)) {
+      const quoteLines: string[] = [];
+      while (i < lines.length && /^>\s?/.test(lines[i])) {
+        quoteLines.push(renderInline(lines[i].replace(/^>\s?/, '')));
+        i += 1;
+      }
+      blocks.push(`<blockquote>${quoteLines.join('<br>')}</blockquote>`);
+      continue;
+    }
+
+    const paragraphLines: string[] = [];
+    while (
+      i < lines.length &&
+      lines[i].trim() &&
+      !/^(#{1,4})\s+/.test(lines[i]) &&
+      !/^\s*-\s+/.test(lines[i]) &&
+      !/^\s*\d+\.\s+/.test(lines[i]) &&
+      !isCustomMarkerLine(lines[i]) &&
+      !/^>\s?/.test(lines[i])
+    ) {
+      paragraphLines.push(renderInline(lines[i]));
+      i += 1;
+    }
+    blocks.push(`<p>${paragraphLines.join('<br>')}</p>`);
+  }
+
+  return blocks.join('');
 }
 
 function isHtmlContent(content: string): boolean {
@@ -99,6 +165,24 @@ export const ResponsiveTable: React.FC<ResponsiveTableProps> = ({ html }) => {
         .table-scroll-wrapper {
           scrollbar-width: none;
           -ms-overflow-style: none;
+        }
+        .custom-marker-list {
+          display: grid;
+          gap: 0.45rem;
+          margin: 0.75rem 0;
+        }
+        .custom-marker-list-item {
+          display: grid;
+          grid-template-columns: max-content minmax(0, 1fr);
+          column-gap: 0.45rem;
+          align-items: start;
+        }
+        .custom-marker-list-marker {
+          color: hsl(var(--primary) / 0.75);
+          font-weight: 500;
+        }
+        .custom-marker-list-content {
+          min-width: 0;
         }
         @media (max-width: 639px) {
           .table-scroll-wrapper table {

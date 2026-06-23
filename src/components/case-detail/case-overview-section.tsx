@@ -12,7 +12,7 @@ export function CaseOverviewSection({
 }: Readonly<CaseOverviewSectionProps>) {
   return (
     <section id="overview" className="mb-12 scroll-mt-28 w-full max-w-4xl min-w-0">
-      <h2 className="mb-6 flex items-center text-2xl md:text-3xl font-semibold tracking-tight text-primary">
+      <h2 className="mb-6 flex items-center text-xl md:text-2xl font-semibold tracking-tight text-primary">
 
         {title}
       </h2>

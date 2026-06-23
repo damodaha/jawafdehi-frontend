@@ -32,7 +32,7 @@ export function InvolvedPartiesSection({
 }: Readonly<InvolvedPartiesSectionProps>) {
   return (
     <section id="parties-involved" className={cn("mb-12 scroll-mt-28 max-w-4xl", className)}>
-      <h2 className="mb-5 text-2xl md:text-3xl font-semibold tracking-tight text-primary">
+      <h2 className="mb-5 text-xl md:text-2xl font-semibold tracking-tight text-primary">
         {title}
       </h2>
 

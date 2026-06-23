@@ -14,7 +14,7 @@ export function NotesSection({
 
   return (
     <section id="notes" className="mb-12 scroll-mt-28 border-t border-border pt-5 max-w-4xl">
-      <h2 className="mb-4 flex items-center text-2xl md:text-3xl font-semibold tracking-tight text-primary">
+      <h2 className="mb-4 flex items-center text-xl md:text-2xl font-semibold tracking-tight text-primary">
 
         {title}
       </h2>
