@@ -1,16 +1,10 @@
-import { Archive, ChevronDown, Download, ExternalLink, FileText, Files, Link as LinkIcon } from "lucide-react";
+import { Archive, Download, ExternalLink, FileText, Files, Link as LinkIcon } from "lucide-react";
 import { useState } from "react";
 import type { ComponentType } from "react";
 import { useTranslation } from "react-i18next";
 import { DocumentPreviewDialog, type PreviewDocument } from "@/components/DocumentPreviewDialog";
 import { SourceTypeBadge } from "@/components/SourceTypeBadge";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import type {
   DocumentSource,
   SourceLink,
@@ -134,6 +128,18 @@ const getPreviewType = (link: SourceLink): PreviewDocument["type"] | undefined =
   return undefined;
 };
 
+const isDownloadOnlyFile = (link: SourceLink) => {
+  const extension = getFileExtension(link.link);
+
+  return extension === "doc" || extension === "docx";
+};
+
+const getPrimaryActionLabel = (link: SourceLink, t: (key: string) => string) => {
+  if (getPreviewType(link) === "pdf") return t("documentSource.role.previewPdf");
+
+  return t("documentSource.role.raw");
+};
+
 const getFileActionLabelKey = (link: SourceLink) => {
   const extension = getFileExtension(link.link);
 
@@ -155,8 +161,9 @@ export function DocumentSourceCard({
   const [previewDocument, setPreviewDocument] = useState<PreviewDocument | null>(null);
   const links = resolveLinks(source);
   const { rawLinks, sourcePageLinks, permalinkLinks, alternateLinks, markdownLinks } = partitionLinks(links);
-  const isNewsSource = source?.source_type === "MEDIA_NEWS";
-  const visibleOriginalLink = sourcePageLinks[0] ?? rawLinks[0] ?? null;
+  const visibleOriginalLink = sourcePageLinks[0] ?? rawLinks.find((link) => !isDownloadOnlyFile(link)) ?? null;
+  const visiblePreviewLink = sourcePageLinks[0] ? rawLinks.find((link) => getPreviewType(link)) ?? null : null;
+  const visiblePermalinkLink = permalinkLinks[0] ?? null;
   const visibleActions: SourceAction[] = [];
   const menuActions: SourceAction[] = [];
 
@@ -166,28 +173,25 @@ export function DocumentSourceCard({
     visibleActions.push({
       href: visibleOriginalLink.link,
       icon: previewType ? FileText : ExternalLink,
-      label: t("documentSource.role.raw"),
+      label: getPrimaryActionLabel(visibleOriginalLink, t),
       previewType,
     });
   }
 
-  if (isNewsSource && permalinkLinks[0]) {
+  if (visiblePreviewLink && visiblePreviewLink.link !== visibleOriginalLink?.link) {
     visibleActions.push({
-      href: permalinkLinks[0].link,
-      icon: LinkIcon,
-      label: t("documentSource.role.permalink"),
+      href: visiblePreviewLink.link,
+      icon: FileText,
+      label: getPrimaryActionLabel(visiblePreviewLink, t),
+      previewType: getPreviewType(visiblePreviewLink),
     });
   }
 
-  if (markdownLinks[0]) {
-    visibleActions.push({
-      href: markdownLinks[0].link,
-      icon: FileText,
-      label: t("documentSource.role.markdown"),
-    });
-  }
+  const visibleActionHrefs = new Set(visibleActions.map((action) => action.href));
 
   sourcePageLinks.slice(1).forEach((link, index) => {
+    if (visibleActionHrefs.has(link.link)) return;
+
     const previewType = getPreviewType(link);
 
     menuActions.push({
@@ -199,7 +203,7 @@ export function DocumentSourceCard({
   });
 
   rawLinks.forEach((link, index) => {
-    if (!sourcePageLinks[0] && index === 0) return;
+    if (visibleActionHrefs.has(link.link)) return;
 
     const labelKey = getFileActionLabelKey(link);
 
@@ -212,7 +216,7 @@ export function DocumentSourceCard({
   });
 
   permalinkLinks.forEach((link, index) => {
-    if (isNewsSource && index === 0) return;
+    if (visiblePermalinkLink?.link === link.link) return;
 
     menuActions.push({
       href: link.link,
@@ -224,14 +228,14 @@ export function DocumentSourceCard({
     });
   });
 
-  markdownLinks.slice(1).forEach((link, index) => {
+  markdownLinks.forEach((link, index) => {
     menuActions.push({
       href: link.link,
       icon: FileText,
       label:
         markdownLinks.length > 1
-          ? t("documentSource.role.markdownFileN", { n: index + 2 })
-          : t("documentSource.role.markdownFile"),
+          ? t("documentSource.role.markdownN", { n: index + 1 })
+          : t("documentSource.role.markdown"),
     });
   });
 
@@ -336,56 +340,68 @@ export function DocumentSourceCard({
                   );
                 })}
 
-                {menuActions.length > 0 && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-8 rounded-full px-3 text-xs font-semibold">
-                        {t("documentSource.more")}
-                        <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
-                      {menuActions.map((action) => {
-                        const Icon = action.icon;
-                        const ariaLabel = action.previewType
-                          ? t("documentPreview.previewAria", { title: action.label })
-                          : `${action.label} ${t("documentSource.opensInNewTab")}`;
-
-                        if (action.previewType) {
-                          return (
-                            <DropdownMenuItem
-                              key={`${action.label}-${action.href}`}
-                              aria-label={ariaLabel}
-                              className="gap-2"
-                              onSelect={(event) => {
-                                event.preventDefault();
-                                openPreview(action);
-                              }}
-                            >
-                              <Icon className="h-4 w-4" aria-hidden="true" />
-                              {action.label}
-                            </DropdownMenuItem>
-                          );
-                        }
-
-                        return (
-                          <DropdownMenuItem key={`${action.label}-${action.href}`} asChild>
-                            <a
-                              href={action.href}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              aria-label={ariaLabel}
-                              className="gap-2"
-                            >
-                              <Icon className="h-4 w-4" aria-hidden="true" />
-                              {action.label}
-                            </a>
-                          </DropdownMenuItem>
-                        );
-                      })}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                {visiblePermalinkLink && (
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 rounded-full px-2.5 text-xs font-medium text-muted-foreground hover:bg-muted/70 hover:text-foreground"
+                  >
+                    <a
+                      href={visiblePermalinkLink.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${t("documentSource.role.permalink")} ${t("documentSource.opensInNewTab")}`}
+                    >
+                      <LinkIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                      {t("documentSource.role.permalinkShort")}
+                    </a>
+                  </Button>
                 )}
+
+                {menuActions.map((action) => {
+                  const Icon = action.icon;
+                  const ariaLabel = action.previewType
+                    ? t("documentPreview.previewAria", { title: action.label })
+                    : `${action.label} ${t("documentSource.opensInNewTab")}`;
+
+                  if (action.previewType) {
+                    return (
+                      <Button
+                        key={`${action.label}-${action.href}`}
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 rounded-full px-2.5 text-xs font-medium text-muted-foreground hover:bg-muted/70 hover:text-foreground"
+                        aria-label={ariaLabel}
+                        onClick={() => openPreview(action)}
+                      >
+                        <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                        {action.label}
+                      </Button>
+                    );
+                  }
+
+                  return (
+                    <Button
+                      key={`${action.label}-${action.href}`}
+                      asChild
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 rounded-full px-2.5 text-xs font-medium text-muted-foreground hover:bg-muted/70 hover:text-foreground"
+                    >
+                      <a
+                        href={action.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={ariaLabel}
+                      >
+                        <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                        {action.label}
+                      </a>
+                    </Button>
+                  );
+                })}
               </div>
             )}
           </div>
