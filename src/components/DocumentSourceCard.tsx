@@ -161,6 +161,39 @@ export function DocumentSourceCard({
   const [previewDocument, setPreviewDocument] = useState<PreviewDocument | null>(null);
   const links = resolveLinks(source);
   const { rawLinks, sourcePageLinks, permalinkLinks, alternateLinks, markdownLinks } = partitionLinks(links);
+
+  const hasSourceDesc = Boolean(source?.description?.trim() && source.description.trim() !== ".");
+  const hasEvidenceDesc = Boolean(evidenceDescription?.trim() && evidenceDescription.trim() !== ".");
+
+  let mainDescription = "";
+  let byline = "";
+
+  if (hasSourceDesc && hasEvidenceDesc) {
+    const srcDesc = source!.description!.trim();
+    const evDesc = evidenceDescription!.trim();
+    if (srcDesc.length > evDesc.length) {
+      mainDescription = srcDesc;
+      byline = evDesc;
+    } else {
+      mainDescription = evDesc;
+      byline = srcDesc;
+    }
+  } else if (hasEvidenceDesc) {
+    const evDesc = evidenceDescription!.trim();
+    if (evDesc.length < 120) {
+      byline = evDesc;
+    } else {
+      mainDescription = evDesc;
+    }
+  } else if (hasSourceDesc) {
+    const srcDesc = source!.description!.trim();
+    if (srcDesc.length < 120) {
+      byline = srcDesc;
+    } else {
+      mainDescription = srcDesc;
+    }
+  }
+
   const visibleOriginalLink = sourcePageLinks[0] ?? rawLinks.find((link) => !isDownloadOnlyFile(link)) ?? null;
   const visiblePreviewLink = sourcePageLinks[0] ? rawLinks.find((link) => getPreviewType(link)) ?? null : null;
   const visiblePermalinkLink = permalinkLinks[0] ?? null;
@@ -267,14 +300,12 @@ export function DocumentSourceCard({
     <>
       <article className="border-b border-border/70 py-3 last:border-b-0">
         <div className="flex min-w-0 items-start gap-3">
-          <span className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
-            {itemNumber}
-          </span>
+
           <div className="min-w-0 flex-1">
             <div className="min-w-0">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <h3 className="font-semibold leading-snug text-primary/90 text-lg break-words">
+                  <h3 className="font-semibold leading-snug text-primary/90 text-lg md:text-xl break-words">
                     {source?.title || t("documentSource.fallbackTitle", { id: sourceId })}
                   </h3>
                   <SourceTypeBadge sourceType={source?.source_type} />
@@ -282,15 +313,15 @@ export function DocumentSourceCard({
               </div>
             </div>
 
-            {source?.description && source.description.trim() !== '.' && source.description.trim() && (
-              <p className="mt-1 text-base md:text-lg font-normal leading-[1.7] text-primary/75 break-words">
-                {source.description}
+            {byline && (
+              <p className="mt-1 text-sm font-normal leading-relaxed text-primary/65 break-words">
+                {byline}
               </p>
             )}
 
-            {evidenceDescription && evidenceDescription.trim() !== '.' && evidenceDescription.trim() && (
-              <p className="mt-2 text-base md:text-lg font-normal leading-[1.7] text-primary/75 break-words">
-                {evidenceDescription}
+            {mainDescription && (
+              <p className={`text-base md:text-lg font-normal leading-[1.7] text-primary/75 break-words ${byline ? "mt-2.5" : "mt-2"}`}>
+                {mainDescription}
               </p>
             )}
 

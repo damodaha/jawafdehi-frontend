@@ -174,7 +174,7 @@ export function CaseDetailBanner({
                 <span className="min-w-0 truncate text-white/80">{title}</span>
               </nav>
 
-              <h1 className="max-w-4xl text-2xl font-bold tracking-tight leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl">
+              <h1 className="max-w-4xl text-2xl font-bold tracking-tight  text-bg sm:text-3xl md:text-4xl ">
                 {title}
               </h1>
             </div>
