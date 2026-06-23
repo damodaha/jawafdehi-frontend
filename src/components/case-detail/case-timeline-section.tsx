@@ -78,7 +78,7 @@ export function CaseTimelineSection({
           <h3 className="text-base md:text-lg font-semibold leading-snug tracking-tight text-primary/90">
             {item.title}
           </h3>
-          <p className="max-w-4xl text-sm md:text-base leading-[1.7] text-primary/75">
+          <p className="max-w-4xl text-base md:text-lg font-normal leading-[1.7] text-primary/75">
             {item.description}
           </p>
         </div>

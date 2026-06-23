@@ -260,7 +260,7 @@ const CaseDetail = () => {
     return (
       <div className="flex min-h-screen flex-col overflow-x-clip bg-background">
         <main id="main-content" className="flex-1 py-6 md:py-12">
-          <div className="container mx-auto max-w-5xl px-3 sm:px-4">
+          <div className="container mx-auto max-w-5xl px-6">
             <Skeleton className="mb-6 h-10 w-32" />
 
             <div className="space-y-8">
@@ -287,7 +287,7 @@ const CaseDetail = () => {
     return (
       <div className="flex min-h-screen flex-col overflow-x-clip bg-background">
         <main id="main-content" className="flex-1 py-6 md:py-12">
-          <div className="container mx-auto max-w-5xl px-3 sm:px-4">
+          <div className="container mx-auto max-w-5xl px-6">
             <Button variant="ghost" asChild className="mb-6">
               <Link to="/cases">
                 <ArrowLeft className="mr-2 h-4 w-4" />
@@ -355,7 +355,7 @@ const CaseDetail = () => {
       />
 
       <main id="main-content" className="flex-1 py-6 sm:py-8">
-        <div className="container mx-auto px-3 sm:px-4">
+        <div className="container mx-auto px-6">
           <div className="min-w-0">
             <div className="min-w-0">
               <FloatingShareSidebar url={canonicalUrl} title={caseData.title} description={plainDescription} />
@@ -479,7 +479,7 @@ const CaseDetail = () => {
                 <Separator className="mb-8 hidden print:block" />
 
                 <div className="grid min-w-0 gap-6 print:block lg:grid-cols-[11rem_minmax(0,1fr)] lg:gap-8 xl:grid-cols-[13rem_minmax(0,1fr)] xl:gap-10">
-                  <aside className="min-w-0 lg:col-start-1 lg:row-start-1">
+                  <aside className="hidden lg:block min-w-0 lg:col-start-1 lg:row-start-1">
                     <CaseSectionJumpNav
                       activeSection={activeSection}
                       onJump={handleJumpToSection}

@@ -108,7 +108,7 @@ const ChangelogContent = ({
                   <span className="-mt-2.5 w-px flex-1 border-l border-primary/20" />
                 </div>
 
-                <div className="flex flex-1 flex-col gap-4 pb-11 pl-3 md:pl-6 lg:pl-9">
+                <div className="flex flex-1 flex-col gap-2 md:gap-4 pb-6 md:pb-11 pl-3 md:pl-6 lg:pl-9">
                   <div className="flex flex-col gap-2 md:hidden">
                     <TimelineDatePill date={release.date} version={release.version} />
                   </div>

@@ -127,14 +127,14 @@ export function CaseDetailBanner({
     return translateDynamicText(displayName, currentLang);
   };
 
-  const metaTitleClass = "text-xs font-semibold uppercase tracking-wider text-primary/65 mb-0.5";
+  const metaTitleClass = "text-xs font-semibold tracking-wider text-primary/65 mb-0.5";
   const metaValueClass = "text-base font-medium leading-relaxed text-primary";
   const metaLinkClass =
     "font-semibold text-primary underline underline-offset-4 transition-colors hover:text-primary/80";
 
   return (
     <section className="w-full text-slate-950 no-print">
-      <div className="mx-auto w-full max-w-8xl px-6">
+      <div className="mx-auto w-full max-w-8xl px-0 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           <img
             src={imageSrc}
@@ -218,7 +218,7 @@ export function CaseDetailBanner({
                 </div>
 
                 <div>
-                  <p className={metaTitleClass}>Case Date:</p>
+                  <p className={metaTitleClass}>Case date:</p>
                   <p className={metaValueClass}>{dateRange}</p>
                 </div>
 

@@ -77,7 +77,7 @@ export function CaseEntityChips({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-x-4 gap-y-2 justify-center sm:justify-start">
+      <div className="grid grid-cols-2 gap-x-3 gap-y-2 sm:flex sm:flex-wrap sm:gap-x-4 sm:justify-start">
         {displayedEntities.map((jawafEntity) => {
           const entity = jawafEntity.nes_id ? resolvedEntities[jawafEntity.nes_id] ?? null : null;
           const displayName = getDisplayName(jawafEntity, entity, language);
@@ -92,7 +92,7 @@ export function CaseEntityChips({
             <Link
               key={jawafEntity.id}
               to={`/entity/${jawafEntity.id}`}
-              className="group flex w-[11rem] flex-col items-center gap-2 rounded-2xl px-3 py-3 text-center transition-all duration-200 hover:bg-muted/40"
+              className="group flex w-full sm:w-[11rem] flex-col items-center gap-2 rounded-2xl px-2 sm:px-3 py-3 text-center transition-all duration-200 hover:bg-muted/40"
             >
               <Avatar className="h-16 w-16 border border-border/80 shadow-sm transition-transform group-hover:scale-105">
                 {imageUrl ? (

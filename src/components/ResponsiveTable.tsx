@@ -80,7 +80,7 @@ function prepareHtml(content: string): string {
   return convertMarkdownToHtml(content);
 }
 
-const PROSE_BASE = 'prose prose-sm sm:prose-base max-w-none text-foreground leading-relaxed';
+const PROSE_BASE = 'prose prose-sm sm:prose-base max-w-none text-base md:text-lg font-normal leading-[1.7] text-primary/75 prose-p:text-primary/75 prose-p:leading-[1.7] prose-li:text-primary/75 prose-li:leading-[1.7] prose-headings:text-primary';
 
 export const ResponsiveTable: React.FC<ResponsiveTableProps> = ({ html }) => {
   const processedHtml = useMemo(() => prepareHtml(html), [html]);
@@ -126,7 +126,7 @@ export const ResponsiveTable: React.FC<ResponsiveTableProps> = ({ html }) => {
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
           <div
-            className="[&_table]:my-4 [&_table]:w-full [&_table]:border-collapse [&_table]:border [&_table]:border-border [&_th]:border [&_th]:border-border [&_th]:px-2 [&_th]:py-2 [&_th]:text-left [&_th]:bg-gradient-to-b [&_th]:from-muted [&_th]:to-muted/80 [&_th]:font-semibold [&_th]:text-xs [&_th]:text-foreground [&_td]:border [&_td]:border-border [&_td]:px-2 [&_td]:py-1.5 [&_td]:text-xs [&_td]:text-foreground [&_tr:nth-child(even)]:bg-muted/40 [&_tr:hover]:bg-muted/60 [&_tr]:transition-colors [&_caption]:text-sm [&_caption]:font-semibold [&_caption]:mb-3 [&_caption]:text-foreground sm:[&_th]:px-3 sm:[&_th]:py-3 sm:[&_th]:text-sm sm:[&_td]:px-3 sm:[&_td]:py-2.5 sm:[&_td]:text-sm"
+            className="[&_table]:my-4 [&_table]:w-full [&_table]:border-collapse [&_table]:border [&_table]:border-border [&_th]:border [&_th]:border-border [&_th]:px-2 [&_th]:py-2 [&_th]:text-left [&_th]:bg-gradient-to-b [&_th]:from-muted [&_th]:to-muted/80 [&_th]:font-semibold [&_th]:text-xs [&_th]:text-foreground [&_td]:border [&_td]:border-border [&_td]:px-2 [&_td]:py-1.5 [&_td]:text-base md:[&_td]:text-lg [&_td]:font-normal [&_td]:leading-[1.7] [&_td]:text-primary/75 [&_tr:nth-child(even)]:bg-muted/40 [&_tr:hover]:bg-muted/60 [&_tr]:transition-colors [&_caption]:text-sm [&_caption]:font-semibold [&_caption]:mb-3 [&_caption]:text-foreground sm:[&_th]:px-3 sm:[&_th]:py-3 sm:[&_th]:text-sm"
             dangerouslySetInnerHTML={{ __html: table }}
           />
         </div>

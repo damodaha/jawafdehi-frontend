@@ -1,4 +1,3 @@
-import { FileText } from "lucide-react";
 import { DocumentSourceCard } from "@/components/DocumentSourceCard";
 import type { DocumentSource, EvidenceEntry } from "@/types/jds";
 
@@ -18,7 +17,6 @@ export function EvidenceSection({
   return (
     <section id="evidence" className="mb-12 scroll-mt-28 max-w-4xl">
       <h2 className="mb-6 flex items-center text-2xl md:text-3xl font-semibold tracking-tight text-primary">
-        <FileText className="mr-2 h-5 w-5" />
         {title}
       </h2>
 

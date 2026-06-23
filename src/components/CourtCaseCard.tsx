@@ -196,10 +196,10 @@ export function CourtCaseCard({ courtCaseId, courtCase, isLoading }: CourtCaseCa
                         .sort((a, b) => a.hearing_date_ad.localeCompare(b.hearing_date_ad))
                         .map((hearing: CourtCaseHearing) => (
                           <tr key={hearing.id} className="border-b border-border/50 last:border-0">
-                            <td className="px-3 py-3 text-foreground whitespace-nowrap">
+                            <td className="px-3 py-3 text-base md:text-lg font-normal leading-[1.7] text-primary/75 whitespace-nowrap">
                               {formatDateWithBS(hearing.hearing_date_ad)}
                             </td>
-                            <td className="px-3 py-3 text-foreground">
+                            <td className="px-3 py-3 text-base md:text-lg font-normal leading-[1.7] text-primary/75">
                               {hearing.judge_names
                                 ? hearing.judge_names.split("\n").map((line, i, arr) => (
                                     <span key={i}>
@@ -209,10 +209,10 @@ export function CourtCaseCard({ courtCaseId, courtCase, isLoading }: CourtCaseCa
                                   ))
                                 : null}
                             </td>
-                            <td className="px-3 py-3 text-foreground whitespace-nowrap">
+                            <td className="px-3 py-3 text-base md:text-lg font-normal leading-[1.7] text-primary/75 whitespace-nowrap">
                               {hearing.case_status}
                             </td>
-                            <td className="px-3 py-3 text-foreground whitespace-nowrap">
+                            <td className="px-3 py-3 text-base md:text-lg font-normal leading-[1.7] text-primary/75 whitespace-nowrap">
                               {hearing.decision_type || ""}
                             </td>
                           </tr>

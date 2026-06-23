@@ -274,7 +274,7 @@ export function DocumentSourceCard({
             <div className="min-w-0">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <h3 className="font-medium leading-snug text-foreground break-words">
+                  <h3 className="font-semibold leading-snug text-primary/90 text-lg break-words">
                     {source?.title || t("documentSource.fallbackTitle", { id: sourceId })}
                   </h3>
                   <SourceTypeBadge sourceType={source?.source_type} />
@@ -283,13 +283,13 @@ export function DocumentSourceCard({
             </div>
 
             {source?.description && source.description.trim() !== '.' && source.description.trim() && (
-              <p className="mt-1 text-sm leading-5 text-muted-foreground break-words">
+              <p className="mt-1 text-base md:text-lg font-normal leading-[1.7] text-primary/75 break-words">
                 {source.description}
               </p>
             )}
 
             {evidenceDescription && evidenceDescription.trim() !== '.' && evidenceDescription.trim() && (
-              <p className="mt-2 text-sm leading-6 text-muted-foreground break-words">
+              <p className="mt-2 text-base md:text-lg font-normal leading-[1.7] text-primary/75 break-words">
                 {evidenceDescription}
               </p>
             )}
