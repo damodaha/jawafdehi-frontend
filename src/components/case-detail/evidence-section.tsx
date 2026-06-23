@@ -4,7 +4,7 @@ import type { DocumentSource, EvidenceEntry } from "@/types/jds";
 
 interface EvidenceSectionProps {
   evidence: EvidenceEntry[];
-  resolvedSources: Record<number, DocumentSource>;
+  resolvedSources: Record<string, DocumentSource>;
   title: string;
 }
 
@@ -24,7 +24,7 @@ export function EvidenceSection({
 
       <div className="text-primary/75">
         {evidence.map((evidenceItem, index) => {
-          const source = resolvedSources[evidenceItem.source_id] ?? null;
+          const source = resolvedSources[String(evidenceItem.source_id)] ?? evidenceItem.source ?? null;
 
           return (
             <DocumentSourceCard

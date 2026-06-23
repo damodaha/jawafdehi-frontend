@@ -84,8 +84,9 @@ export interface TimelineEntry {
 }
 
 export interface EvidenceEntry {
-  source_id: number;
+  source_id: string | number;
   description: string;
+  source?: DocumentSource | null;
 }
 
 export interface CourtCaseHearing {
@@ -190,15 +191,16 @@ export interface SourceLink {
 }
 
 export interface DocumentSource {
-  id: number;
-  source_id: string;
+  id?: number;
+  source_id?: string;
   title: string;
-  description: string;
+  description?: string;
   source_type: DocumentSourceType | string | null; // DocumentSourceType for known values; plain string covers legacy/unknown backend values; null if not classified
   urls?: SourceLink[] | null; // Link dicts with explicit role (RAW/MARKDOWN/PERMALINK/SOURCE_PAGE/ALTERNATE); includes uploaded-file URL when present
-  related_entities: JawafEntity[]; // Related entities
-  created_at: string;
-  updated_at: string;
+  related_entities?: JawafEntity[]; // Related entities
+  publication_date?: string | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 // ============================================================================

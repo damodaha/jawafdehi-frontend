@@ -249,9 +249,9 @@ export async function getCourtCase(caseId: string): Promise<CourtCase> {
 /**
  * Retrieve detailed information about a specific document source.
  */
-export async function getDocumentSourceById(id: number): Promise<DocumentSource> {
+export async function getDocumentSourceById(id: string | number): Promise<DocumentSource> {
   try {
-    const response = await apiClient.get<DocumentSource>(`/sources/${id}/`);
+    const response = await apiClient.get<DocumentSource>(`/sources/${encodeURIComponent(String(id))}/`);
     return response.data;
   } catch (error) {
     handleApiError(error, `/sources/${id}/`);
@@ -330,5 +330,3 @@ export async function submitFeedback(feedback: FeedbackSubmission): Promise<Feed
     handleApiError(error, '/feedback/');
   }
 }
-
-

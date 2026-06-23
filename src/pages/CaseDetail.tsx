@@ -8,7 +8,20 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Banknote, Calendar, AlertTriangle, ArrowLeft, ExternalLink, AlertCircle, Info, Mail, MapPin, MessageCircle, StickyNote, User } from "lucide-react";
+import {
+  Banknote,
+  Calendar,
+  AlertTriangle,
+  ArrowLeft,
+  ExternalLink,
+  AlertCircle,
+  Info,
+  Mail,
+  MapPin,
+  MessageCircle,
+  StickyNote,
+  User,
+} from "lucide-react";
 import { CaseDetailBanner } from "@/components/case-detail/case-detail-banner";
 import { CaseOverviewSection } from "@/components/case-detail/case-overview-section";
 import { CaseSectionJumpNav, type CaseJumpSection } from "@/components/case-detail/case-section-jump-nav";
@@ -38,10 +51,12 @@ import "@/styles/print.css";
 
 function getGroupedEntities(entities: JawafEntity[]) {
   const seen = new Set<number>();
+
   return entities.reduce((groups, entity) => {
     if (seen.has(entity.id) || entity.type === "location") return groups;
 
     seen.add(entity.id);
+
     const type = entity.type || "unknown";
 
     if (!groups[type]) groups[type] = [];
@@ -65,7 +80,7 @@ const CaseDetail = () => {
   const legacyTargetSlug = resolveLegacyCaseSlug(id);
 
   const { data: caseData, isLoading, isError } = useQuery({
-    queryKey: ['case', id],
+    queryKey: ["case", id],
     queryFn: () => getCaseById(id!),
     enabled: id != null && legacyTargetSlug == null,
     staleTime: 5 * 60 * 1000,
@@ -73,7 +88,7 @@ const CaseDetail = () => {
 
   // Subject entities: accused for CORRUPTION cases, else any named (non-location)
   // entity so cases without an accused (e.g. TAX_EVASION) still name a subject.
-  const bannerEntities = getSubjectEntities(caseData?.entities, e => e.type);
+  const bannerEntities = getSubjectEntities(caseData?.entities, (e) => e.type);
   const accusedCount = bannerEntities.length;
   const BANNER_ACCUSED_LIMIT = 5;
   const collapsedAccused = accusedCount > BANNER_ACCUSED_LIMIT;
@@ -82,7 +97,7 @@ const CaseDetail = () => {
 
   const sourceQueries = useQueries({
     queries: (caseData?.evidence ?? []).map((evidence) => ({
-      queryKey: ['source', evidence.source_id],
+      queryKey: ["source", evidence.source_id],
       queryFn: () => getDocumentSourceById(evidence.source_id),
       staleTime: 10 * 60 * 1000,
       retry: false,
@@ -90,12 +105,12 @@ const CaseDetail = () => {
   });
 
   const uniqueNesIds = caseData
-    ? [...new Set(caseData.entities.filter(e => e.nes_id).map(e => e.nes_id!))]
+    ? [...new Set(caseData.entities.filter((e) => e.nes_id).map((e) => e.nes_id!))]
     : [];
 
   const entityQueries = useQueries({
     queries: uniqueNesIds.map((nesId) => ({
-      queryKey: ['nes-entity', nesId],
+      queryKey: ["nes-entity", nesId],
       queryFn: () => getEntityById(nesId),
       staleTime: 10 * 60 * 1000,
       retry: false,
@@ -104,7 +119,7 @@ const CaseDetail = () => {
 
   const courtCaseQueries = useQueries({
     queries: (caseData?.court_cases ?? []).map((courtCaseId) => ({
-      queryKey: ['court-case', courtCaseId],
+      queryKey: ["court-case", courtCaseId],
       queryFn: () => getCourtCase(courtCaseId),
       staleTime: 10 * 60 * 1000,
       retry: false,
@@ -113,6 +128,7 @@ const CaseDetail = () => {
 
   useEffect(() => {
     const loadedCaseId = caseData?.id?.toString();
+
     if (!id || !loadedCaseId || isError) {
       return;
     }
@@ -121,14 +137,14 @@ const CaseDetail = () => {
       return;
     }
 
-    trackEvent('case_view', { case_id: loadedCaseId, slug: `/case/${id}` });
+    trackEvent("case_view", { case_id: loadedCaseId, slug: `/case/${id}` });
     trackedCaseIdRef.current = loadedCaseId;
   }, [id, caseData?.id, isError]);
 
-  const resolvedSources: Record<number, DocumentSource> = {};
+  const resolvedSources: Record<string, DocumentSource> = {};
   (caseData?.evidence ?? []).forEach((evidence, i) => {
-    const data = sourceQueries[i]?.data;
-    if (data) resolvedSources[evidence.source_id] = data;
+    const data = sourceQueries[i]?.data ?? evidence.source;
+    if (data) resolvedSources[String(evidence.source_id)] = data;
   });
 
   const resolvedEntities: Record<string, Entity> = {};
@@ -137,9 +153,7 @@ const CaseDetail = () => {
     if (data) resolvedEntities[nesId] = data;
   });
 
-  const groupedEntities = caseData
-    ? getGroupedEntities(caseData.entities)
-    : {};
+  const groupedEntities = caseData ? getGroupedEntities(caseData.entities) : {};
 
   const hasInvolvedParties = Object.keys(groupedEntities).length > 0;
   const hasTimeline = (caseData?.timeline || []).length > 0;
@@ -175,9 +189,7 @@ const CaseDetail = () => {
     if (!caseData || jumpSections.length === 0) return;
 
     setActiveSection((currentSection) =>
-      jumpSections.some((section) => section.id === currentSection)
-        ? currentSection
-        : jumpSections[0].id
+      jumpSections.some((section) => section.id === currentSection) ? currentSection : jumpSections[0].id
     );
 
     const sectionElements = jumpSections
@@ -226,59 +238,62 @@ const CaseDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <main id="main-content" className="flex-1 py-8 md:py-12">
-          <div className="container mx-auto px-4 max-w-5xl">
-            <Skeleton className="h-10 w-32 mb-6" />
+      <div className="flex min-h-screen flex-col overflow-x-clip bg-background">
+        <main id="main-content" className="flex-1 py-6 md:py-12">
+          <div className="container mx-auto max-w-5xl px-3 sm:px-4">
+            <Skeleton className="mb-6 h-10 w-32" />
+
             <div className="space-y-8">
               <div>
-                <Skeleton className="h-8 w-3/4 mb-4" />
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Skeleton className="mb-4 h-8 w-3/4" />
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                   <Skeleton className="h-6 w-full" />
                   <Skeleton className="h-6 w-full" />
                   <Skeleton className="h-6 w-full" />
                 </div>
               </div>
+
               <Skeleton className="h-64 w-full" />
               <Skeleton className="h-64 w-full" />
             </div>
           </div>
         </main>
-
       </div>
     );
   }
 
   if (isError || !caseData) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <main id="main-content" className="flex-1 py-8 md:py-12">
-          <div className="container mx-auto px-4 max-w-5xl">
+      <div className="flex min-h-screen flex-col overflow-x-clip bg-background">
+        <main id="main-content" className="flex-1 py-6 md:py-12">
+          <div className="container mx-auto max-w-5xl px-3 sm:px-4">
             <Button variant="ghost" asChild className="mb-6">
               <Link to="/cases">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 {t("caseDetail.backToCases")}
               </Link>
             </Button>
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
+
+            <Alert variant="destructive" className="items-start">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+              <AlertDescription className="break-words">
                 {isError ? t("caseDetail.failedToLoad") : t("caseDetail.notFound")}
               </AlertDescription>
             </Alert>
           </div>
         </main>
-
       </div>
     );
   }
 
   const canonicalUrl = `https://jawafdehi.org/case/${id}`;
   const plainDescription = stripMarkdown(caseData.description).substring(0, 160);
-  const metaDescription = plainDescription || caseData.key_allegations?.slice(0, 2).join('. ').substring(0, 160) || "";
+  const metaDescription =
+    plainDescription || caseData.key_allegations?.slice(0, 2).join(". ").substring(0, 160) || "";
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="flex min-h-screen flex-col overflow-x-clip bg-background">
       <Helmet>
         <title>{caseData.title} | Jawafdehi</title>
         <meta name="description" content={metaDescription} />
@@ -299,119 +314,155 @@ const CaseDetail = () => {
         <meta name="twitter:title" content={`${caseData.title} | Jawafdehi`} />
         <meta name="twitter:description" content={metaDescription} />
         <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
-        <link rel="alternate" type="application/json" href={`https://portal.jawafdehi.org/api/cases/${id}/`} title="Case data (JSON API)" />
-        <link rel="alternate" type="application/json+oembed" href={`https://jawafdehi.org/oembed/?url=${encodeURIComponent(canonicalUrl)}&format=json`} title={`${caseData.title} oEmbed`} />
+        <link
+          rel="alternate"
+          type="application/json"
+          href={`https://portal.jawafdehi.org/api/cases/${id}/`}
+          title="Case data (JSON API)"
+        />
+        <link
+          rel="alternate"
+          type="application/json+oembed"
+          href={`https://jawafdehi.org/oembed/?url=${encodeURIComponent(canonicalUrl)}&format=json`}
+          title={`${caseData.title} oEmbed`}
+        />
       </Helmet>
+
       <CaseDetailBanner
         caseData={caseData}
         resolvedEntities={resolvedEntities}
         actions={<ReportCaseDialog caseId={id || ""} caseTitle={caseData.title} />}
       />
 
-      <main id="main-content" className="flex-1 py-8">
-        <div className="container mx-auto px-4">
-          <div>
+      <main id="main-content" className="flex-1 py-6 sm:py-8">
+        <div className="container mx-auto px-3 sm:px-4">
+          <div className="min-w-0">
             <div className="min-w-0">
-              <FloatingShareSidebar
-                url={canonicalUrl}
-                title={caseData.title}
-                description={plainDescription}
-              />
+              <FloatingShareSidebar url={canonicalUrl} title={caseData.title} description={plainDescription} />
 
-              <Alert className="mb-6 border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800 no-print">
-                <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                <AlertDescription className="text-blue-800 dark:text-blue-200 text-sm">
+              <Alert className="no-print mb-5 items-start border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950 sm:mb-6">
+                <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
+                <AlertDescription className="break-words text-sm text-blue-800 dark:text-blue-200">
                   {t("footer.disclaimer")}
                 </AlertDescription>
               </Alert>
 
-              {caseData.state === 'IN_REVIEW' && (
-                <Alert className="mb-6 border-yellow-200 bg-yellow-50 dark:bg-yellow-950 dark:border-yellow-800 no-print">
-                  <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-                  <AlertDescription className="text-yellow-800 dark:text-yellow-200 text-sm">
+              {caseData.state === "IN_REVIEW" && (
+                <Alert className="no-print mb-5 items-start border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950 sm:mb-6">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-yellow-600 dark:text-yellow-400" />
+                  <AlertDescription className="break-words text-sm text-yellow-800 dark:text-yellow-200">
                     {t("caseDetail.inReviewBanner")}
                   </AlertDescription>
                 </Alert>
               )}
 
-              <div id="print-content" className="print-content">
+              <div id="print-content" className="print-content min-w-0">
                 <div className="mb-8 hidden print:block">
-                  <h1 className="text-4xl font-bold text-foreground mb-6">{caseData.title}</h1>
+                  <h1 className="mb-6 text-4xl font-bold text-foreground">{caseData.title}</h1>
 
                   {caseData.banner_url && (
                     <img
                       src={caseData.banner_url}
                       alt={caseData.title}
-                      className="w-full h-64 object-cover rounded-lg mb-6"
+                      className="mb-6 h-64 w-full rounded-lg object-cover"
                     />
                   )}
 
-            <div className="grid grid-cols-1 gap-4">
-              <div className="flex items-start text-muted-foreground">
-                <User className="mr-2 h-5 w-5 flex-shrink-0" />
-                <div className="text-sm flex flex-wrap gap-1">
-                  {visibleAccusedEntities.map((e, index, arr) => {
-                    const entity = e.nes_id ? resolvedEntities[e.nes_id] : null;
-                    let displayName = entity?.names?.[0]?.en?.full || entity?.names?.[0]?.ne?.full || e.display_name || e.nes_id || t('common.notAvailable');
-                    displayName = translateDynamicText(displayName, currentLang);
-                    return (
-                      <span key={e.id}>
-                        <Link to={`/entity/${e.id}`} className="text-primary hover:underline">{displayName}</Link>
-                        {index < arr.length - 1 && ', '}
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="flex items-start text-muted-foreground">
+                      <User className="mr-2 h-5 w-5 flex-shrink-0" />
+                      <div className="flex flex-wrap gap-1 text-sm">
+                        {visibleAccusedEntities.map((e, index, arr) => {
+                          const entity = e.nes_id ? resolvedEntities[e.nes_id] : null;
+                          let displayName =
+                            entity?.names?.[0]?.en?.full ||
+                            entity?.names?.[0]?.ne?.full ||
+                            e.display_name ||
+                            e.nes_id ||
+                            t("common.notAvailable");
+
+                          displayName = translateDynamicText(displayName, currentLang);
+
+                          return (
+                            <span key={e.id}>
+                              <Link to={`/entity/${e.id}`} className="text-primary hover:underline">
+                                {displayName}
+                              </Link>
+                              {index < arr.length - 1 && ", "}
+                            </span>
+                          );
+                        })}
+
+                        {collapsedAccused && (
+                          <span className="text-muted-foreground">
+                            {t("caseDetail.andMoreAccused", { count: hiddenAccusedCount })}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center text-muted-foreground">
+                      <MapPin className="mr-2 h-5 w-5" />
+                      <div className="flex flex-wrap gap-1 text-sm">
+                        {(() => {
+                          const locations = caseData.entities.filter((e) => e.type === "location");
+
+                          return locations.length > 0
+                            ? locations.map((e, index) => {
+                                const entity = e.nes_id ? resolvedEntities[e.nes_id] : null;
+                                let displayName =
+                                  entity?.names?.[0]?.en?.full ||
+                                  entity?.names?.[0]?.ne?.full ||
+                                  e.display_name ||
+                                  e.nes_id ||
+                                  t("common.notAvailable");
+
+                                displayName = translateDynamicText(displayName, currentLang);
+
+                                return (
+                                  <span key={e.id}>
+                                    <Link to={`/entity/${e.id}`} className="text-primary hover:underline">
+                                      {displayName}
+                                    </Link>
+                                    {index < locations.length - 1 && ", "}
+                                  </span>
+                                );
+                              })
+                            : t("common.notAvailable");
+                        })()}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center text-muted-foreground">
+                      <Calendar className="mr-2 h-5 w-5" />
+                      <span className="text-sm">
+                        {t("caseDetail.period")}:{" "}
+                        {formatCaseDateRange(
+                          caseData.case_start_date,
+                          caseData.case_end_date,
+                          t("cases.status.ongoing")
+                        )}
                       </span>
-                    );
-                  })}
-                  {collapsedAccused && (
-                    <span className="text-muted-foreground">
-                      {t('caseDetail.andMoreAccused', { count: hiddenAccusedCount })}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center text-muted-foreground">
-                <MapPin className="mr-2 h-5 w-5" />
-                <div className="text-sm flex flex-wrap gap-1">
-                  {(() => {
-                    const locations = caseData.entities.filter(e => e.type === 'location');
-                    return locations.length > 0 ? locations.map((e, index) => {
-                      const entity = e.nes_id ? resolvedEntities[e.nes_id] : null;
-                      let displayName = entity?.names?.[0]?.en?.full || entity?.names?.[0]?.ne?.full || e.display_name || e.nes_id || t('common.notAvailable');
-                      displayName = translateDynamicText(displayName, currentLang);
-                      return (
-                        <span key={e.id}>
-                          <Link to={`/entity/${e.id}`} className="text-primary hover:underline">{displayName}</Link>
-                          {index < locations.length - 1 && ', '}
+                    </div>
+
+                    {caseData.bigo != null && caseData.bigo > 0 && (
+                      <div className="flex items-center text-muted-foreground">
+                        <Banknote className="mr-2 h-5 w-5" />
+                        <span className="text-sm">
+                          {t("caseDetail.embezzledAmount")}: {formatBigo(caseData.bigo)}
                         </span>
-                      );
-                    }) : t('common.notAvailable');
-                  })()}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center text-muted-foreground">
-                <Calendar className="mr-2 h-5 w-5" />
-                <span className="text-sm">
-                  {t("caseDetail.period")}:{" "}
-                  {formatCaseDateRange(caseData.case_start_date, caseData.case_end_date, t("cases.status.ongoing"))}
-                </span>
-              </div>
-              {caseData.bigo != null && caseData.bigo > 0 && (
-                <div className="flex items-center text-muted-foreground">
-                  <Banknote className="mr-2 h-5 w-5" />
-                  <span className="text-sm">
-                    {t("caseDetail.embezzledAmount")}: {formatBigo(caseData.bigo)}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
 
                 <Separator className="mb-8 hidden print:block" />
 
-                <div className="grid gap-8 print:block lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[13rem_minmax(0,1fr)]">
+                <div className="grid min-w-0 gap-6 print:block lg:grid-cols-[11rem_minmax(0,1fr)] lg:gap-8 xl:grid-cols-[13rem_minmax(0,1fr)] xl:gap-10">
                   <aside className="min-w-0 lg:col-start-1 lg:row-start-1">
                     <CaseSectionJumpNav
                       activeSection={activeSection}
-                      className="lg:sticky lg:top-24"
+                      className="lg:sticky lg:top-1/2 lg:-translate-y-1/2"
                       onJump={handleJumpToSection}
                       sections={jumpSections}
                     />
@@ -447,14 +498,12 @@ const CaseDetail = () => {
                       />
                     )}
 
-                    <CaseOverviewSection
-                      description={caseData.description}
-                      title={t("caseDetail.overview")}
-                    />
+                    <CaseOverviewSection description={caseData.description} title={t("caseDetail.overview")} />
 
                     <CourtCasesSection
                       courtCases={(caseData.court_cases ?? []).map((courtCaseId, index) => {
                         const query = courtCaseQueries[index];
+
                         return {
                           courtCase: query?.data as CourtCase | undefined,
                           id: courtCaseId,
@@ -487,59 +536,60 @@ const CaseDetail = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col md:flex-row justify-between items-center gap-6 p-6 bg-muted/30 rounded-xl border border-dashed border-muted-foreground/30 no-print">
-                <div className="space-y-2 text-center md:text-left">
-                  <h3 className="font-semibold text-lg">{t("caseDetail.contact")}</h3>
-                  <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Mail className="h-4 w-4" />
-                      <span className="mt-1">{t("caseDetail.emailLabel")}: {JAWAFDEHI_EMAIL}</span>
+              <div className="no-print flex flex-col items-stretch justify-between gap-5 rounded-xl border border-dashed border-muted-foreground/30 bg-muted/30 p-4 sm:p-6 md:flex-row md:items-center">
+                <div className="min-w-0 space-y-2 text-center md:text-left">
+                  <h3 className="text-lg font-semibold">{t("caseDetail.contact")}</h3>
+
+                  <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4 md:justify-start">
+                    <div className="flex min-w-0 items-center gap-1">
+                      <Mail className="h-4 w-4 shrink-0" />
+                      <span className="min-w-0 break-all">
+                        {t("caseDetail.emailLabel")}: {JAWAFDEHI_EMAIL}
+                      </span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <MessageCircle className="h-4 w-4" />
-                      <span className="mt-1">{t("caseDetail.whatsappLabel")}: {JAWAFDEHI_WHATSAPP_NUMBER}</span>
+
+                    <div className="flex min-w-0 items-center gap-1">
+                      <MessageCircle className="h-4 w-4 shrink-0" />
+                      <span className="min-w-0 break-all">
+                        {t("caseDetail.whatsappLabel")}: {JAWAFDEHI_WHATSAPP_NUMBER}
+                      </span>
                     </div>
                   </div>
                 </div>
-                <Button variant="outline" size="lg" asChild className="shrink-0">
+
+                <Button variant="outline" size="lg" asChild className="w-full shrink-0 sm:w-auto">
                   <a
                     href={`https://portal.jawafdehi.org/admin/cases/case/${id}/change/`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2"
+                    className="flex items-center justify-center gap-2"
                   >
                     <ExternalLink className="h-4 w-4" />
-                    <span className="mt-1.5">{t("caseDetail.editCase")}</span>
+                    <span>{t("caseDetail.editCase")}</span>
                   </a>
                 </Button>
               </div>
 
-              <DisqusComments
-                caseId={id || ""}
-                caseTitle={caseData.title}
-                caseUrl={canonicalUrl}
-              />
+              <DisqusComments caseId={id || ""} caseTitle={caseData.title} caseUrl={canonicalUrl} />
             </div>
-
           </div>
         </div>
       </main>
 
       {/* Mobile Share Button */}
       {isMobile && (
-        <div className="pointer-events-auto fixed bottom-5 left-4 sm:left-6 z-40 no-print">
+        <div className="no-print pointer-events-auto fixed bottom-5 left-3 z-40 sm:left-6">
           <ShareButton
             url={canonicalUrl}
             title={caseData.title}
             description={plainDescription}
             variant="outline"
             size="lg"
-            showLabel={true}
-            className="shadow-lg border-2 hover:shadow-xl"
+            showLabel
+            className="border-2 shadow-lg hover:shadow-xl"
           />
         </div>
       )}
-
     </div>
   );
 };

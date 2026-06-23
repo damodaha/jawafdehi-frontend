@@ -416,18 +416,45 @@
   },
   "documentSource": {
     "fallbackTitle": "Source {{id}}",
+    "sourceLinks": "Source links",
+    "sourceDomain": "Source: {{host}}",
+    "more": "More",
     "viewSource": "View Source",
     "viewSourceN": "View Source {{n}}",
     "opensInNewTab": "(opens in a new tab)",
     "role": {
-      "raw": "View original",
-      "permalink": "Permalink",
+      "raw": "Open original",
+      "rawN": "Open original {{n}}",
+      "permalink": "Jawafdehi permalink",
+      "permalinkN": "Jawafdehi permalink {{n}}",
       "sourcePage": "Source page",
       "alternate": "Alternate format",
       "alternateN": "Alternate format {{n}}",
-      "markdown": "Show markdown transcript",
-      "markdownN": "Show markdown transcript {{n}}"
+      "alternateSource": "Alternate source",
+      "alternateSourceN": "Alternate source {{n}}",
+      "markdown": "Text version",
+      "markdownN": "Text version {{n}}",
+      "openFile": "Open file",
+      "openFileN": "Open file {{n}}",
+      "pdf": "PDF copy",
+      "pdfN": "PDF copy {{n}}",
+      "markdownFile": "Text file",
+      "markdownFileN": "Text file {{n}}",
+      "downloadDoc": "Download DOC",
+      "downloadDocN": "Download DOC {{n}}",
+      "downloadDocx": "Download DOCX",
+      "downloadDocxN": "Download DOCX {{n}}"
     }
+  },
+  "documentPreview": {
+    "download": "Download",
+    "loading": "Loading preview...",
+    "markdownDescription": "Previewing the extracted text version. Download is available below.",
+    "markdownError": "We could not load this text preview. You can still open or download the file.",
+    "openInNewTab": "Open in new tab",
+    "pdfDescription": "Previewing this PDF. Download is available below.",
+    "pdfError": "We could not load this PDF preview. You can still open or download the file.",
+    "previewAria": "Preview {{title}}"
   },
   "sourceType": {
     "LEGAL_COURT_ORDER": "Legal: Court Order/Verdict",
@@ -601,6 +628,7 @@
       }
     },
     "faq": {
+    
       "title": "Frequently Asked Questions",
       "description": "We compiled a list of answers to address your most pressing questions regarding Jawafdehi.",
       "howToReport": {
