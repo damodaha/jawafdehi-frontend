@@ -75,10 +75,10 @@ export function CaseTimelineSection({
       year: primaryDate?.year || undefined,
       content: (
         <div className="space-y-1">
-          <h3 className="text-base md:text-lg font-semibold leading-snug tracking-tight text-primary/90">
+          <h3 className="text-base md:text-xl font-semibold leading-snug tracking-tight text-primary/90">
             {item.title}
           </h3>
-          <p className="max-w-4xl text-base md:text-lg font-normal leading-[1.7] text-primary/75">
+          <p className="max-w-4xl text-base md:text-md font-normal leading-[1.7] text-primary/75">
             {item.description}
           </p>
         </div>

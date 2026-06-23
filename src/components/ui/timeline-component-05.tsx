@@ -66,7 +66,7 @@ const ChangelogContent = ({
 
   return (
     <div className={cn("w-full", className)}>
-      <div className="mb-8 space-y-4 text-left md:mb-10 lg:mb-[4.5rem]">
+      <div className="mb-8 space-y-4 text-left ">
         <h2 className="text-2xl font-semibold tracking-tight text-primary md:text-3xl">
           {heading}
         </h2>

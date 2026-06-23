@@ -298,7 +298,7 @@ export function DocumentSourceCard({
 
   return (
     <>
-      <article className="border-b border-border/70 py-3 last:border-b-0">
+      <article className="border-b border-border/70 py-6 md:py-8 first:pt-0 last:pb-0 last:border-b-0">
         <div className="flex min-w-0 items-start gap-3">
 
           <div className="min-w-0 flex-1">
@@ -320,7 +320,7 @@ export function DocumentSourceCard({
             )}
 
             {mainDescription && (
-              <p className={`text-base md:text-lg font-normal leading-[1.7] text-primary/75 break-words ${byline ? "mt-2.5" : "mt-2"}`}>
+              <p className={`text-base md:text-md font-normal leading-[1.7] text-primary/75 break-words ${byline ? "mt-2.5" : "mt-2"}`}>
                 {mainDescription}
               </p>
             )}

@@ -52,14 +52,14 @@ function getFallbackIcon(jawafEntity: JawafEntity, entity: Entity | null) {
   return <User className="h-5 w-5" />;
 }
 
-export function CaseEntityChips({ 
-  entities, 
-  resolvedEntities, 
-  language, 
-  initialLimit = 12 
+export function CaseEntityChips({
+  entities,
+  resolvedEntities,
+  language,
+  initialLimit = 12
 }: CaseEntityChipsProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
   const displayedEntities = isExpanded ? entities : entities.slice(0, initialLimit);
   const hasMore = entities.length > initialLimit;
   const remainingCount = entities.length - initialLimit;
@@ -102,11 +102,11 @@ export function CaseEntityChips({
                   {getFallbackIcon(jawafEntity, entity)}
                 </AvatarFallback>
               </Avatar>
-              <span className="line-clamp-2 text-sm font-medium leading-snug text-foreground group-hover:text-primary transition-colors">
+              <span className="line-clamp-2 text-base md:text-md font-medium leading-snug text-primary ">
                 {displayName}
               </span>
               {strippedNotes && (
-                <span className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+                <span className="line-clamp-2 text-sm md:text-base leading-tight text-primary/75">
                   {strippedNotes}
                 </span>
               )}
@@ -114,7 +114,7 @@ export function CaseEntityChips({
           );
         })}
       </div>
-      
+
       {hasMore && (
         <div className="flex justify-center sm:justify-start px-3">
           <button

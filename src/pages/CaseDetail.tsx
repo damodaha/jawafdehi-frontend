@@ -25,7 +25,8 @@ import {
 import { CaseDetailBanner } from "@/components/case-detail/case-detail-banner";
 import { CaseOverviewSection } from "@/components/case-detail/case-overview-section";
 import { CaseSectionJumpNav, type CaseJumpSection } from "@/components/case-detail/case-section-jump-nav";
-import { CaseSupplementarySection } from "@/components/case-detail/case-supplementary-section";
+import { MissingDetailsSection } from "@/components/case-detail/missing-details-section";
+import { NotesSection } from "@/components/case-detail/notes-section";
 import { CaseTimelineSection } from "@/components/case-detail/case-timeline-section";
 import { CourtCasesSection } from "@/components/case-detail/court-cases-section";
 import { EvidenceSection } from "@/components/case-detail/evidence-section";
@@ -538,17 +539,13 @@ const CaseDetail = () => {
                       title={t("caseDetail.evidence")}
                     />
 
-                    <CaseSupplementarySection
-                      Icon={Info}
+                    <MissingDetailsSection
                       html={caseData.missing_details}
-                      id="missing-details"
                       title={t("caseDetail.missingDetails")}
                     />
 
-                    <CaseSupplementarySection
-                      Icon={StickyNote}
+                    <NotesSection
                       html={caseData.notes}
-                      id="notes"
                       title={t("caseDetail.notes")}
                     />
                   </div>

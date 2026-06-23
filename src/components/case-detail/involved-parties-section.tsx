@@ -42,10 +42,10 @@ export function InvolvedPartiesSection({
           .map(([type, entities]) => (
             <div key={type} className="space-y-4">
               <div className="flex items-center gap-3">
-                <h3 className="whitespace-nowrap text-xs font-semibold uppercase tracking-wider text-primary/75">
+                <h3 className="whitespace-nowrap text-base md:text-md font-semibold  text-accent/90">
                   {translateRelation(type)}
                 </h3>
-                <div className="h-px w-full bg-border/60" />
+
               </div>
               <CaseEntityChips
                 entities={entities}
