@@ -38,7 +38,7 @@ function groupReleases(releases: Release[]) {
 
 function TimelineDatePill({ date, version }: Pick<Release, "date" | "version">) {
   const primaryDate = (
-    <Badge className="flex min-h-7 w-auto justify-end rounded-full border border-primary/10 bg-primary/40 px-3.5 py-1 text-sm font-medium text-primary shadow-none hover:bg-primary/50">
+    <Badge className="flex min-h-7 w-auto justify-end rounded-full border border-primary/10 bg-primary/10 px-3.5 py-1 text-sm font-medium text-primary shadow-none hover:bg-primary/50">
       {version}
     </Badge>
   );
@@ -101,8 +101,8 @@ const ChangelogContent = ({
 
                 <div className="flex flex-col items-center">
                   <div className="sticky top-[4.75rem] flex size-6 items-center justify-center max-sm:top-5">
-                    <span className="flex size-[1.125rem] shrink-0 items-center justify-center rounded-full bg-primary/20">
-                      <span className="size-3 rounded-full bg-primary" />
+                    <span className="flex size-[1.125rem] shrink-0 items-center justify-center rounded-full bg-accent/20">
+                      <span className="size-3 rounded-full bg-accent/85" />
                     </span>
                   </div>
                   <span className="-mt-2.5 w-px flex-1 border-l border-primary/20" />
