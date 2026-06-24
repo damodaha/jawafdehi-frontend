@@ -15,6 +15,8 @@
     "preview": "vite preview",
     "predeploy": "bun run lint && bun run build",
     "deploy": "wrangler deploy",
+    "postdeploy": "bun run cache:purge",
+    "cache:purge": "bun run scripts/purge-cloudflare-cache.ts",
     "prepare": "husky"
   },
   "dependencies": {
@@ -120,6 +122,7 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0",
     "vite": "^5.4.19",
-    "vitest": "^4.0.9"
+    "vitest": "^4.0.9",
+    "wrangler": "^4.104.0"
   }
 }
