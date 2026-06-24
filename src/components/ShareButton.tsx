@@ -60,10 +60,11 @@ export const ShareButton = ({
   const shareText = `${title}${description ? ` - ${description}` : ""}`;
   const encodedUrl = encodeURIComponent(url);
   const encodedText = encodeURIComponent(shareText);
+  const encodedTitle = encodeURIComponent(title);
 
   const shareLinks = {
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-    twitter: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`,
+    twitter: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
     whatsapp: `https://wa.me/?text=${encodedText}%20${encodedUrl}`,
     linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
     telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`,

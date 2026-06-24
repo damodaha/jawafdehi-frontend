@@ -51,10 +51,11 @@ export const FloatingShareSidebar = ({
   const shareText = `${title}${description ? ` - ${description}` : ""}`;
   const encodedUrl = encodeURIComponent(url);
   const encodedText = encodeURIComponent(shareText);
+  const encodedTitle = encodeURIComponent(title);
 
   const shareLinks = {
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-    twitter: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`,
+    twitter: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
     linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
     whatsapp: `https://wa.me/?text=${encodedText}%20${encodedUrl}`,
     telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`,
