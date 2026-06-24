@@ -65,7 +65,10 @@ export function formatDateTime(dateString: string | null | undefined): string {
  * a date-only value shows the calendar day the editor entered regardless of the
  * viewer's timezone. Shared by the Updates list and the article detail/preview.
  */
-export function formatPublicationDate(value: string): string {
+export function formatPublicationDate(value: string | null | undefined): string {
+  if (!value) {
+    return '';
+  }
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
     return value;
