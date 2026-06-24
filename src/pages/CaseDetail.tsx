@@ -44,7 +44,7 @@ import { formatBigo } from "@/utils/number";
 import { resolveLegacyCaseSlug } from "@/utils/legacyCaseMap";
 import { isCourtCaseRef } from "@/utils/courtCaseRef";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { HEADER_LOGO_URL, previewImageUrl, SITE_NAME, SITE_URL, truncateMeta } from "@/utils/seo";
+import { previewImageUrl, SITE_NAME, SITE_URL, SOCIAL_IMAGE_URL, stripHtml, truncateMeta } from "@/utils/seo";
 import "@/styles/print.css";
 
 const RELATION_PRIORITY: Record<string, number> = {
@@ -330,14 +330,14 @@ const CaseDetail = () => {
 
   const canonicalSlug = caseData.slug || id;
   const canonicalUrl = `${SITE_URL}/case/${canonicalSlug}`;
-  const plainDescription = truncateMeta(stripMarkdown(caseData.description));
+  const plainDescription = truncateMeta(stripMarkdown(stripHtml(caseData.description)));
   const allegationDescription = truncateMeta(caseData.key_allegations?.slice(0, 2).join(". "));
   const metaDescription = plainDescription || allegationDescription || "";
   const metaTitle = `${caseData.title} | Jawafdehi`;
   const ogImage =
-    previewImageUrl(caseData.banner_url) ||
-    previewImageUrl(caseData.thumbnail_url) ||
-    HEADER_LOGO_URL;
+    previewImageUrl(caseData.banner_url, "https://portal.jawafdehi.org") ||
+    previewImageUrl(caseData.thumbnail_url, "https://portal.jawafdehi.org") ||
+    SOCIAL_IMAGE_URL;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

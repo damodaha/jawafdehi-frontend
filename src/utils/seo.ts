@@ -1,6 +1,6 @@
 export const SITE_URL = "https://jawafdehi.org";
 export const SITE_NAME = "Jawafdehi Nepal";
-export const HEADER_LOGO_URL = `${SITE_URL}/assets/logo.svg`;
+export const SOCIAL_IMAGE_URL = `${SITE_URL}/assets/social-preview.png`;
 
 export function absoluteUrl(value: string | null | undefined, base = SITE_URL): string | null {
   if (!value) return null;
@@ -19,7 +19,7 @@ export function previewImageUrl(value: string | null | undefined, base = SITE_UR
     const parsed = new URL(url);
     const pathname = parsed.pathname.toLowerCase();
     const isAdminUrl = pathname.includes("/admin/");
-    const imageExtensionPattern = /\.(avif|gif|jpe?g|png|svg|webp)$/i;
+    const imageExtensionPattern = /\.(avif|gif|jpe?g|png|webp)$/i;
     const isImagePath = imageExtensionPattern.test(pathname);
     const hasImageQueryValue = [...parsed.searchParams.values()].some((paramValue) =>
       imageExtensionPattern.test(paramValue.split("?")[0].toLowerCase()),

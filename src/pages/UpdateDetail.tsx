@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, ArrowRight } from "lucide-react";
 import NotFound from "./NotFound";
 import { useTranslation } from "react-i18next";
-import { HEADER_LOGO_URL, previewImageUrl, SITE_NAME, SITE_URL, truncateMeta } from "@/utils/seo";
+import { previewImageUrl, SITE_NAME, SITE_URL, SOCIAL_IMAGE_URL, truncateMeta } from "@/utils/seo";
 
 const formatDate = (value: string) => {
     const date = new Date(value);
@@ -47,7 +47,7 @@ const UpdateDetail = () => {
     const canonicalUrl = `${SITE_URL}/updates/${article.meta.slug}`;
     const ogImage =
         previewImageUrl(article.thumbnail?.url, "https://portal.jawafdehi.org") ||
-        HEADER_LOGO_URL;
+        SOCIAL_IMAGE_URL;
     const metaTitle = `${article.title} | Jawafdehi`;
     const description = truncateMeta(article.excerpt || "");
     const imageAlt = article.thumbnail?.alt || article.title;

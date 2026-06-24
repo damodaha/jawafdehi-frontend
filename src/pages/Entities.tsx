@@ -132,12 +132,12 @@ const Entities = () => {
         <meta property="og:url" content="https://jawafdehi.org/entities" />
         <meta property="og:title" content="Public Entities | Jawafdehi Nepal" />
         <meta property="og:description" content="Explore profiles of Nepali public officials, politicians, and organizations tracked on Jawafdehi. View their associated corruption and misconduct cases." />
-        <meta property="og:image" content="https://jawafdehi.org/assets/logo.svg" />
+        <meta property="og:image" content="https://jawafdehi.org/assets/social-preview.png" />
         <meta property="og:locale" content="en_US" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Public Entities | Jawafdehi Nepal" />
         <meta name="twitter:description" content="Explore profiles of Nepali public officials, politicians, and organizations tracked on Jawafdehi. View their associated corruption and misconduct cases." />
-        <meta name="twitter:image" content="https://jawafdehi.org/assets/logo.svg" />
+        <meta name="twitter:image" content="https://jawafdehi.org/assets/social-preview.png" />
       </Helmet>
 
       <main id="main-content" className="flex-1 container mx-auto px-4 py-8">
