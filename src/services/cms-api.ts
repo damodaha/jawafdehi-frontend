@@ -52,3 +52,23 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
   });
   return res.data.items[0] ?? null;
 }
+
+/**
+ * Fetch the current *unsaved* draft for the Wagtail headless preview iframe.
+ *
+ * The edit-screen preview redirects here with `content_type` + `token` (set by
+ * `wagtail_headless_preview` on the backend). The draft is resolved from the
+ * token, so the pk in the detail path is a placeholder (`0`); the response is a
+ * single serialized page with the same fields as a published article, so the
+ * preview renders identically.
+ */
+export async function getArticlePreview(
+  contentType: string,
+  token: string,
+): Promise<Article | null> {
+  const res = await cmsClient.get<Article>("/page_preview/0/", {
+    params: { content_type: contentType, token, fields: "*" },
+    headers: { Accept: "application/json" },
+  });
+  return res.data ?? null;
+}
