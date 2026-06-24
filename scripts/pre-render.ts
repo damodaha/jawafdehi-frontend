@@ -5,13 +5,12 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import {
   PRE_RENDERED_STATIC_ROUTES,
-  UPDATE_ROUTE_ENTRIES,
   staticRouteToSearchEntry,
-  updateRouteToSearchEntry,
   type SearchIndexEntry,
   type SearchIndexFile,
   type SearchIndexLine,
 } from '../src/data/site-routes.ts';
+import type { ArticleListItem, WagtailListResponse } from './cms-types.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -49,30 +48,6 @@ interface PaginatedCaseList {
     updated_at: string;
     entities: Array<{ id: number; nes_id: string | null; display_name?: string | null }>;
   }>;
-}
-
-interface WagtailListResponse<T> {
-  meta: { total_count: number };
-  items: T[];
-}
-
-interface ArticleListItem {
-  id: number;
-  meta: {
-    slug: string;
-    first_published_at: string | null;
-    html_url?: string | null;
-  };
-  title: string;
-  category: 'UPDATE' | 'NEWS';
-  date: string;
-  excerpt: string;
-  thumbnail: {
-    url: string;
-    width: number;
-    height: number;
-    alt: string;
-  } | null;
 }
 
 const API_BASE = 'https://portal.jawafdehi.org/api';
@@ -414,22 +389,6 @@ async function main() {
       console.error(`[pre-render] ERROR rendering ${route.path}:`, err);
       if (err instanceof Error) console.error(err.stack);
       process.exit(1);
-    }
-  }
-
-  // Render update detail routes (static data — IDs are known at build time)
-  for (const update of UPDATE_ROUTE_ENTRIES) {
-    const path = `/updates/${update.id}`;
-    const outFile = join(ROOT, 'dist', 'updates', update.id, 'index.html');
-    try {
-      const result = await render(path);
-      const html = injectIntoTemplate(template, result);
-      await writeHtml(outFile, html);
-      searchEntries.push(withSearchLines(updateRouteToSearchEntry(update), result.html));
-      console.log(`[pre-render] ✓ ${path}`);
-    } catch (err) {
-      console.warn(`[pre-render] WARNING: Skipping update ${update.id}:`, err);
-      if (err instanceof Error) console.error(err.stack);
     }
   }
 

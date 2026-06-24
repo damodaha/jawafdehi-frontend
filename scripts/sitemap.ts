@@ -1,13 +1,15 @@
 import { writeFile, mkdir } from 'fs/promises';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { PRE_RENDERED_STATIC_ROUTES, UPDATE_ROUTE_ENTRIES } from '../src/data/site-routes.ts';
+import { PRE_RENDERED_STATIC_ROUTES } from '../src/data/site-routes.ts';
+import type { ArticleListItem, WagtailListResponse } from './cms-types.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const CANONICAL = 'https://jawafdehi.org';
 const API_BASE = 'https://portal.jawafdehi.org/api';
 const CMS_BASE = `${API_BASE}/cms/v2`;
+const FETCH_TIMEOUT_MS = 10_000;
 
 interface EntitySummary {
   id: number;
@@ -28,32 +30,23 @@ interface PaginatedCaseList {
   results: CaseSummary[];
 }
 
-interface WagtailListResponse<T> {
-  meta: { total_count: number };
-  items: T[];
-}
-
-interface ArticleListItem {
-  id: number;
-  meta: {
-    slug: string;
-    first_published_at: string | null;
-    html_url?: string | null;
-  };
-  title: string;
-  category: 'UPDATE' | 'NEWS';
-  date: string;
-  excerpt: string;
-  thumbnail: {
-    url: string;
-    width: number;
-    height: number;
-    alt: string;
-  } | null;
-}
-
 function toYMD(isoDate: string): string {
   return isoDate.substring(0, 10);
+}
+
+async function fetchWithTimeout(url: string): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    return await fetch(url, { signal: controller.signal });
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new Error(`Request timed out after ${FETCH_TIMEOUT_MS}ms fetching ${url}`);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function buildDate(): string {
@@ -79,7 +72,7 @@ async function fetchAllCases(): Promise<CaseSummary[]> {
   const all: CaseSummary[] = [];
   let url: string | null = `${API_BASE}/cases/`;
   while (url) {
-    const res = await fetch(url);
+    const res = await fetchWithTimeout(url);
     if (!res.ok) throw new Error(`API error ${res.status}`);
     const data: PaginatedCaseList = await res.json();
     all.push(...data.results);
@@ -104,7 +97,7 @@ async function fetchAllArticles(): Promise<ArticleListItem[]> {
       url.searchParams.set('offset', String(offset));
     }
 
-    const res = await fetch(url.toString());
+    const res = await fetchWithTimeout(url.toString());
     if (!res.ok) throw new Error(`CMS API error ${res.status}`);
     const data: WagtailListResponse<ArticleListItem> = await res.json();
     totalCount = data.meta.total_count;
@@ -154,7 +147,6 @@ async function main() {
 
   const entries: string[] = [
     ...PRE_RENDERED_STATIC_ROUTES.map(r => urlEntry(`${CANONICAL}${r.path}`, today, r.sitemapTitle)),
-    ...UPDATE_ROUTE_ENTRIES.map(u => urlEntry(`${CANONICAL}/updates/${u.id}`, today, u.title)),
     ...articles
       .filter(a => a.meta.slug)
       .map(a => urlEntry(
