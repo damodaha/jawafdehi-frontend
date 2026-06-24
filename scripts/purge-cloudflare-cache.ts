@@ -1,7 +1,6 @@
 import { readdir } from 'fs/promises';
-import { join } from 'path';
+import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -95,9 +94,18 @@ async function purge(zoneId: string, token: string, body: Record<string, unknown
     body: JSON.stringify(body),
   });
 
-  const payload = await response.json() as CloudflarePurgeResponse;
-  if (!response.ok || !payload.success) {
-    const details = JSON.stringify(payload.errors || payload.messages || payload, null, 2);
+  const responseText = await response.text();
+  let payload: CloudflarePurgeResponse | null = null;
+  try {
+    payload = responseText ? JSON.parse(responseText) as CloudflarePurgeResponse : null;
+  } catch {
+    payload = null;
+  }
+
+  if (!response.ok || !payload?.success) {
+    const details = payload
+      ? JSON.stringify(payload.errors || payload.messages || payload, null, 2)
+      : responseText || response.statusText;
     throw new Error(`Cloudflare purge failed (${response.status}): ${details}`);
   }
 }
