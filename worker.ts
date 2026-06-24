@@ -23,7 +23,7 @@ interface FeedVideo {
 
 function securityHeaders(): Record<string, string> {
   return {
-    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://portal.jawafdehi.org https://jawafdehi.org https://nes.jawafdehi.org https://api.jawafdehi.org https://auth.jawafdehi.org; worker-src blob:;",
+    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://portal.jawafdehi.org https://jawafdehi.org https://nes.jawafdehi.org https://auth.jawafdehi.org; worker-src blob:;",
     'X-Frame-Options': 'DENY',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
@@ -33,6 +33,22 @@ function securityHeaders(): Record<string, string> {
 function securityHeadersAllowFrame(): Record<string, string> {
   const headers = securityHeaders();
   delete headers['X-Frame-Options'];
+  return headers;
+}
+
+const CMS_ADMIN_ORIGIN = 'https://portal.jawafdehi.org';
+
+// Headers for the Wagtail headless preview route. Unlike the embed widget
+// (framable anywhere), the preview shows an unsaved draft, so we scope framing
+// to the CMS admin via CSP frame-ancestors (which supersedes X-Frame-Options,
+// removed here so it doesn't block the admin), and add X-Robots-Tag so the
+// draft is never indexed even when the SPA shell is served before JS runs.
+function previewSecurityHeaders(): Record<string, string> {
+  const headers = securityHeaders();
+  delete headers['X-Frame-Options'];
+  headers['Content-Security-Policy'] +=
+    ` frame-ancestors ${CMS_ADMIN_ORIGIN};`;
+  headers['X-Robots-Tag'] = 'noindex, nofollow';
   return headers;
 }
 
@@ -216,8 +232,17 @@ export default {
       return handleLatestVideos(request);
     }
 
+    // The case-embed widget and the Wagtail headless preview both render inside
+    // an <iframe>, so neither can send X-Frame-Options: DENY. The embed widget
+    // is framable anywhere; the preview (an unsaved draft) is scoped to the CMS
+    // admin and marked noindex — see previewSecurityHeaders.
     const isEmbedRoute = /^\/embed\/case\//.test(path);
-    const secHeaders = isEmbedRoute ? securityHeadersAllowFrame() : securityHeaders();
+    const isPreviewRoute = /^\/updates\/preview\/?$/.test(path);
+    const secHeaders = isPreviewRoute
+      ? previewSecurityHeaders()
+      : isEmbedRoute
+        ? securityHeadersAllowFrame()
+        : securityHeaders();
 
     // Short alias: /weekly → /saptahik (301)
     if (path === '/weekly' || path === '/weekly/') {

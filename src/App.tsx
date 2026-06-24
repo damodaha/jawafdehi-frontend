@@ -26,6 +26,7 @@ import ModerationDashboard from "./pages/ModerationDashboard";
 import Feedback from "./pages/Feedback";
 import Updates from "./pages/Updates";
 import UpdateDetail from "./pages/UpdateDetail";
+import UpdatePreview from "./pages/UpdatePreview";
 import EmbedCaseCard from "./pages/EmbedCaseCard";
 import Privacy from "./pages/Privacy";
 import TermsOfService from "./pages/TermsOfService";
@@ -114,6 +115,8 @@ const App = () => (
             <Route path="/moderation" element={<ModerationDashboard />} />
             <Route path="/feedback" element={<Feedback />} />
             <Route path="/updates" element={<Updates />} />
+            {/* Wagtail headless preview target — must precede the :slug route. */}
+            <Route path="/updates/preview" element={<UpdatePreview />} />
             <Route path="/updates/:slug" element={<UpdateDetail />} />
             <Route path="/information" element={<Information />} />
             <Route path="/about" element={<About />} />
