@@ -9,12 +9,14 @@ interface Env {
 }
 
 const JDS_API_BASE = 'https://portal.jawafdehi.org/api';
+const PORTAL_BASE = 'https://portal.jawafdehi.org';
 const SITE_URL = 'https://jawafdehi.org';
 const SITE_NAME = 'Jawafdehi Nepal';
-const HEADER_LOGO_URL = `${SITE_URL}/assets/logo.svg`;
+const SOCIAL_IMAGE_URL = `${SITE_URL}/assets/social-preview.png`;
 const CMS_API_BASE = `${JDS_API_BASE}/cms/v2`;
 
 const MAX_LATEST_VIDEOS = 6;
+const API_FETCH_TIMEOUT_MS = 10_000;
 
 interface FeedVideo {
   videoId: string;
@@ -84,7 +86,7 @@ function previewImageUrl(value: unknown, base = SITE_URL): string | null {
     const parsed = new URL(url);
     const pathname = parsed.pathname.toLowerCase();
     const isAdminUrl = pathname.includes('/admin/');
-    const imageExtensionPattern = /\.(avif|gif|jpe?g|png|svg|webp)$/i;
+    const imageExtensionPattern = /\.(avif|gif|jpe?g|png|webp)$/i;
     const isImagePath = imageExtensionPattern.test(pathname);
     const hasImageQueryValue = [...parsed.searchParams.values()].some((paramValue) =>
       imageExtensionPattern.test(paramValue.split('?')[0].toLowerCase()),
@@ -137,10 +139,93 @@ async function fetchIndexHtml(request: Request, env: Env): Promise<string | null
   return indexResponse.text();
 }
 
+async function fetchJsonWithTimeout<T>(url: string): Promise<T | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), API_FETCH_TIMEOUT_MS);
+  try {
+    const response = await fetch(url, {
+      headers: { Accept: 'application/json' },
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return await response.json() as T;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function splitMetaTags(metaTags: string): { title: string; meta: string } {
+  const titleMatch = metaTags.match(/<title\b[\s\S]*?<\/title>/i);
+  const title = titleMatch?.[0] ?? '';
+  return {
+    title,
+    meta: titleMatch ? metaTags.replace(titleMatch[0], '').trim() : metaTags,
+  };
+}
+
+function getHtmlAttribute(attributes: string, name: string): string | null {
+  const match = new RegExp(`\\s${name}\\s*=\\s*(['"])(.*?)\\1`, 'i').exec(attributes);
+  return match?.[2]?.toLowerCase() ?? null;
+}
+
+const MANAGED_META_NAMES = new Set([
+  'description',
+  'twitter:card',
+  'twitter:title',
+  'twitter:description',
+  'twitter:image',
+  'twitter:image:alt',
+]);
+
+const MANAGED_META_PROPERTIES = new Set([
+  'og:site_name',
+  'og:type',
+  'og:url',
+  'og:title',
+  'og:description',
+  'og:image',
+  'og:image:alt',
+  'og:locale',
+  'article:published_time',
+  'article:modified_time',
+  'article:tag',
+]);
+
+function stripManagedHeadTags(html: string): string {
+  return html.replace(/<head\b([^>]*)>([\s\S]*?)<\/head>/i, (_match, attributes: string, headContent: string) => {
+    const cleanedHead = headContent
+      .replace(/<title\b[\s\S]*?<\/title>\s*/gi, '')
+      .replace(/<link\b([^>]*)>\s*/gi, (tag, linkAttributes: string) => {
+        const rel = getHtmlAttribute(linkAttributes, 'rel');
+        return rel?.split(/\s+/).includes('canonical') ? '' : tag;
+      })
+      .replace(/<meta\b([^>]*)>\s*/gi, (tag, metaAttributes: string) => {
+        const name = getHtmlAttribute(metaAttributes, 'name');
+        const property = getHtmlAttribute(metaAttributes, 'property');
+        return (name && MANAGED_META_NAMES.has(name)) || (property && MANAGED_META_PROPERTIES.has(property))
+          ? ''
+          : tag;
+      });
+
+    return `<head${attributes}>${cleanedHead}</head>`;
+  });
+}
+
 function injectHeadMeta(indexHtml: string, metaTags: string): string {
-  const cleaned = indexHtml
-    .replace('<!--helmet-title-->', '')
-    .replace('<!--helmet-meta-->', '');
+  if (indexHtml.includes('<!--helmet-title-->') || indexHtml.includes('<!--helmet-meta-->')) {
+    const { title, meta } = splitMetaTags(metaTags);
+    return indexHtml
+      .replace('<!--helmet-title-->', title)
+      .replace('<!--helmet-meta-->', meta);
+  }
+
+  const cleaned = stripManagedHeadTags(indexHtml);
 
   if (cleaned.includes('</head>')) {
     return cleaned.replace('</head>', `${metaTags}\n</head>`);
@@ -238,12 +323,8 @@ async function resolveCourtRefSlug(ref: string): Promise<string | null> {
   for (const identifier of courtRefCandidates(ref)) {
     try {
       const apiUrl = `${JDS_API_BASE}/cases/${encodeURIComponent(identifier)}/`;
-      const apiResponse = await fetch(apiUrl, { headers: { Accept: 'application/json' } });
-      if (!apiResponse.ok) {
-        continue;
-      }
-      const caseData = (await apiResponse.json()) as { slug?: string | null };
-      if (caseData.slug) {
+      const caseData = await fetchJsonWithTimeout<{ slug?: string | null }>(apiUrl);
+      if (caseData?.slug) {
         return caseData.slug;
       }
     } catch {
@@ -255,11 +336,8 @@ async function resolveCourtRefSlug(ref: string): Promise<string | null> {
 
 async function handleCaseMetaFallback(request: Request, env: Env, slug: string): Promise<Response | null> {
   const apiUrl = `${JDS_API_BASE}/cases/${encodeURIComponent(slug)}/`;
-  const apiResponse = await fetch(apiUrl, { headers: { Accept: 'application/json' } });
-
-  if (!apiResponse.ok) return null;
-
-  const caseData = await apiResponse.json() as Record<string, unknown>;
+  const caseData = await fetchJsonWithTimeout<Record<string, unknown>>(apiUrl);
+  if (!caseData) return null;
   const titleRaw = String(caseData.title || 'Jawafdehi Case');
   const title = `${titleRaw} | Jawafdehi`;
   const descriptionText = stripHtml(caseData.description);
@@ -286,9 +364,9 @@ async function handleCaseMetaFallback(request: Request, env: Env, slug: string):
 
   const canonicalUrl = `${SITE_URL}/case/${encodeURIComponent(canonicalSlug)}`;
   const imageUrl =
-    previewImageUrl(caseData.banner_url) ||
-    previewImageUrl(caseData.thumbnail_url) ||
-    HEADER_LOGO_URL;
+    previewImageUrl(caseData.banner_url, PORTAL_BASE) ||
+    previewImageUrl(caseData.thumbnail_url, PORTAL_BASE) ||
+    SOCIAL_IMAGE_URL;
 
   const indexHtml = await fetchIndexHtml(request, env);
   if (!indexHtml) return null;
@@ -318,13 +396,10 @@ async function handleCaseMetaFallback(request: Request, env: Env, slug: string):
 
 async function handleUpdateMetaFallback(request: Request, env: Env, slug: string): Promise<Response | null> {
   const apiUrl = `${CMS_API_BASE}/pages/?type=content.ArticlePage&slug=${encodeURIComponent(slug)}&fields=*`;
-  const apiResponse = await fetch(apiUrl, { headers: { Accept: 'application/json' } });
-
-  if (!apiResponse.ok) return null;
-
-  const payload = await apiResponse.json() as {
+  const payload = await fetchJsonWithTimeout<{
     items?: Array<Record<string, unknown>>;
-  };
+  }>(apiUrl);
+  if (!payload) return null;
 
   const article = payload.items?.[0];
   if (!article) return null;
@@ -336,8 +411,8 @@ async function handleUpdateMetaFallback(request: Request, env: Env, slug: string
 
   const thumbnail = article.thumbnail as { url?: string; alt?: string } | null | undefined;
   const imageUrl =
-    previewImageUrl(thumbnail?.url, 'https://portal.jawafdehi.org') ||
-    HEADER_LOGO_URL;
+    previewImageUrl(thumbnail?.url, PORTAL_BASE) ||
+    SOCIAL_IMAGE_URL;
 
   const meta = article.meta as { first_published_at?: string | null } | undefined;
   const date = typeof article.date === 'string' ? article.date : null;
@@ -383,15 +458,11 @@ async function handleOembed(request: Request): Promise<Response> {
 
   try {
     const apiUrl = `${JDS_API_BASE}/cases/${encodeURIComponent(slug)}/`;
-    const apiResponse = await fetch(apiUrl, {
-      headers: { 'Accept': 'application/json' },
-    });
-
-    if (!apiResponse.ok) {
+    const caseData = await fetchJsonWithTimeout<Record<string, unknown>>(apiUrl);
+    if (!caseData) {
       return jsonResponse({ error: 'Case not found' }, 404);
     }
 
-    const caseData = await apiResponse.json() as Record<string, unknown>;
     const caseUrl = `https://jawafdehi.org/case/${slug}`;
     const embedUrl = `https://jawafdehi.org/embed/case/${slug}`;
     const title = (caseData.title as string) || 'Untitled Case';
@@ -406,8 +477,8 @@ async function handleOembed(request: Request): Promise<Response> {
       provider_url: 'https://jawafdehi.org',
       cache_age: 86400,
       thumbnail_url:
-        previewImageUrl(caseData.thumbnail_url) ||
-        previewImageUrl(caseData.banner_url) ||
+        previewImageUrl(caseData.thumbnail_url, PORTAL_BASE) ||
+        previewImageUrl(caseData.banner_url, PORTAL_BASE) ||
         null,
       html: `<iframe src="${embedUrl}" width="480" height="360" frameborder="0" title="${title}" style="max-width:100%;overflow:hidden;border:none;border-radius:8px" allowfullscreen></iframe>`,
       width: 480,
