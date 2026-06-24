@@ -44,6 +44,7 @@ import CaseworkRules from "./pages/CaseworkRules";
 import CaseworkHow from "./pages/CaseworkHow";
 
 const GuestChat = lazy(() => import("./pages/GuestChat"));
+const Donate = lazy(() => import("./pages/Donate"));
 
 // Wraps the portal in the OIDC AuthProvider. Built as a component (not a spread
 // of a config object) so the UserManager is only constructed when this renders
@@ -120,6 +121,7 @@ const App = () => (
             <Route path="/our-process" element={<OurProcess />} />
             <Route path="/team" element={<OurTeam />} />
             <Route path="/volunteer" element={<Volunteer />} />
+            <Route path="/donate" element={<Donate />} />
             <Route path="/products" element={<OurProducts />} />
             <Route path="/saptahik" element={<WeeklyMeetings />} />
             <Route path="/privacy" element={<Privacy />} />
