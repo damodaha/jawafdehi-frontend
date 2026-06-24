@@ -11,6 +11,26 @@ export function absoluteUrl(value: string | null | undefined, base = SITE_URL): 
   }
 }
 
+export function previewImageUrl(value: string | null | undefined, base = SITE_URL): string | null {
+  const url = absoluteUrl(value, base);
+  if (!url) return null;
+
+  try {
+    const parsed = new URL(url);
+    const pathname = parsed.pathname.toLowerCase();
+    const isAdminUrl = pathname.includes("/admin/");
+    const imageExtensionPattern = /\.(avif|gif|jpe?g|png|svg|webp)$/i;
+    const isImagePath = imageExtensionPattern.test(pathname);
+    const hasImageQueryValue = [...parsed.searchParams.values()].some((paramValue) =>
+      imageExtensionPattern.test(paramValue.split("?")[0].toLowerCase()),
+    );
+
+    return !isAdminUrl && (isImagePath || hasImageQueryValue) ? url : null;
+  } catch {
+    return null;
+  }
+}
+
 export function truncateMeta(value: string | null | undefined, maxLength = 160): string {
   const cleaned = (value ?? "").replace(/\s+/g, " ").trim();
   if (cleaned.length <= maxLength) return cleaned;

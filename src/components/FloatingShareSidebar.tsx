@@ -16,6 +16,7 @@ import {
 import { Link2, Check, Share2, QrCode, Printer, Download, X } from "lucide-react";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
+import { buildShareLinks } from "@/utils/share";
 import {
   FacebookIcon,
   XTwitterIcon,
@@ -48,25 +49,12 @@ export const FloatingShareSidebar = ({
   const [moreDialogOpen, setMoreDialogOpen] = useState(false);
   const [qrDialogOpen, setQrDialogOpen] = useState(false);
 
-  const shareText = `${title}${description ? ` - ${description}` : ""}`;
-  const encodedUrl = encodeURIComponent(url);
-  const encodedText = encodeURIComponent(shareText);
-  const encodedTitle = encodeURIComponent(title);
-
-  const shareLinks = {
-    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-    twitter: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
-    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
-    whatsapp: `https://wa.me/?text=${encodedText}%20${encodedUrl}`,
-    telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`,
-    viber: `viber://forward?text=${encodedText}%20${encodedUrl}`,
-    reddit: `https://reddit.com/submit?url=${encodedUrl}&title=${encodedText}`,
-    messenger: `https://www.facebook.com/dialog/send?link=${encodedUrl}&app_id=291494419107518&redirect_uri=${encodedUrl}`,
-    threads: `https://threads.net/intent/post?text=${encodedText}%20${encodedUrl}`,
-  };
+  const shareLinks = buildShareLinks({ url, title, description });
 
   const handleShare = (platform: keyof typeof shareLinks) => {
-    window.open(shareLinks[platform], "_blank", "noopener,noreferrer,width=600,height=400");
+    const shareUrl = shareLinks[platform];
+    if (!shareUrl) return;
+    window.open(shareUrl, "_blank", "noopener,noreferrer,width=600,height=400");
   };
 
   const handleCopyLink = async () => {

@@ -76,6 +76,26 @@ function absoluteUrl(value: unknown, base = SITE_URL): string | null {
   }
 }
 
+function previewImageUrl(value: unknown, base = SITE_URL): string | null {
+  const url = absoluteUrl(value, base);
+  if (!url) return null;
+
+  try {
+    const parsed = new URL(url);
+    const pathname = parsed.pathname.toLowerCase();
+    const isAdminUrl = pathname.includes('/admin/');
+    const imageExtensionPattern = /\.(avif|gif|jpe?g|png|svg|webp)$/i;
+    const isImagePath = imageExtensionPattern.test(pathname);
+    const hasImageQueryValue = [...parsed.searchParams.values()].some((paramValue) =>
+      imageExtensionPattern.test(paramValue.split('?')[0].toLowerCase()),
+    );
+
+    return !isAdminUrl && (isImagePath || hasImageQueryValue) ? url : null;
+  } catch {
+    return null;
+  }
+}
+
 function buildMetaTags(input: {
   title: string;
   description: string;
@@ -266,8 +286,8 @@ async function handleCaseMetaFallback(request: Request, env: Env, slug: string):
 
   const canonicalUrl = `${SITE_URL}/case/${encodeURIComponent(canonicalSlug)}`;
   const imageUrl =
-    absoluteUrl(caseData.banner_url) ||
-    absoluteUrl(caseData.thumbnail_url) ||
+    previewImageUrl(caseData.banner_url) ||
+    previewImageUrl(caseData.thumbnail_url) ||
     HEADER_LOGO_URL;
 
   const indexHtml = await fetchIndexHtml(request, env);
@@ -316,7 +336,7 @@ async function handleUpdateMetaFallback(request: Request, env: Env, slug: string
 
   const thumbnail = article.thumbnail as { url?: string; alt?: string } | null | undefined;
   const imageUrl =
-    absoluteUrl(thumbnail?.url, 'https://portal.jawafdehi.org') ||
+    previewImageUrl(thumbnail?.url, 'https://portal.jawafdehi.org') ||
     HEADER_LOGO_URL;
 
   const meta = article.meta as { first_published_at?: string | null } | undefined;
@@ -385,7 +405,10 @@ async function handleOembed(request: Request): Promise<Response> {
       provider_name: 'Jawafdehi',
       provider_url: 'https://jawafdehi.org',
       cache_age: 86400,
-      thumbnail_url: (caseData.thumbnail_url as string) || (caseData.banner_url as string) || null,
+      thumbnail_url:
+        previewImageUrl(caseData.thumbnail_url) ||
+        previewImageUrl(caseData.banner_url) ||
+        null,
       html: `<iframe src="${embedUrl}" width="480" height="360" frameborder="0" title="${title}" style="max-width:100%;overflow:hidden;border:none;border-radius:8px" allowfullscreen></iframe>`,
       width: 480,
       height: 360,

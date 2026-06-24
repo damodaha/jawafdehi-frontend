@@ -44,7 +44,7 @@ import { formatBigo } from "@/utils/number";
 import { resolveLegacyCaseSlug } from "@/utils/legacyCaseMap";
 import { isCourtCaseRef } from "@/utils/courtCaseRef";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { absoluteUrl, HEADER_LOGO_URL, SITE_NAME, SITE_URL, truncateMeta } from "@/utils/seo";
+import { HEADER_LOGO_URL, previewImageUrl, SITE_NAME, SITE_URL, truncateMeta } from "@/utils/seo";
 import "@/styles/print.css";
 
 const RELATION_PRIORITY: Record<string, number> = {
@@ -335,8 +335,8 @@ const CaseDetail = () => {
   const metaDescription = plainDescription || allegationDescription || "";
   const metaTitle = `${caseData.title} | Jawafdehi`;
   const ogImage =
-    absoluteUrl(caseData.banner_url) ||
-    absoluteUrl(caseData.thumbnail_url) ||
+    previewImageUrl(caseData.banner_url) ||
+    previewImageUrl(caseData.thumbnail_url) ||
     HEADER_LOGO_URL;
 
   return (
