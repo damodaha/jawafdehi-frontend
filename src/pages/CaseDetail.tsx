@@ -44,6 +44,7 @@ import { formatBigo } from "@/utils/number";
 import { resolveLegacyCaseSlug } from "@/utils/legacyCaseMap";
 import { isCourtCaseRef } from "@/utils/courtCaseRef";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { absoluteUrl, HEADER_LOGO_URL, SITE_NAME, SITE_URL, truncateMeta } from "@/utils/seo";
 import "@/styles/print.css";
 
 const RELATION_PRIORITY: Record<string, number> = {
@@ -327,22 +328,30 @@ const CaseDetail = () => {
     );
   }
 
-  const canonicalUrl = `https://jawafdehi.org/case/${id}`;
-  const plainDescription = stripMarkdown(caseData.description).substring(0, 160);
-  const metaDescription = plainDescription || caseData.key_allegations?.slice(0, 2).join('. ').substring(0, 160) || "";
+  const canonicalSlug = caseData.slug || id;
+  const canonicalUrl = `${SITE_URL}/case/${canonicalSlug}`;
+  const plainDescription = truncateMeta(stripMarkdown(caseData.description));
+  const allegationDescription = truncateMeta(caseData.key_allegations?.slice(0, 2).join(". "));
+  const metaDescription = plainDescription || allegationDescription || "";
+  const metaTitle = `${caseData.title} | Jawafdehi`;
+  const ogImage =
+    absoluteUrl(caseData.banner_url) ||
+    absoluteUrl(caseData.thumbnail_url) ||
+    HEADER_LOGO_URL;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Helmet>
-        <title>{caseData.title} | Jawafdehi</title>
+        <title>{metaTitle}</title>
         <meta name="description" content={metaDescription} />
         <link rel="canonical" href={canonicalUrl} />
-        <meta property="og:site_name" content="Jawafdehi Nepal" />
+        <meta property="og:site_name" content={SITE_NAME} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={canonicalUrl} />
-        <meta property="og:title" content={`${caseData.title} | Jawafdehi`} />
+        <meta property="og:title" content={metaTitle} />
         <meta property="og:description" content={metaDescription} />
-        <meta property="og:image" content="https://jawafdehi.org/og-favicon.png" />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:image:alt" content={caseData.title} />
         <meta property="og:locale" content="en_US" />
         <meta property="article:published_time" content={caseData.created_at} />
         <meta property="article:modified_time" content={caseData.updated_at} />
@@ -350,9 +359,10 @@ const CaseDetail = () => {
           <meta key={tag} property="article:tag" content={tag} />
         ))}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${caseData.title} | Jawafdehi`} />
+        <meta name="twitter:title" content={metaTitle} />
         <meta name="twitter:description" content={metaDescription} />
-        <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
+        <meta name="twitter:image" content={ogImage} />
+        <meta name="twitter:image:alt" content={caseData.title} />
         <link rel="alternate" type="application/json" href={`https://portal.jawafdehi.org/api/cases/${id}/`} title="Case data (JSON API)" />
         <link rel="alternate" type="application/json+oembed" href={`https://jawafdehi.org/oembed?url=${encodeURIComponent(canonicalUrl)}&format=json`} title={`${caseData.title} oEmbed`} />
       </Helmet>

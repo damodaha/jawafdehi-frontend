@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, ArrowRight } from "lucide-react";
 import NotFound from "./NotFound";
 import { useTranslation } from "react-i18next";
+import { absoluteUrl, HEADER_LOGO_URL, SITE_NAME, SITE_URL, truncateMeta } from "@/utils/seo";
 
 const formatDate = (value: string) => {
     const date = new Date(value);
@@ -43,19 +44,40 @@ const UpdateDetail = () => {
         return <NotFound />;
     }
 
-    const description = (article.excerpt || "").slice(0, 160);
+    const canonicalUrl = `${SITE_URL}/updates/${article.meta.slug}`;
+    const ogImage =
+        absoluteUrl(article.thumbnail?.url, "https://portal.jawafdehi.org") ||
+        HEADER_LOGO_URL;
+    const metaTitle = `${article.title} | Jawafdehi`;
+    const description = truncateMeta(article.excerpt || "");
+    const imageAlt = article.thumbnail?.alt || article.title;
 
     return (
         <div className="min-h-screen flex flex-col bg-background">
             <Helmet>
-                <title>{article.title} | Jawafdehi</title>
+                <title>{metaTitle}</title>
                 <meta name="description" content={description} />
-                <meta property="og:title" content={article.title} />
-                <meta property="og:description" content={description} />
+                <link rel="canonical" href={canonicalUrl} />
+
+                <meta property="og:site_name" content={SITE_NAME} />
                 <meta property="og:type" content="article" />
-                {article.thumbnail?.url && <meta property="og:image" content={article.thumbnail.url} />}
+                <meta property="og:url" content={canonicalUrl} />
+                <meta property="og:title" content={metaTitle} />
+                <meta property="og:description" content={description} />
+                <meta property="og:image" content={ogImage} />
+                <meta property="og:image:alt" content={imageAlt} />
+                <meta property="og:locale" content="en_US" />
+
+                {article.meta.first_published_at && (
+                    <meta property="article:published_time" content={article.meta.first_published_at} />
+                )}
+                <meta property="article:modified_time" content={article.date} />
+
                 <meta name="twitter:card" content="summary_large_image" />
-                {article.thumbnail?.url && <meta name="twitter:image" content={article.thumbnail.url} />}
+                <meta name="twitter:title" content={metaTitle} />
+                <meta name="twitter:description" content={description} />
+                <meta name="twitter:image" content={ogImage} />
+                <meta name="twitter:image:alt" content={imageAlt} />
             </Helmet>
 
             <main id="main-content" className="flex-1 py-8 md:py-12">
