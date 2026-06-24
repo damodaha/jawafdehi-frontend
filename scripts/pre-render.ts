@@ -1,6 +1,6 @@
 process.env.SSR = 'true';
 
-import { readFile, writeFile, mkdir, cp } from 'fs/promises';
+import { readFile, writeFile, mkdir, cp, rm } from 'fs/promises';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import {
@@ -41,40 +41,102 @@ interface PaginatedCaseList {
   next: string | null;
   results: Array<{
     id: number;
+    slug?: string | null;
     title?: string | null;
     description?: string | null;
+    thumbnail_url?: string | null;
+    banner_url?: string | null;
     updated_at: string;
     entities: Array<{ id: number; nes_id: string | null; display_name?: string | null }>;
   }>;
 }
 
+interface WagtailListResponse<T> {
+  meta: { total_count: number };
+  items: T[];
+}
+
+interface ArticleListItem {
+  id: number;
+  meta: {
+    slug: string;
+    first_published_at: string | null;
+    html_url?: string | null;
+  };
+  title: string;
+  category: 'UPDATE' | 'NEWS';
+  date: string;
+  excerpt: string;
+  thumbnail: {
+    url: string;
+    width: number;
+    height: number;
+    alt: string;
+  } | null;
+}
+
 const API_BASE = 'https://portal.jawafdehi.org/api';
+const CMS_BASE = `${API_BASE}/cms/v2`;
 const CONCURRENCY = 5;
 
 const FETCH_TIMEOUT_MS = 10_000;
+
+async function fetchWithTimeout(url: string): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    return await fetch(url, { signal: controller.signal });
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new Error(`Request timed out after ${FETCH_TIMEOUT_MS}ms fetching ${url}`);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 async function fetchAllCases(): Promise<PaginatedCaseList['results']> {
   const all: PaginatedCaseList['results'] = [];
   let url: string | null = `${API_BASE}/cases/`;
   while (url) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-    let res: Response;
-    try {
-      res = await fetch(url, { signal: controller.signal });
-    } catch (err) {
-      if (err instanceof Error && err.name === 'AbortError') {
-        throw new Error(`Request timed out after ${FETCH_TIMEOUT_MS}ms fetching ${url}`);
-      }
-      throw err;
-    } finally {
-      clearTimeout(timer);
-    }
+    const res = await fetchWithTimeout(url);
     if (!res.ok) throw new Error(`API error ${res.status} fetching ${url}`);
     const data: PaginatedCaseList = await res.json();
     all.push(...data.results);
     url = data.next;
   }
+  return all;
+}
+
+async function fetchAllArticles(): Promise<ArticleListItem[]> {
+  const all: ArticleListItem[] = [];
+  const limit = 20;
+  let offset = 0;
+  let totalCount: number | null = null;
+
+  do {
+    const url = new URL(`${CMS_BASE}/pages/`);
+    url.searchParams.set('type', 'content.ArticlePage');
+    url.searchParams.set('fields', 'title,category,date,excerpt,thumbnail');
+    url.searchParams.set('order', '-date');
+    url.searchParams.set('limit', String(limit));
+    if (offset > 0) {
+      url.searchParams.set('offset', String(offset));
+    }
+
+    const res = await fetchWithTimeout(url.toString());
+    if (!res.ok) throw new Error(`CMS API error ${res.status} fetching ${url.toString()}`);
+    const data: WagtailListResponse<ArticleListItem> = await res.json();
+    totalCount = data.meta.total_count;
+    all.push(...data.items);
+
+    if (data.items.length === 0) {
+      break;
+    }
+    offset += data.items.length;
+  } while (totalCount == null || offset < totalCount);
+
   return all;
 }
 
@@ -97,6 +159,14 @@ async function withConcurrency<T>(
 async function writeHtml(outFile: string, content: string): Promise<void> {
   await mkdir(dirname(outFile), { recursive: true });
   await writeFile(outFile, content, 'utf-8');
+}
+
+async function cleanGeneratedRouteDirs(): Promise<void> {
+  await Promise.all(
+    ['case', 'entity', 'updates'].map((dir) =>
+      rm(join(ROOT, 'dist', dir), { recursive: true, force: true }),
+    ),
+  );
 }
 
 async function writeSearchIndex(entries: SearchIndexEntry[]): Promise<void> {
@@ -246,13 +316,14 @@ function withSearchLines(entry: SearchIndexEntry, html: string): SearchIndexEntr
 function caseToSearchEntry(caseItem: PaginatedCaseList['results'][number], html: string): SearchIndexEntry {
   const title = stripHtml(caseItem.title) || `Case ${caseItem.id}`;
   const description = truncate(stripHtml(caseItem.description), 180);
+  const slug = caseItem.slug || String(caseItem.id);
 
   return withSearchLines({
-    path: `/case/${caseItem.id}`,
+    path: `/case/${slug}`,
     title,
     descriptionKey: description ? undefined : 'searchCommand.descriptions.caseDetail',
     description,
-    keywords: ['case', 'corruption', 'archive', String(caseItem.id), title],
+    keywords: ['case', 'corruption', 'archive', String(caseItem.id), slug, title],
     icon: 'FileText',
     group: 'cases',
   }, html);
@@ -276,6 +347,8 @@ async function main() {
   // reachable at the same absolute paths referenced in index.html (e.g. /assets/index-[hash].js)
   await cp(join(ROOT, 'dist/client'), join(ROOT, 'dist'), { recursive: true });
   console.log('[pre-render] Copied dist/client → dist/');
+  await cleanGeneratedRouteDirs();
+  console.log('[pre-render] Cleaned generated route directories');
 
   // Read template
   const templatePath = join(ROOT, 'dist/client/index.html');
@@ -308,6 +381,14 @@ async function main() {
   } catch (err) {
     console.warn('[pre-render] WARNING: API unreachable, rendering static routes only:', err);
     apiReachable = false;
+  }
+
+  let articles: ArticleListItem[] = [];
+  try {
+    articles = await fetchAllArticles();
+    console.log(`[pre-render] Fetched ${articles.length} CMS articles`);
+  } catch (err) {
+    console.warn('[pre-render] WARNING: CMS API unreachable, skipping update detail routes:', err);
   }
 
   // Collect unique entity IDs — use numeric JDS entity IDs for /entity/:id routes
@@ -352,12 +433,46 @@ async function main() {
     }
   }
 
+  // Render update/news detail routes from Wagtail CMS.
+  for (const article of articles) {
+    const slug = article.meta.slug;
+    if (!slug) continue;
+
+    const path = `/updates/${encodeURIComponent(slug)}`;
+    const outFile = join(ROOT, 'dist', 'updates', slug, 'index.html');
+
+    try {
+      const result = await render(path);
+      const html = injectIntoTemplate(template, result);
+      await writeHtml(outFile, html);
+
+      searchEntries.push(
+        withSearchLines(
+          {
+            path: `/updates/${slug}`,
+            title: article.title,
+            description: truncate(stripHtml(article.excerpt), 180),
+            keywords: ['updates', 'news', 'posts', slug, article.title],
+            icon: 'Newspaper',
+            group: 'updates',
+          },
+          result.html,
+        ),
+      );
+
+      console.log(`[pre-render] ✓ ${path}`);
+    } catch (err) {
+      console.warn(`[pre-render] WARNING: Skipping update ${slug}:`, err);
+      if (err instanceof Error) console.error(err.stack);
+    }
+  }
+
   if (apiReachable) {
     // Render case routes
     await withConcurrency(cases, CONCURRENCY, async (caseItem) => {
-      const caseId = String(caseItem.id);
-      const path = `/case/${encodeURIComponent(caseId)}`;
-      const outFile = join(ROOT, 'dist', 'case', caseId, 'index.html');
+      const routeSlug = caseItem.slug || String(caseItem.id);
+      const path = `/case/${encodeURIComponent(routeSlug)}`;
+      const outFile = join(ROOT, 'dist', 'case', routeSlug, 'index.html');
       try {
         const result = await render(path);
         const html = injectIntoTemplate(template, result);

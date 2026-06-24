@@ -7,6 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const CANONICAL = 'https://jawafdehi.org';
 const API_BASE = 'https://portal.jawafdehi.org/api';
+const CMS_BASE = `${API_BASE}/cms/v2`;
 
 interface EntitySummary {
   id: number;
@@ -16,6 +17,7 @@ interface EntitySummary {
 
 interface CaseSummary {
   id: number;
+  slug?: string | null;
   title: string;
   updated_at: string;
   entities: EntitySummary[];
@@ -24,6 +26,30 @@ interface CaseSummary {
 interface PaginatedCaseList {
   next: string | null;
   results: CaseSummary[];
+}
+
+interface WagtailListResponse<T> {
+  meta: { total_count: number };
+  items: T[];
+}
+
+interface ArticleListItem {
+  id: number;
+  meta: {
+    slug: string;
+    first_published_at: string | null;
+    html_url?: string | null;
+  };
+  title: string;
+  category: 'UPDATE' | 'NEWS';
+  date: string;
+  excerpt: string;
+  thumbnail: {
+    url: string;
+    width: number;
+    height: number;
+    alt: string;
+  } | null;
 }
 
 function toYMD(isoDate: string): string {
@@ -62,6 +88,37 @@ async function fetchAllCases(): Promise<CaseSummary[]> {
   return all;
 }
 
+async function fetchAllArticles(): Promise<ArticleListItem[]> {
+  const all: ArticleListItem[] = [];
+  const limit = 20;
+  let offset = 0;
+  let totalCount: number | null = null;
+
+  do {
+    const url = new URL(`${CMS_BASE}/pages/`);
+    url.searchParams.set('type', 'content.ArticlePage');
+    url.searchParams.set('fields', 'title,category,date,excerpt,thumbnail');
+    url.searchParams.set('order', '-date');
+    url.searchParams.set('limit', String(limit));
+    if (offset > 0) {
+      url.searchParams.set('offset', String(offset));
+    }
+
+    const res = await fetch(url.toString());
+    if (!res.ok) throw new Error(`CMS API error ${res.status}`);
+    const data: WagtailListResponse<ArticleListItem> = await res.json();
+    totalCount = data.meta.total_count;
+    all.push(...data.items);
+
+    if (data.items.length === 0) {
+      break;
+    }
+    offset += data.items.length;
+  } while (totalCount == null || offset < totalCount);
+
+  return all;
+}
+
 async function main() {
   const today = buildDate();
 
@@ -71,6 +128,14 @@ async function main() {
     console.log(`[sitemap] Fetched ${cases.length} cases`);
   } catch (err) {
     console.warn('[sitemap] WARNING: API unreachable, generating static-only sitemap:', err);
+  }
+
+  let articles: ArticleListItem[] = [];
+  try {
+    articles = await fetchAllArticles();
+    console.log(`[sitemap] Fetched ${articles.length} CMS articles`);
+  } catch (err) {
+    console.warn('[sitemap] WARNING: CMS API unreachable, skipping update detail URLs:', err);
   }
 
   // Build a map of entity id → display_name from all cases
@@ -90,7 +155,14 @@ async function main() {
   const entries: string[] = [
     ...PRE_RENDERED_STATIC_ROUTES.map(r => urlEntry(`${CANONICAL}${r.path}`, today, r.sitemapTitle)),
     ...UPDATE_ROUTE_ENTRIES.map(u => urlEntry(`${CANONICAL}/updates/${u.id}`, today, u.title)),
-    ...cases.map(c => urlEntry(`${CANONICAL}/case/${c.id}`, toYMD(c.updated_at), c.title ? `${c.title} — Jawafdehi` : undefined)),
+    ...articles
+      .filter(a => a.meta.slug)
+      .map(a => urlEntry(
+        `${CANONICAL}/updates/${a.meta.slug}`,
+        toYMD(a.date || a.meta.first_published_at || new Date().toISOString()),
+        a.title ? `${a.title} — Jawafdehi` : undefined,
+      )),
+    ...cases.map(c => urlEntry(`${CANONICAL}/case/${c.slug || c.id}`, toYMD(c.updated_at), c.title ? `${c.title} — Jawafdehi` : undefined)),
     ...entityIds.map(id => {
       const name = entityMap.get(id);
       return urlEntry(`${CANONICAL}/entity/${id}`, today, name ? `${name} — Jawafdehi` : undefined);
