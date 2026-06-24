@@ -53,7 +53,6 @@ export const FloatingShareSidebar = ({
 
   const handleShare = (platform: keyof typeof shareLinks) => {
     const shareUrl = shareLinks[platform];
-    if (!shareUrl) return;
     window.open(shareUrl, "_blank", "noopener,noreferrer,width=600,height=400");
   };
 

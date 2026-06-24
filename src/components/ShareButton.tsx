@@ -77,7 +77,6 @@ export const ShareButton = ({
   const handleShare = (platform: keyof typeof shareLinks) => {
     setSharing(platform);
     const shareUrl = shareLinks[platform];
-    if (!shareUrl) return;
     window.open(shareUrl, "_blank", "noopener,noreferrer,width=600,height=400");
     setTimeout(() => {
       setSharing(null);
