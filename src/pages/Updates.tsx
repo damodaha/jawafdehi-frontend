@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getArticles } from "@/services/cms-api";
 import type { ArticleListItem } from "@/types/cms";
 import { cn } from "@/lib/utils";
+import { formatPublicationDate } from "@/utils/date";
 import {
     CalendarIcon,
     ChevronRight,
@@ -13,19 +14,6 @@ import {
     List,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-
-const formatDate = (value: string) => {
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-        return value;
-    }
-    return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        timeZone: "UTC",
-    });
-};
 
 type ViewMode = "cards" | "list";
 
@@ -65,7 +53,7 @@ const UpdateCard = ({ article, viewMode }: UpdateCardProps) => {
                 <div>
                     <div className="mb-3 flex items-center gap-2 text-sm leading-5 text-muted-foreground">
                         <CalendarIcon className="h-4 w-4" aria-hidden="true" />
-                        <span>{formatDate(article.date)}</span>
+                        <span>{formatPublicationDate(article.date)}</span>
                     </div>
                     <h2 className="line-clamp-2 text-lg font-semibold leading-8 tracking-normal text-foreground transition-colors group-hover:text-primary">
                         {article.title}

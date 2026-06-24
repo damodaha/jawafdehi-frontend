@@ -26,6 +26,7 @@ import ModerationDashboard from "./pages/ModerationDashboard";
 import Feedback from "./pages/Feedback";
 import Updates from "./pages/Updates";
 import UpdateDetail from "./pages/UpdateDetail";
+import UpdatePreview from "./pages/UpdatePreview";
 import EmbedCaseCard from "./pages/EmbedCaseCard";
 import Privacy from "./pages/Privacy";
 import TermsOfService from "./pages/TermsOfService";
@@ -44,6 +45,7 @@ import CaseworkRules from "./pages/CaseworkRules";
 import CaseworkHow from "./pages/CaseworkHow";
 
 const GuestChat = lazy(() => import("./pages/GuestChat"));
+const Donate = lazy(() => import("./pages/Donate"));
 
 // Wraps the portal in the OIDC AuthProvider. Built as a component (not a spread
 // of a config object) so the UserManager is only constructed when this renders
@@ -113,6 +115,8 @@ const App = () => (
             <Route path="/moderation" element={<ModerationDashboard />} />
             <Route path="/feedback" element={<Feedback />} />
             <Route path="/updates" element={<Updates />} />
+            {/* Wagtail headless preview target — must precede the :slug route. */}
+            <Route path="/updates/preview" element={<UpdatePreview />} />
             <Route path="/updates/:slug" element={<UpdateDetail />} />
             <Route path="/information" element={<Information />} />
             <Route path="/about" element={<About />} />
@@ -120,6 +124,7 @@ const App = () => (
             <Route path="/our-process" element={<OurProcess />} />
             <Route path="/team" element={<OurTeam />} />
             <Route path="/volunteer" element={<Volunteer />} />
+            <Route path="/donate" element={<Donate />} />
             <Route path="/products" element={<OurProducts />} />
             <Route path="/saptahik" element={<WeeklyMeetings />} />
             <Route path="/privacy" element={<Privacy />} />

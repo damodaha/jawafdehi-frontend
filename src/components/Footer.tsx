@@ -123,6 +123,7 @@ export const Footer = () => {
     { label: t("nav.ourProcess"), to: "/our-process" },
     { label: t("nav.ourCommitment"), to: "/commitment" },
     { label: t("nav.volunteer"), to: "/volunteer" },
+    { label: t("nav.donate"), to: "/donate" },
   ];
 
   const aboutLinks: FooterLink[] = [
