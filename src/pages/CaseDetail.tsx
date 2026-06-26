@@ -46,6 +46,7 @@ import { trackEvent } from "@/utils/analytics";
 import { formatBigo } from "@/utils/number";
 import { resolveLegacyCaseSlug } from "@/utils/legacyCaseMap";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { toast } from "sonner";
 import "@/styles/print.css";
 
 function getGroupedEntities(entities: JawafEntity[]) {
@@ -72,6 +73,7 @@ const CaseDetail = () => {
   const trackedCaseIdRef = useRef<string | null>(null);
   const isMobile = useIsMobile();
   const [activeSection, setActiveSection] = useState("allegations");
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   // Legacy /case/<numeric> URLs: resolve to canonical slug and replace.
   // Mirrors worker.ts behaviour for environments without the Cloudflare edge
@@ -249,6 +251,39 @@ const CaseDetail = () => {
     window.history.replaceState(null, "", `#${sectionId}`);
   };
 
+  const handleBannerShare = async () => {
+    if (!caseData) return;
+
+    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+    if (isDesktop) {
+      setIsShareOpen(true);
+      return;
+    }
+
+    const shareData = {
+      title: caseData.title,
+      text: plainDescription,
+      url: canonicalUrl,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(canonicalUrl);
+      toast.success(t("share.linkCopied"));
+    } catch (error) {
+      console.error("Failed to copy:", error);
+      toast.error(t("share.copyFailed"));
+    }
+  };
+
   // Legacy /case/<numeric> URLs: replace with the canonical slug. This must
   // happen after all hooks have run so we don't violate rules-of-hooks.
   if (legacyTargetSlug) {
@@ -306,7 +341,8 @@ const CaseDetail = () => {
     );
   }
 
-  const canonicalUrl = `https://jawafdehi.org/case/${id}`;
+  const canonicalCaseSlug = caseData.slug || id;
+  const canonicalUrl = `https://jawafdehi.org/case/${canonicalCaseSlug}`;
   const plainDescription = stripMarkdown(caseData.description).substring(0, 160);
   const metaDescription =
     plainDescription || caseData.key_allegations?.slice(0, 2).join(". ").substring(0, 160) || "";
@@ -351,13 +387,23 @@ const CaseDetail = () => {
         caseData={caseData}
         resolvedEntities={resolvedEntities}
         actions={<ReportCaseDialog caseId={id || ""} caseTitle={caseData.title} />}
+        shareAction={{
+          label: t("caseDetail.shareCase"),
+          onClick: handleBannerShare,
+        }}
       />
 
       <main id="main-content" className="flex-1 py-6 sm:py-8">
         <div className="container mx-auto px-6">
           <div className="min-w-0">
             <div className="min-w-0">
-              <FloatingShareSidebar url={canonicalUrl} title={caseData.title} description={plainDescription} />
+              <FloatingShareSidebar
+                url={canonicalUrl}
+                title={caseData.title}
+                description={plainDescription}
+                open={isShareOpen}
+                onOpenChange={setIsShareOpen}
+              />
 
               <CaseDisclaimerBanner>{t("footer.disclaimer")}</CaseDisclaimerBanner>
 
@@ -487,7 +533,7 @@ const CaseDetail = () => {
 
                 <Separator className="mb-8 hidden print:block" />
 
-                <div className="grid min-w-0 gap-6 print:block lg:grid-cols-[11rem_minmax(0,1fr)] lg:gap-8 xl:grid-cols-[13rem_minmax(0,1fr)] xl:gap-10">
+                <div className="grid min-w-0 gap-6 print:block lg:grid-cols-[11rem_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[13rem_minmax(0,1fr)] xl:gap-12">
                   <aside className="hidden lg:block min-w-0 lg:col-start-1 lg:row-start-1">
                     <CaseSectionJumpNav
                       activeSection={activeSection}
@@ -496,7 +542,7 @@ const CaseDetail = () => {
                     />
                   </aside>
 
-                  <div className="min-w-0 w-full lg:col-start-2">
+                  <div className="min-w-0 w-full max-w-5xl rounded-lg bg-background px-4 py-6 shadow-sm ring-1 ring-border/60 sm:px-6 lg:col-start-2 lg:px-10 xl:px-12">
                     <KeyAllegationsSection
                       allegations={caseData.key_allegations || []}
                       emptyLabel={t("common.notAvailable")}

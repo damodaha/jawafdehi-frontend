@@ -32,17 +32,23 @@ interface FloatingShareSidebarProps {
   url: string;
   title: string;
   description?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export const FloatingShareSidebar = ({
   url,
   title,
   description = "",
+  open,
+  onOpenChange,
 }: FloatingShareSidebarProps) => {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
-  const [moreDialogOpen, setMoreDialogOpen] = useState(false);
+  const [uncontrolledMoreDialogOpen, setUncontrolledMoreDialogOpen] = useState(false);
   const [qrDialogOpen, setQrDialogOpen] = useState(false);
+  const moreDialogOpen = open ?? uncontrolledMoreDialogOpen;
+  const setMoreDialogOpen = onOpenChange ?? setUncontrolledMoreDialogOpen;
 
   const shareText = `${title}${description ? ` - ${description}` : ""}`;
   const encodedUrl = encodeURIComponent(url);

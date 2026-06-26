@@ -2,9 +2,11 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Share2 } from "lucide-react";
 import { CaseStatusBadge, CaseTagBadge, CaseTypeBadge } from "@/components/CaseBadge";
+import { Button } from "@/components/ui/button";
 import { getCaseStatusLabelKey } from "@/lib/case-badges";
+import { cn } from "@/lib/utils";
 import type { CaseDetail, JawafEntity } from "@/types/jds";
 import type { Entity } from "@/types/nes";
 import { formatCaseDateRangeForLanguage } from "@/utils/date";
@@ -19,6 +21,10 @@ interface CaseDetailBannerProps {
   homeLabel?: string;
   casesLabel?: string;
   actions?: ReactNode;
+  shareAction?: {
+    label: string;
+    onClick: () => void;
+  };
 }
 
 const PLACEHOLDER_IMAGE = "/assets/placeholder.png";
@@ -79,12 +85,20 @@ export function CaseDetailBanner({
   homeLabel,
   casesLabel,
   actions,
+  shareAction,
 }: CaseDetailBannerProps) {
   const { t, i18n } = useTranslation();
 
   const currentLang = i18n.language;
   const normalizedLang = currentLang === "ne" ? "ne" : "en";
   const title = caseData.title;
+  const titleLength = title.trim().length;
+  const titleSizeClass =
+    titleLength > 110
+      ? "text-xl leading-snug sm:text-2xl md:text-[1.7rem]"
+      : titleLength > 80
+        ? "text-2xl leading-snug sm:text-[1.7rem] md:text-3xl"
+        : "text-2xl sm:text-3xl md:text-4xl";
 
   const bannerSrc = getCaseBannerSrc(caseData);
   const [imageSrc, setImageSrc] = useState(bannerSrc);
@@ -139,8 +153,8 @@ export function CaseDetailBanner({
     return translateDynamicText(displayName, currentLang);
   };
 
-  const metaTitleClass = "text-xs font-semibold tracking-wider text-primary/65 mb-0.5";
-  const metaValueClass = "text-base font-medium leading-relaxed text-primary";
+  const metaTitleClass = "mb-1 text-sm font-semibold leading-5 text-primary/60";
+  const metaValueClass = "text-sm font-medium leading-6 text-primary md:text-base";
   const metaLinkClass =
     "font-semibold text-primary underline underline-offset-4 transition-colors hover:text-primary/80";
 
@@ -186,7 +200,7 @@ export function CaseDetailBanner({
                 <span className="min-w-0 truncate text-white/80">{breadcrumbCase}</span>
               </nav>
 
-              <h1 className="max-w-4xl text-2xl font-bold tracking-tight  text-bg sm:text-3xl md:text-4xl ">
+              <h1 className={cn("max-w-4xl break-words font-bold tracking-tight text-bg", titleSizeClass)}>
                 {title}
               </h1>
             </div>
@@ -234,7 +248,7 @@ export function CaseDetailBanner({
                   <div className={metaValueClass}>
                     <p>{dateRange.primary}</p>
                     {dateRange.secondary && (
-                      <p className="text-sm font-normal text-primary/70">
+                      <p className="text-sm font-normal leading-6 text-primary/65">
                         ({dateRange.secondary})
                       </p>
                     )}
@@ -246,7 +260,7 @@ export function CaseDetailBanner({
                     <p className={metaTitleClass}>
                       {t("caseDetail.embezzledAmount")}:
                     </p>
-                    <p className="text-lg font-bold leading-relaxed text-accent">
+                    <p className="text-sm font-semibold leading-6 text-accent md:text-base">
                       {formatBigo(caseData.bigo)}
                     </p>
                   </div>
@@ -264,7 +278,7 @@ export function CaseDetailBanner({
                           href={courtCase.href}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline underline-offset-4 transition-colors hover:text-primary/75"
+                          className="inline-flex items-center gap-1.5 text-sm font-semibold leading-6 text-primary underline underline-offset-4 transition-colors hover:text-primary/75"
                         >
                           <span>{courtCase.label}</span>
                           <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
@@ -275,9 +289,21 @@ export function CaseDetailBanner({
                 )}
               </div>
 
-              {actions ? (
+              {actions || shareAction ? (
                 <div className="mt-5 flex flex-wrap items-center gap-3 no-print">
                   {actions}
+                  {shareAction && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="gap-2 border-primary/20 bg-background text-primary hover:bg-primary/5 hover:text-primary"
+                      onClick={shareAction.onClick}
+                      aria-label={shareAction.label}
+                    >
+                      <Share2 className="h-4 w-4" aria-hidden="true" />
+                      <span className="font-semibold">{shareAction.label}</span>
+                    </Button>
+                  )}
                 </div>
               ) : null}
             </div>
