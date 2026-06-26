@@ -102,11 +102,11 @@ export function CaseEntityChips({
                   {getFallbackIcon(jawafEntity, entity)}
                 </AvatarFallback>
               </Avatar>
-              <span className="line-clamp-2 text-base md:text-md font-medium leading-snug text-primary ">
+              <span className="text-base md:text-md font-medium leading-snug text-primary">
                 {displayName}
               </span>
               {strippedNotes && (
-                <span className="line-clamp-2 text-sm md:text-base leading-tight text-primary/75">
+                <span className="text-sm leading-snug text-primary/75">
                   {strippedNotes}
                 </span>
               )}
