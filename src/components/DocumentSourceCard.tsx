@@ -124,6 +124,9 @@ const getPreviewType = (link: SourceLink): PreviewDocument["type"] | undefined =
   const extension = getFileExtension(link.link);
 
   if (extension === "pdf") return "pdf";
+  if (link.role === "MARKDOWN" || extension === "md" || extension === "markdown") {
+    return "markdown";
+  }
 
   return undefined;
 };
@@ -135,7 +138,10 @@ const isDownloadOnlyFile = (link: SourceLink) => {
 };
 
 const getPrimaryActionLabel = (link: SourceLink, t: (key: string) => string) => {
-  if (getPreviewType(link) === "pdf") return t("documentSource.role.previewPdf");
+  const previewType = getPreviewType(link);
+
+  if (previewType === "pdf") return t("documentSource.role.previewPdf");
+  if (previewType === "markdown") return t("documentSource.role.previewMarkdown");
 
   return t("documentSource.role.raw");
 };
@@ -269,6 +275,7 @@ export function DocumentSourceCard({
         markdownLinks.length > 1
           ? t("documentSource.role.markdownN", { n: index + 1 })
           : t("documentSource.role.markdown"),
+      previewType: getPreviewType(link),
     });
   });
 
