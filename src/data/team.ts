@@ -163,11 +163,11 @@ export const members: TeamMember[] = [
     ],
   },
   {
-    displayName: { en: "Britika Khanal", ne: "ब्रिटिका खनाल" },
+    displayName: { en: "Britika Khanal", ne: "बृतिका खनाल" },
+    thumb: "/assets/teammembers/britika.jpg",
     description: "Content & Social Media",
     contacts: [
       { type: "linkedin", value: "https://np.linkedin.com/in/britika-khanal-217b50257" },
-      { type: "facebook", value: "https://www.facebook.com/britikakhanal/" },
     ],
   },
   {
