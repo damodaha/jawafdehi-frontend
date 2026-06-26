@@ -2,11 +2,12 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
+import { ExternalLink } from "lucide-react";
 import { CaseStatusBadge, CaseTagBadge, CaseTypeBadge } from "@/components/CaseBadge";
 import { getCaseStatusLabelKey } from "@/lib/case-badges";
 import type { CaseDetail, JawafEntity } from "@/types/jds";
 import type { Entity } from "@/types/nes";
-import { formatCaseDateRange } from "@/utils/date";
+import { formatCaseDateRangeForLanguage } from "@/utils/date";
 import { getPrimaryName } from "@/utils/nes-helpers";
 import { translateDynamicText } from "@/lib/translate-dynamic-content";
 import { formatBigo } from "@/utils/number";
@@ -32,6 +33,27 @@ const COURT_NAME_MAP: Record<string, { en: string; ne: string }> = {
     ne: "विशेष अदालत",
   },
 };
+
+function parseCourtCaseRef(courtCase: string, language: "en" | "ne") {
+  const colonIndex = courtCase.indexOf(":");
+
+  if (colonIndex === -1) return null;
+
+  const courtId = courtCase.substring(0, colonIndex).trim();
+  const caseNumber = courtCase.substring(colonIndex + 1).trim();
+
+  if (!courtId || !caseNumber) return null;
+
+  const courtName = COURT_NAME_MAP[courtId]?.[language] || courtId;
+
+  return {
+    courtId,
+    courtName,
+    caseNumber,
+    href: `https://ngm.jawafdehi.org/case/${encodeURIComponent(courtId)}/${encodeURIComponent(caseNumber)}`,
+    label: `${caseNumber} (${courtName})`,
+  };
+}
 
 function isValidCaseImage(url?: string | null) {
   const trimmedUrl = url?.trim();
@@ -74,10 +96,11 @@ export function CaseDetailBanner({
   const statusLabel = t(getCaseStatusLabelKey(caseData.state || "PUBLISHED"));
   const caseTypeLabel = t(getCaseTypeLabelKey(caseData.case_type));
 
-  const dateRange = formatCaseDateRange(
+  const dateRange = formatCaseDateRangeForLanguage(
     caseData.case_start_date,
     caseData.case_end_date,
-    t("cases.status.ongoing")
+    t("cases.status.ongoing"),
+    currentLang
   );
 
   const notAvailableLabel = t("common.notAvailable");
@@ -91,22 +114,11 @@ export function CaseDetailBanner({
     if (!caseData.court_cases?.length) return [];
 
     return caseData.court_cases
-      .map((courtCase) => {
-        const colonIndex = courtCase.indexOf(":");
-
-        if (colonIndex === -1) return null;
-
-        const courtId = courtCase.substring(0, colonIndex).trim();
-        const caseNumber = courtCase.substring(colonIndex + 1).trim();
-
-        if (!courtId || !caseNumber) return null;
-
-        const courtName = COURT_NAME_MAP[courtId]?.[normalizedLang] || courtId;
-
-        return `${caseNumber} (${courtName})`;
-      })
-      .filter((courtCase): courtCase is string => Boolean(courtCase));
+      .map((courtCase) => parseCourtCaseRef(courtCase, normalizedLang))
+      .filter((courtCase): courtCase is NonNullable<ReturnType<typeof parseCourtCaseRef>> => Boolean(courtCase));
   }, [caseData.court_cases, normalizedLang]);
+
+  const breadcrumbCase = formattedCourtCases[0]?.caseNumber || caseData.case_id || String(caseData.id);
 
   const getEntityDisplayName = (caseEntity: JawafEntity) => {
     const entity = caseEntity.nes_id
@@ -157,7 +169,7 @@ export function CaseDetailBanner({
                   to="/"
                   className="shrink-0 transition-colors hover:text-white"
                 >
-                  {homeLabel || t("nav.home")}
+                  {homeLabel || "jawafdehi.org"}
                 </Link>
 
                 <span className="shrink-0 text-white/40">/</span>
@@ -166,12 +178,12 @@ export function CaseDetailBanner({
                   to="/cases"
                   className="shrink-0 transition-colors hover:text-white"
                 >
-                  {casesLabel || t("nav.cases")}
+                  {casesLabel || "case"}
                 </Link>
 
                 <span className="shrink-0 text-white/40">/</span>
 
-                <span className="min-w-0 truncate text-white/80">{title}</span>
+                <span className="min-w-0 truncate text-white/80">{breadcrumbCase}</span>
               </nav>
 
               <h1 className="max-w-4xl text-2xl font-bold tracking-tight  text-bg sm:text-3xl md:text-4xl ">
@@ -198,7 +210,7 @@ export function CaseDetailBanner({
 
               <div className="space-y-2">
                 <div>
-                  <p className={metaTitleClass}>Location:</p>
+                  <p className={metaTitleClass}>{t("caseDetail.location")}:</p>
 
                   <div className={metaValueClass}>
                     {locationEntities.length > 0
@@ -218,8 +230,15 @@ export function CaseDetailBanner({
                 </div>
 
                 <div>
-                  <p className={metaTitleClass}>Case date:</p>
-                  <p className={metaValueClass}>{dateRange}</p>
+                  <p className={metaTitleClass}>{t("caseDetail.period")}:</p>
+                  <div className={metaValueClass}>
+                    <p>{dateRange.primary}</p>
+                    {dateRange.secondary && (
+                      <p className="text-sm font-normal text-primary/70">
+                        ({dateRange.secondary})
+                      </p>
+                    )}
+                  </div>
                 </div>
 
                 {caseData.bigo != null && caseData.bigo > 0 && (
@@ -238,9 +257,20 @@ export function CaseDetailBanner({
                     <p className={metaTitleClass}>
                       {t("caseDetail.courtCases")}:
                     </p>
-                    <p className={metaValueClass}>
-                      {formattedCourtCases.join(", ")}
-                    </p>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1">
+                      {formattedCourtCases.map((courtCase) => (
+                        <a
+                          key={courtCase.label}
+                          href={courtCase.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline underline-offset-4 transition-colors hover:text-primary/75"
+                        >
+                          <span>{courtCase.label}</span>
+                          <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                        </a>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
