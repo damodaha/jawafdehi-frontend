@@ -134,7 +134,13 @@ function handleApiError(error: unknown, endpoint: string): never {
     const axiosError = error as AxiosError;
     const statusCode = axiosError.response?.status;
     const responseData = axiosError.response?.data as Record<string, unknown> | undefined;
-    const message = (responseData?.detail as string) || axiosError.message;
+    const detail = responseData?.detail;
+    const message =
+      typeof detail === 'string'
+        ? detail
+        : detail
+          ? JSON.stringify(detail)
+          : axiosError.message;
 
     throw new NESApiError(
       `API request failed: ${message}`,
