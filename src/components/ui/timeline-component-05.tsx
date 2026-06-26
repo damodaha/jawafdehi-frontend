@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 
-import { TransitionsTooltip } from "@/components/ui/TransitionsTooltip";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -38,7 +37,7 @@ function groupReleases(releases: Release[]) {
 
 function TimelineDatePill({ date, version }: Pick<Release, "date" | "version">) {
   const primaryDate = (
-    <Badge className="flex min-h-7 w-auto justify-end rounded-full border border-primary/10 bg-primary/10 px-3.5 py-1 text-sm font-medium text-primary shadow-none hover:bg-primary/50">
+    <Badge className="flex min-h-7 w-auto justify-end rounded-full border border-primary/10 bg-primary/10 px-3.5 py-1 text-sm font-medium text-primary shadow-none hover:bg-primary/20">
       {version}
     </Badge>
   );
@@ -46,13 +45,12 @@ function TimelineDatePill({ date, version }: Pick<Release, "date" | "version">) 
   if (!date) return primaryDate;
 
   return (
-    <TransitionsTooltip
-      className="flex justify-end"
-      content={date}
-      contentClassName="text-xs font-medium text-primary"
-    >
+    <div className="flex flex-col items-end gap-1">
       {primaryDate}
-    </TransitionsTooltip>
+      <span className="max-w-36 text-right text-xs font-medium leading-snug text-primary/65">
+        {date}
+      </span>
+    </div>
   );
 }
 
