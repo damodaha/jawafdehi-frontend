@@ -21,7 +21,6 @@ export function CourtCasesSection({
   return (
     <section id="court-case" className="mb-12 scroll-mt-28 max-w-4xl">
       <h2 className="mb-6 flex items-center text-xl md:text-2xl font-semibold tracking-tight text-primary">
-
         {title}
       </h2>
 
