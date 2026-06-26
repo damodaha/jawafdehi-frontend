@@ -1,10 +1,12 @@
 import { useTranslation } from "react-i18next";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ExternalLink } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import type { CourtCase, CourtCaseHearing } from "@/types/jds";
 import { formatDateWithBS } from "@/utils/date";
+import { cn } from "@/lib/utils";
 
 // ── Court identifier parsing ──────────────────────────────────────────────
 
@@ -24,10 +26,10 @@ const COURT_NAMES_NE: Record<string, string> = {
 function parseCourtIdentifier(
   courtIdentifier: string,
   lang: string
-): { courtName: string; caseNumber: string } {
+): { courtName: string; caseNumber: string; courtSlug: string } {
   const colonIdx = courtIdentifier.indexOf(":");
   if (colonIdx === -1) {
-    return { courtName: courtIdentifier, caseNumber: "" };
+    return { courtName: courtIdentifier, caseNumber: "", courtSlug: courtIdentifier };
   }
 
   const prefix = courtIdentifier.slice(0, colonIdx).toLowerCase();
@@ -40,7 +42,12 @@ function parseCourtIdentifier(
     courtName = COURT_NAMES_EN[prefix] ?? courtIdentifier.slice(0, colonIdx);
   }
 
-  return { courtName, caseNumber };
+  return { courtName, caseNumber, courtSlug: prefix };
+}
+
+function getCourtCaseHref(courtSlug: string, caseNumber: string) {
+  if (!courtSlug || !caseNumber) return "https://ngm.jawafdehi.org";
+  return `https://ngm.jawafdehi.org/case/${encodeURIComponent(courtSlug)}/${encodeURIComponent(caseNumber)}`;
 }
 
 // ── Defendant/Plaintiff from entities ────────────────────────────────────
@@ -72,6 +79,64 @@ function getPartiesByRole(courtCase: CourtCase): {
   return { plaintiffs, defendants };
 }
 
+function getStatusTone(status: string | null | undefined) {
+  const normalized = status?.toLowerCase() || "";
+
+  if (
+    normalized.includes("फैसला") ||
+    normalized.includes("faisala") ||
+    normalized.includes("decision") ||
+    normalized.includes("decided") ||
+    normalized.includes("verdict")
+  ) {
+    return "border-green-200 bg-green-50 text-green-800 dark:border-green-900 dark:bg-green-950 dark:text-green-200";
+  }
+
+  if (
+    normalized.includes("pending") ||
+    normalized.includes("progress") ||
+    normalized.includes("विचाराधीन") ||
+    normalized.includes("चालु") ||
+    normalized.includes("ongoing")
+  ) {
+    return "border-slate-200 bg-slate-100 text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200";
+  }
+
+  return "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200";
+}
+
+function getLatestCourtUpdate(courtCase: CourtCase) {
+  if (courtCase.verdict_date_ad) {
+    return {
+      type: courtCase.case_status || "Faisala",
+      fallbackKey: "caseDetail.courtFaisala",
+      date: formatDateWithBS(courtCase.verdict_date_ad, "PP", courtCase.verdict_date_bs),
+    };
+  }
+
+  const latestHearing = [...courtCase.hearings]
+    .filter((hearing) => hearing.hearing_date_ad)
+    .sort((a, b) => b.hearing_date_ad.localeCompare(a.hearing_date_ad))[0];
+
+  if (latestHearing) {
+    return {
+      type: latestHearing.decision_type || latestHearing.case_status || "Hearing",
+      fallbackKey: "caseDetail.courtHearing",
+      date: formatDateWithBS(latestHearing.hearing_date_ad, "PP", latestHearing.hearing_date_bs),
+    };
+  }
+
+  if (courtCase.registration_date_ad) {
+    return {
+      type: "",
+      fallbackKey: "caseDetail.courtRegistered",
+      date: formatDateWithBS(courtCase.registration_date_ad, "PP", courtCase.registration_date_bs),
+    };
+  }
+
+  return null;
+}
+
 // ── Component ─────────────────────────────────────────────────────────────
 
 interface CourtCaseCardProps {
@@ -84,19 +149,33 @@ export function CourtCaseCard({ courtCaseId, courtCase, isLoading }: CourtCaseCa
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
 
-  const { courtName, caseNumber } = parseCourtIdentifier(courtCaseId, lang);
+  const { courtName, caseNumber, courtSlug } = parseCourtIdentifier(courtCaseId, lang);
+  const courtCaseHref = getCourtCaseHref(courtSlug, caseNumber);
+  const lastUpdate = courtCase ? getLatestCourtUpdate(courtCase) : null;
 
   return (
     <div className="rounded-lg border border-border  p-4">
       {/* Court name + case number header */}
-      <div className="mb-3 min-w-0">
-        <h3 className="break-words text-lg font-semibold leading-snug text-primary/90 md:text-xl">
-          {courtName}
-        </h3>
-        {caseNumber && (
-          <p className="mt-1 break-words text-sm font-normal leading-relaxed text-primary/65">
-            {t("caseDetail.courtCaseNumber", "Case No.")}: {caseNumber}
-          </p>
+      <div className="mb-3 flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <a
+          href={courtCaseHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex min-w-0 flex-wrap items-center gap-2 text-lg font-semibold leading-snug text-primary underline underline-offset-4 transition-colors hover:text-primary/75 md:text-xl"
+        >
+          <span className="break-words">
+            {caseNumber ? `${caseNumber} (${courtName})` : courtName}
+          </span>
+          <ExternalLink className="h-4 w-4 shrink-0" aria-hidden="true" />
+        </a>
+
+        {courtCase?.case_status && (
+          <Badge
+            variant="outline"
+            className={cn("w-fit shrink-0 rounded-full px-3 py-1 text-xs font-semibold", getStatusTone(courtCase.case_status))}
+          >
+            {courtCase.case_status}
+          </Badge>
         )}
       </div>
 
@@ -107,6 +186,15 @@ export function CourtCaseCard({ courtCaseId, courtCase, isLoading }: CourtCaseCa
         </div>
       ) : courtCase ? (
         <div className="space-y-3">
+          {lastUpdate && (
+            <div className="rounded-md border border-border bg-muted/35 px-3 py-2 text-sm leading-relaxed text-primary/80">
+              <span className="font-semibold text-primary/90">
+                {t("caseDetail.courtLastUpdate", "Last update")}:
+              </span>{" "}
+              {lastUpdate.type || t(lastUpdate.fallbackKey)} - {lastUpdate.date}
+            </div>
+          )}
+
           {/* Metadata row */}
           <div className="flex flex-wrap gap-x-5 gap-y-1 text-base md:text-md font-normal leading-[1.7] text-primary/75 break-words">
             {courtCase.case_type && (
@@ -121,22 +209,16 @@ export function CourtCaseCard({ courtCaseId, courtCase, isLoading }: CourtCaseCa
                 {courtCase.category}
               </span>
             )}
-            {courtCase.division && (
-              <span className="break-words">
-                <span className="font-medium text-primary/90">{t("caseDetail.courtDivision", "Division")}:</span>{" "}
-                {courtCase.division}
-              </span>
-            )}
             {courtCase.registration_date_ad && (
               <span className="break-words">
                 <span className="font-medium text-primary/90">{t("caseDetail.courtRegistered", "Registered")}:</span>{" "}
-                {formatDateWithBS(courtCase.registration_date_ad)}
+                {formatDateWithBS(courtCase.registration_date_ad, "PP", courtCase.registration_date_bs)}
               </span>
             )}
-            {courtCase.case_status && (
+            {courtCase.verdict_date_ad && (
               <span className="break-words">
-                <span className="font-medium text-primary/90">{t("caseDetail.courtStatus", "Status")}:</span>{" "}
-                {courtCase.case_status}
+                <span className="font-medium text-primary/90">{t("caseDetail.courtVerdictDate", "Faisala date")}:</span>{" "}
+                {formatDateWithBS(courtCase.verdict_date_ad, "PP", courtCase.verdict_date_bs)}
               </span>
             )}
           </div>
