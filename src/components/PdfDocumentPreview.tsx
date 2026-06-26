@@ -66,22 +66,25 @@ export function PdfDocumentPreview({
     setPageCount(pdf.numPages);
     const loadId = pdfLoadIdRef.current;
 
-    Promise.all(
-      Array.from({ length: pdf.numPages }, async (_, index) => {
-        const page = await pdf.getPage(index + 1);
-        const viewport = page.getViewport({ scale: 1 });
+    (async () => {
+      const sizes: Array<[number, PdfPageSize]> = [];
 
-        return [index + 1, { height: viewport.height, width: viewport.width }] as const;
-      }),
-    )
-      .then((sizes) => {
+      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
         if (pdfLoadIdRef.current !== loadId) return;
+
+        try {
+          const page = await pdf.getPage(pageNumber);
+          const viewport = page.getViewport({ scale: 1 });
+          sizes.push([pageNumber, { height: viewport.height, width: viewport.width }]);
+        } catch {
+          // Keep the default A4 fallback for pages whose dimensions fail to load.
+        }
+      }
+
+      if (pdfLoadIdRef.current === loadId) {
         setPageSizes(Object.fromEntries(sizes));
-      })
-      .catch(() => {
-        if (pdfLoadIdRef.current !== loadId) return;
-        setPageSizes({});
-      });
+      }
+    })();
   };
 
   return (

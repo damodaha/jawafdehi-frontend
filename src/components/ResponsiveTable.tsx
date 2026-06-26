@@ -31,13 +31,26 @@ function convertMarkdownToHtml(markdown: string): string {
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
+  const escapeAttribute = (value: string) =>
+    escapeHtml(value)
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  const getSafeLinkHref = (value: string) => {
+    const trimmed = value.trim();
+    const isSafeHref = /^(https?:\/\/|\/(?!\/)|\.{1,2}\/|#)/i.test(trimmed);
+
+    return isSafeHref ? escapeAttribute(trimmed) : '#';
+  };
 
   const renderInline = (value: string) =>
     escapeHtml(value)
       .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>')
-      .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+      .replace(/\[(.+?)\]\((.+?)\)/g, (_, text: string, url: string) => {
+        const href = getSafeLinkHref(url);
+        return `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+      })
       .replace(/`([^`]+)`/g, '<code>$1</code>');
 
   const isCustomMarkerLine = (line: string) =>

@@ -172,6 +172,7 @@ const CaseDetail = () => {
       hasCourtCases && { id: "court-case", label: t("caseDetail.courtUpdates", "Court updates") },
       hasEvidence && { id: "evidence", label: t("caseDetail.evidence") },
       hasMissingDetails && { id: "missing-details", label: t("caseDetail.missingDetails") },
+      hasNotes && { id: "notes", label: t("caseDetail.notes") },
     ];
 
     return sections.filter((section): section is CaseJumpSection => Boolean(section));
@@ -180,6 +181,7 @@ const CaseDetail = () => {
     hasEvidence,
     hasInvolvedParties,
     hasMissingDetails,
+    hasNotes,
     hasTimeline,
     t,
   ]);

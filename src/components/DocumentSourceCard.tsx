@@ -38,7 +38,8 @@ const isArchiveUrl = (link: string) =>
 const getFileExtension = (link: string) => {
   try {
     const pathname = new URL(link).pathname;
-    return pathname.split(".").pop()?.toLowerCase() ?? "";
+    const lastSegment = pathname.split("/").pop() ?? "";
+    return lastSegment.includes(".") ? lastSegment.split(".").pop()?.toLowerCase() ?? "" : "";
   } catch {
     return "";
   }
@@ -327,7 +328,7 @@ export function DocumentSourceCard({
             )}
 
             {mainDescription && (
-              <p className={`text-base md:text-md font-normal leading-[1.7] text-primary/75 break-words ${byline ? "mt-2.5" : "mt-2"}`}>
+              <p className={`text-base font-normal leading-[1.7] text-primary/75 break-words ${byline ? "mt-2.5" : "mt-2"}`}>
                 {mainDescription}
               </p>
             )}

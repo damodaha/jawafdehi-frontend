@@ -69,6 +69,7 @@ export function DocumentPreviewViewer({
   const [isLoadingMarkdown, setIsLoadingMarkdown] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageInput, setPageInput] = useState("1");
   const [pdfError, setPdfError] = useState(false);
   const [pageSizes, setPageSizes] = useState<Record<number, PdfPageSize>>({});
   const [previewWidth, setPreviewWidth] = useState(760);
@@ -83,6 +84,10 @@ export function DocumentPreviewViewer({
   const downloadUrl = useMemo(() => getDocumentProxyUrl(document.url, true), [document.url]);
   const viewerUrl = useMemo(() => getDocumentViewerUrl(document), [document]);
   const renderedPageWidth = Math.round(previewWidth * zoom);
+
+  useEffect(() => {
+    setPageInput(String(currentPage));
+  }, [currentPage]);
 
   useEffect(() => {
     if (document.type !== "markdown") {
@@ -269,14 +274,31 @@ export function DocumentPreviewViewer({
               className="h-7 w-11 rounded border border-white/20 bg-black/25 px-2 text-center text-sm text-white outline-none focus:border-white/60"
               aria-label={t("documentPreview.currentPage")}
               inputMode="numeric"
-              value={currentPage}
+              value={pageInput}
               onChange={(event) => {
-                const value = Number.parseInt(event.target.value, 10);
-                if (Number.isFinite(value)) setCurrentPage(clamp(value, 1, Math.max(pageCount, 1)));
+                const value = event.target.value;
+                if (value === "" || /^\d+$/.test(value)) {
+                  setPageInput(value);
+
+                  const parsedValue = Number.parseInt(value, 10);
+                  if (Number.isFinite(parsedValue)) {
+                    setCurrentPage(clamp(parsedValue, 1, Math.max(pageCount, 1)));
+                  }
+                }
               }}
-              onBlur={() => goToPage(currentPage)}
+              onBlur={() => {
+                if (pageInput === "") {
+                  setPageInput(String(currentPage));
+                  return;
+                }
+
+                goToPage(Number.parseInt(pageInput, 10));
+              }}
               onKeyDown={(event) => {
-                if (event.key === "Enter") goToPage(currentPage);
+                if (event.key === "Enter") {
+                  const parsedValue = Number.parseInt(pageInput, 10);
+                  goToPage(Number.isFinite(parsedValue) ? parsedValue : currentPage);
+                }
               }}
             />
             <span className="text-white/60">/ {pageCount || "-"}</span>

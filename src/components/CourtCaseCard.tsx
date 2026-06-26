@@ -200,7 +200,7 @@ export function CourtCaseCard({ courtCaseId, courtCase, isLoading }: CourtCaseCa
       ) : courtCase ? (
         <div className="space-y-3">
           {/* Metadata row */}
-          <div className="flex flex-wrap gap-x-5 gap-y-1 text-base md:text-md font-normal leading-[1.7] text-primary/75 break-words">
+          <div className="flex flex-wrap gap-x-5 gap-y-1 text-base font-normal leading-[1.7] text-primary/75 break-words">
             {courtCase.case_type && (
               <span className="break-words">
                 <span className="font-medium text-primary/90">{t("caseDetail.courtCaseType", "Case Type")}:</span>{" "}
@@ -232,7 +232,7 @@ export function CourtCaseCard({ courtCaseId, courtCase, isLoading }: CourtCaseCa
             const { plaintiffs, defendants } = getPartiesByRole(courtCase);
             if (plaintiffs.length === 0 && defendants.length === 0) return null;
             return (
-              <div className="flex flex-wrap gap-x-5 gap-y-1 text-base md:text-md font-normal leading-[1.7] text-primary/75 break-words">
+              <div className="flex flex-wrap gap-x-5 gap-y-1 text-base font-normal leading-[1.7] text-primary/75 break-words">
                 {plaintiffs.length > 0 && (
                   <span className="break-words">
                     <span className="font-medium text-primary/90">{t("caseDetail.courtPlaintiff", "Plaintiff")}:</span>{" "}
