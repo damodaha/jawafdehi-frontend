@@ -163,6 +163,14 @@ export const members: TeamMember[] = [
     ],
   },
   {
+    displayName: { en: "Britika Khanal", ne: "बृतिका खनाल" },
+    thumb: "/assets/teammembers/britika.jpg",
+    description: "Content & Social Media",
+    contacts: [
+      { type: "linkedin", value: "https://np.linkedin.com/in/britika-khanal-217b50257" },
+    ],
+  },
+  {
     displayName: { en: "Shishir Bashyal", ne: "शिशिर बस्याल" },
     thumb: "https://s3.jawafdehi.org/team/shishir.jpeg",
     description: "CEO, Proma.ai; Volunteer",
