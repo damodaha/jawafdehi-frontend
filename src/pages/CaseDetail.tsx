@@ -35,7 +35,7 @@ import { getEntityById } from "@/services/api";
 import type { CourtCase, DocumentSource, JawafEntity } from "@/types/jds";
 import type { Entity } from "@/types/nes";
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { formatCaseDateRange } from "@/utils/date";
+import { formatCaseDateRangeForLanguage } from "@/utils/date";
 import { stripMarkdown } from "@/utils/markdown";
 import { getSubjectEntities } from "@/utils/case-entities";
 import { ReportCaseDialog } from "@/components/ReportCaseDialog";
@@ -167,7 +167,7 @@ const CaseDetail = () => {
       hasInvolvedParties && { id: "parties-involved", label: t("caseDetail.partiesInvolved") },
       hasTimeline && { id: "timeline", label: t("caseDetail.timeline") },
       { id: "overview", label: t("caseDetail.overview") },
-      hasCourtCases && { id: "court-case", label: t("caseDetail.courtCase", "Court Case") },
+      hasCourtCases && { id: "court-case", label: t("caseDetail.courtUpdates", "Court updates") },
       hasEvidence && { id: "evidence", label: t("caseDetail.evidence") },
       hasMissingDetails && { id: "missing-details", label: t("caseDetail.missingDetails") },
     ];
@@ -451,11 +451,26 @@ const CaseDetail = () => {
                       <Calendar className="mr-2 h-5 w-5" />
                       <span className="text-sm">
                         {t("caseDetail.period")}:{" "}
-                        {formatCaseDateRange(
-                          caseData.case_start_date,
-                          caseData.case_end_date,
-                          t("cases.status.ongoing")
-                        )}
+                        {(() => {
+                          const dateRange = formatCaseDateRangeForLanguage(
+                            caseData.case_start_date,
+                            caseData.case_end_date,
+                            t("cases.status.ongoing"),
+                            currentLang
+                          );
+
+                          return (
+                            <>
+                              {dateRange.primary}
+                              {dateRange.secondary && (
+                                <>
+                                  <br />
+                                  ({dateRange.secondary})
+                                </>
+                              )}
+                            </>
+                          );
+                        })()}
                       </span>
                     </div>
 
@@ -523,7 +538,7 @@ const CaseDetail = () => {
                           isLoading: query?.isLoading ?? false,
                         };
                       })}
-                      title={t("caseDetail.courtCase", "Court Case")}
+                      title={t("caseDetail.courtUpdates", "Court updates")}
                     />
 
                     <EvidenceSection
