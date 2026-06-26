@@ -156,27 +156,40 @@ export function CourtCaseCard({ courtCaseId, courtCase, isLoading }: CourtCaseCa
   return (
     <div className="rounded-lg border border-border  p-4">
       {/* Court name + case number header */}
-      <div className="mb-3 flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <a
-          href={courtCaseHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex min-w-0 flex-wrap items-center gap-2 text-lg font-semibold leading-snug text-primary underline underline-offset-4 transition-colors hover:text-primary/75 md:text-xl"
-        >
-          <span className="break-words">
-            {caseNumber ? `${caseNumber} (${courtName})` : courtName}
-          </span>
-          <ExternalLink className="h-4 w-4 shrink-0" aria-hidden="true" />
-        </a>
-
-        {courtCase?.case_status && (
-          <Badge
-            variant="outline"
-            className={cn("w-fit shrink-0 rounded-full px-3 py-1 text-xs font-semibold", getStatusTone(courtCase.case_status))}
+      <div className="mb-3 flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <a
+            href={courtCaseHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-w-0 flex-wrap items-center gap-1.5 text-base font-semibold leading-6 text-primary underline underline-offset-4 transition-colors hover:text-primary/75 md:text-lg"
           >
-            {courtCase.case_status}
-          </Badge>
-        )}
+            <span className="break-words">
+              {caseNumber ? `${caseNumber} (${courtName})` : courtName}
+            </span>
+            <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+          </a>
+        </div>
+
+        <div className="flex shrink-0 flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-end">
+          {lastUpdate && (
+            <p className="max-w-md text-left text-sm leading-5 text-primary/60">
+              <span className="font-medium text-primary/70">
+                {t("caseDetail.courtLastUpdate", "Last update")}:
+              </span>{" "}
+              {lastUpdate.type || t(lastUpdate.fallbackKey)} - {lastUpdate.date}
+            </p>
+          )}
+
+          {courtCase?.case_status && (
+            <Badge
+              variant="outline"
+              className={cn("w-fit rounded-full px-3 py-1 text-xs font-semibold", getStatusTone(courtCase.case_status))}
+            >
+              {courtCase.case_status}
+            </Badge>
+          )}
+        </div>
       </div>
 
       {isLoading ? (
@@ -186,15 +199,6 @@ export function CourtCaseCard({ courtCaseId, courtCase, isLoading }: CourtCaseCa
         </div>
       ) : courtCase ? (
         <div className="space-y-3">
-          {lastUpdate && (
-            <div className="rounded-md border border-border bg-muted/35 px-3 py-2 text-sm leading-relaxed text-primary/80">
-              <span className="font-semibold text-primary/90">
-                {t("caseDetail.courtLastUpdate", "Last update")}:
-              </span>{" "}
-              {lastUpdate.type || t(lastUpdate.fallbackKey)} - {lastUpdate.date}
-            </div>
-          )}
-
           {/* Metadata row */}
           <div className="flex flex-wrap gap-x-5 gap-y-1 text-base md:text-md font-normal leading-[1.7] text-primary/75 break-words">
             {courtCase.case_type && (

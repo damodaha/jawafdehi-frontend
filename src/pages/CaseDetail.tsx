@@ -542,7 +542,7 @@ const CaseDetail = () => {
                     />
                   </aside>
 
-                  <div className="min-w-0 w-full max-w-5xl rounded-lg bg-background px-4 py-6 shadow-sm ring-1 ring-border/60 sm:px-6 lg:col-start-2 lg:px-10 xl:px-12">
+                  <div className="min-w-0 w-full max-w-6xl lg:col-start-2 lg:pl-8 xl:pl-24">
                     <KeyAllegationsSection
                       allegations={caseData.key_allegations || []}
                       emptyLabel={t("common.notAvailable")}
