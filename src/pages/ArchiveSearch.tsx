@@ -42,7 +42,7 @@ import {
 } from "@/utils/archive-search-params";
 import { getFacetItemLabel } from "@/utils/case-entities";
 
-type RefinementName = SidebarFilterName | "type" | "tags";
+type RefinementName = SidebarFilterName | "type";
 
 const validSorts = new Set<ArchiveSearchSort>([
   "relevance",
@@ -52,9 +52,7 @@ const validSorts = new Set<ArchiveSearchSort>([
 ]);
 const archiveSearchPageSize = 4;
 const emptyFacets: ArchiveSearchFacets = {
-  type: [],
   entity_type: [],
-  role: [],
   case_type: [],
   tags: [],
 };
@@ -120,7 +118,7 @@ export default function ArchiveSearch() {
     updateParams({ [name]: value, page: 1 });
   };
 
-  const toggleRefinement = (name: SidebarFilterName | "tags", value: string) => {
+  const toggleRefinement = (name: SidebarFilterName, value: string) => {
     setSearchParams(
       toggleArchiveSearchParam(searchParams, name, value),
     );
@@ -141,7 +139,7 @@ export default function ArchiveSearch() {
   const clearRefinements = () => {
     const next = new URLSearchParams(searchParams);
     (
-      ["type", "entity_type", "role", "case_type", "tags"] as RefinementName[]
+      ["type", "entity_type", "case_type", "tags"] as RefinementName[]
     ).forEach((name) => next.delete(name));
     next.delete("page");
     setSearchParams(next);
@@ -154,13 +152,12 @@ export default function ArchiveSearch() {
 
   const selectedSidebarFilters = {
     entity_type: params.entity_type || [],
-    role: params.role || [],
     case_type: params.case_type || [],
+    tags: params.tags || [],
   };
   const selectedRefinements = {
     ...selectedSidebarFilters,
     type: selectedRecordType === "all" ? [] : [selectedRecordType],
-    tags: params.tags || [],
   };
   const activeRefinementCount = Object.values(selectedRefinements).reduce(
     (count, values) => count + values.length,
@@ -173,6 +170,7 @@ export default function ArchiveSearch() {
       <SearchFiltersSkeleton />
     ) : (
       <SearchFilters
+        counts={displayData?.counts || {}}
         facets={facets}
         onClear={clearRefinements}
         onToggle={toggleRefinement}
@@ -296,7 +294,7 @@ export default function ArchiveSearch() {
           <section
             aria-busy={isInitialLoading || isRefreshing}
             aria-label="Archive search results"
-            className="self-start"
+            className="min-w-0 self-start"
           >
             {showError ? (
               <Alert className="mb-5" variant="destructive">
@@ -337,9 +335,11 @@ export default function ArchiveSearch() {
 
 function readRecordType(searchParams: URLSearchParams): ArchiveSearchType {
   const requestedType = searchParams.get("type");
-  return ["all", "case", "entity", "document"].includes(requestedType || "")
+  return ["all", "entity", "material", "courtcase", "case"].includes(
+    requestedType || "",
+  )
     ? (requestedType as ArchiveSearchType)
-    : "case";
+    : "all";
 }
 
 function readParams(
@@ -352,7 +352,6 @@ function readParams(
     q: searchParams.get("q") || undefined,
     type: selectedRecordType === "all" ? undefined : selectedRecordType,
     entity_type: searchParams.getAll("entity_type"),
-    role: searchParams.getAll("role"),
     case_type: searchParams.getAll("case_type"),
     tags: searchParams.getAll("tags"),
     sort: requestedSort && validSorts.has(requestedSort) ? requestedSort : "relevance",
@@ -404,7 +403,7 @@ function ArchiveSearchResults({
   return (
     <div className="space-y-3">
       {data.results.map((result) => (
-        <SearchResultCard key={`${result.result_type}-${result.id}`} result={result} />
+        <SearchResultCard key={`${result.type}-${result.id}`} result={result} />
       ))}
     </div>
   );
@@ -415,18 +414,17 @@ function getSelectedItems(
   selected: Record<RefinementName, string[]>,
   translate: (key: string) => string,
 ) {
+  // Selected-filter pill labels are localized via getFacetItemLabel. The "type"
+  // refinement has no facet group (it's the record-type radio), so it falls back
+  // to a humanized value. `facets` carries {name, count} under the unified contract.
   return (Object.keys(selected) as RefinementName[]).flatMap((name) =>
     selected[name].map((value) => {
-      const facetItem = facets[name].find((item) => item.name === value) ?? {
-        name: value,
-        display_name: humanize(value),
-        count: 0,
-      };
+      const facetItem =
+        name === "type"
+          ? { name: value }
+          : facets[name].find((item) => item.name === value) ?? { name: value };
       return { name, value, label: getFacetItemLabel(name, facetItem, translate) };
     }),
   );
 }
 
-function humanize(value: string) {
-  return value.replaceAll("_", " ").replaceAll("-", " ");
-}
