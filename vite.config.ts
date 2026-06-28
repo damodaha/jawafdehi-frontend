@@ -35,31 +35,34 @@ export default defineConfig(({ mode, isSsrBuild }) => {
 
   return {
     server: {
-      // Loopback only; reached via SSH port-forward of this single port.
-      host: "127.0.0.1",
+      // Loopback by default (reached via SSH port-forward of this single port).
+      // In compose, set VITE_DEV_HOST=0.0.0.0 so the port is reachable from the
+      // host across the container boundary.
+      host: process.env.VITE_DEV_HOST || "127.0.0.1",
       port: 40114,
       strictPort: true,
-      // Same-origin /api and /admin -> local gunicorn, so only one tunnel is needed.
-      proxy: {
-        "/api": {
-          target: "http://127.0.0.1:40173",
-          changeOrigin: true,
-        },
-        "/admin": {
-          target: "http://127.0.0.1:40173",
-          changeOrigin: true,
-        },
-        // Django/WhiteNoise static (admin CSS etc.) lives under /static.
-        "/static": {
-          target: "http://127.0.0.1:40173",
-          changeOrigin: true,
-        },
-        // Wagtail-managed media (uploaded images/renditions, documents).
-        "/media": {
-          target: "http://127.0.0.1:40173",
-          changeOrigin: true,
-        },
-      },
+      // Same-origin /api, /admin, /static, /media -> the Think-Big monolith (the
+      // consolidated backend that serves unified search AND the per-app APIs like
+      // /api/cases/ used to hydrate result cards). One target, env-overridable so
+      // the same config works on the host (default :48000) and inside compose
+      // (VITE_API_PROXY_TARGET=http://platform:8080).
+      proxy: (() => {
+        const apiTarget =
+          process.env.VITE_API_PROXY_TARGET || "http://127.0.0.1:48000";
+        const proxyOpts = { target: apiTarget, changeOrigin: true };
+        return {
+          "/api": proxyOpts,
+          // NES (entities) lives under /nes/api and NGM under /ngm/api on the same
+          // monolith; proxy both so NES entity pages / per-app calls resolve.
+          "/nes": proxyOpts,
+          "/ngm": proxyOpts,
+          "/admin": proxyOpts,
+          // Django/WhiteNoise static (admin CSS etc.) lives under /static.
+          "/static": proxyOpts,
+          // Wagtail-managed media (uploaded images/renditions, documents).
+          "/media": proxyOpts,
+        };
+      })(),
     },
     plugins: [
       react(),
