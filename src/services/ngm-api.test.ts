@@ -17,6 +17,14 @@ describe("materialTail", () => {
   it("returns a bare tail unchanged", () => {
     expect(materialTail("dfmis/2")).toBe("dfmis/2");
   });
+
+  it("preserves the documented id shapes as-is (no reserved chars)", () => {
+    // The common live shapes (slash separators, dots) carry through unchanged;
+    // getMaterial encodes each segment, but the tail itself is unmodified here.
+    expect(materialTail("https://jawafdehi.org/material/court/special.081-cr-0079")).toBe(
+      "court/special.081-cr-0079",
+    );
+  });
 });
 
 describe("parseCourtCaseRef", () => {

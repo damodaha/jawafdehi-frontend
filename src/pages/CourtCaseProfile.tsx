@@ -35,22 +35,29 @@ export default function CourtCaseProfile() {
   });
 
   const caseNumber = parsed?.caseNumber ?? "";
-  const courtCaseIri = `https://jawafdehi.org/courtcase/${tail.replace(/\/+$/, "")}`;
+  // The canonical court-case @id IRI lowercases court + case number (matches the
+  // backend build_courtcase_iri); use it as the JSON-LD `url` so the structured
+  // data points at one canonical URL, not a mixed-case duplicate.
+  const courtCaseIri = parsed
+    ? `https://jawafdehi.org/courtcase/${parsed.court.toLowerCase()}/${parsed.caseNumber.toLowerCase()}`
+    : "";
   const title = data
     ? `${caseNumber} — ${data.case_type || "Court case"}`
     : caseNumber || "Court case";
 
-  // schema.org JSON-LD for crawlers (parity with the retired R2 landing pages).
+  // schema.org JSON-LD for crawlers (parity with the retired R2 landing pages). A
+  // court case is a document/record, so CreativeWork (matches MaterialProfile) —
+  // NOT Legislation, which is schema.org's type for statutes/acts.
   const jsonLd = data
     ? JSON.stringify({
         "@context": "https://schema.org",
-        "@type": "Legislation",
+        "@type": "CreativeWork",
         name: title,
         url: courtCaseIri,
         identifier: caseNumber,
         inLanguage: "ne",
         isAccessibleForFree: true,
-        ...(data.registration_date_ad ? { datePublished: data.registration_date_ad } : {}),
+        ...(data.registration_date_ad ? { dateCreated: data.registration_date_ad } : {}),
         publisher: { "@type": "Organization", name: "Jawafdehi NGM" },
       })
     : null;

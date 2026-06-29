@@ -118,10 +118,12 @@ async function prefetch(url: string, queryClient: QueryClient): Promise<void> {
     await queryClient.prefetchQuery({
       queryKey: ['ngm-courtcase', court, caseNumber],
       queryFn: async () => {
-        const [core, hearings, entities] = await Promise.all([
-          axios.get(`${base}/`).then((r) => r.data),
-          axios.get(`${base}/hearings`).then((r) => r.data?.results ?? r.data ?? []),
-          axios.get(`${base}/entities`).then((r) => r.data?.results ?? r.data ?? []),
+        // Core must load; hearings/entities degrade to [] (mirrors
+        // getCourtCaseFull so SSR and client agree on cache shape).
+        const core = await axios.get(`${base}/`).then((r) => r.data);
+        const [hearings, entities] = await Promise.all([
+          axios.get(`${base}/hearings`).then((r) => r.data?.results ?? r.data ?? []).catch(() => []),
+          axios.get(`${base}/entities`).then((r) => r.data?.results ?? r.data ?? []).catch(() => []),
         ]);
         return { ...core, hearings, entities };
       },

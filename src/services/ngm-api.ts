@@ -35,6 +35,11 @@ export function materialTail(iriOrTail: string): string {
   return i === -1 ? iriOrTail : iriOrTail.slice(i + MATERIAL_MARKER.length);
 }
 
+/** Percent-encode each path segment of a tail, preserving the `/` separators. */
+function encodeTail(tail: string): string {
+  return tail.split("/").map(encodeURIComponent).join("/");
+}
+
 /**
  * A material is stored schema.org JSON-LD (bilingual language maps + a `jawafdehi:`
  * extension namespace), the same family as NES entities. We type only the spine and
@@ -61,7 +66,7 @@ export interface Material {
  * Accepts either the bare tail or a full material IRI.
  */
 export async function getMaterial(iriOrTail: string): Promise<Material> {
-  const tail = materialTail(iriOrTail);
+  const tail = encodeTail(materialTail(iriOrTail));
   const endpoint = `/materials/${tail}`;
   try {
     const response = await axios.get<Material>(`${NGM_API_BASE_URL}${endpoint}`);
@@ -140,10 +145,13 @@ export async function getCourtCaseFull(courtOrRef: string, caseNumber?: string):
     caseNumber === undefined
       ? parseCourtCaseRef(courtOrRef)
       : { court: courtOrRef, caseNumber };
-  const [core, hearings, entities] = await Promise.all([
-    getCourtCase(court, number),
-    getCaseSubResource<CourtCaseHearing>(court, number, 'hearings'),
-    getCaseSubResource<CourtCaseEntity>(court, number, 'entities'),
+  // The core case MUST load (it determines whether the case exists / the page
+  // 404s). Hearings + entities are supplementary: a flaky or empty sub-resource
+  // must NOT tank an otherwise-valid page, so they degrade to [] on failure.
+  const core = await getCourtCase(court, number);
+  const [hearings, entities] = await Promise.all([
+    getCaseSubResource<CourtCaseHearing>(court, number, 'hearings').catch(() => []),
+    getCaseSubResource<CourtCaseEntity>(court, number, 'entities').catch(() => []),
   ]);
   return { ...core, hearings, entities };
 }
