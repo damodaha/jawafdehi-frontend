@@ -26,7 +26,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Banknote, Calendar, FileText, AlertTriangle, ArrowLeft, ExternalLink, AlertCircle, Info, Mail, MapPin, MessageCircle, Scale, StickyNote, User, Share2 } from "lucide-react";
-import { getCaseById, getCaseByCourtRef, getCourtCase, getDocumentSourceById } from "@/services/jds-api";
+import { getCaseById, getCaseByCourtRef, getDocumentSourceById } from "@/services/jds-api";
+import { getCourtCase } from "@/services/ngm-api";
 import { getEntityById } from "@/services/api";
 import type { CourtCase, DocumentSource, JawafEntity } from "@/types/jds";
 import type { Entity } from "@/types/nes";
