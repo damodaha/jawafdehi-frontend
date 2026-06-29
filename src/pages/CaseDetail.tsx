@@ -577,6 +577,7 @@ const CaseDetail = () => {
                                   courtCaseId={courtCaseId}
                                   courtCase={query?.data as CourtCase | undefined}
                                   isLoading={query?.isLoading ?? false}
+                                  linkToDetail
                                 />
                               );
                             })}
