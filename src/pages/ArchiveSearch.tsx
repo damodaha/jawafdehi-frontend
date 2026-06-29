@@ -31,6 +31,7 @@ import type {
   ArchiveSearchFacets,
   ArchiveSearchParams,
   ArchiveSearchResponse,
+  ArchiveSearchResultType,
   ArchiveSearchSort,
   ArchiveSearchType,
 } from "@/types/search";
@@ -57,12 +58,27 @@ const emptyFacets: ArchiveSearchFacets = {
   tags: [],
 };
 
-export default function ArchiveSearch() {
+// When `lockedType` is set the page is a single-type browse view (e.g. the NGM
+// Materials / Court-cases landing pages reuse this component): the record-type is
+// pinned, the type selector is hidden, and the heading/SEO are overridden.
+export interface ArchiveSearchProps {
+  lockedType?: ArchiveSearchResultType;
+  heading?: string;
+  description?: string;
+  canonicalPath?: string;
+}
+
+export default function ArchiveSearch({
+  lockedType,
+  heading,
+  description,
+  canonicalPath,
+}: ArchiveSearchProps = {}) {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedRecordType = useMemo(
-    () => readRecordType(searchParams),
-    [searchParams],
+    () => lockedType ?? readRecordType(searchParams),
+    [searchParams, lockedType],
   );
   const params = useMemo(
     () => readParams(searchParams, selectedRecordType),
@@ -157,7 +173,9 @@ export default function ArchiveSearch() {
   };
   const selectedRefinements = {
     ...selectedSidebarFilters,
-    type: selectedRecordType === "all" ? [] : [selectedRecordType],
+    // On a locked single-type page the type isn't a removable refinement.
+    type:
+      lockedType || selectedRecordType === "all" ? [] : [selectedRecordType],
   };
   const activeRefinementCount = Object.values(selectedRefinements).reduce(
     (count, values) => count + values.length,
@@ -172,6 +190,7 @@ export default function ArchiveSearch() {
       <SearchFilters
         counts={displayData?.counts || {}}
         facets={facets}
+        hideTypeSelector={Boolean(lockedType)}
         onClear={clearRefinements}
         onToggle={toggleRefinement}
         onTypeChange={updateRecordType}
@@ -184,23 +203,26 @@ export default function ArchiveSearch() {
   return (
     <main id="main-content" className="min-h-screen bg-background py-8 md:py-12">
       <Helmet>
-        <title>Archive Search | Jawafdehi Nepal</title>
+        <title>{heading ? `${heading} | Jawafdehi Nepal` : "Archive Search | Jawafdehi Nepal"}</title>
         <meta
-          content="Search Jawafdehi's public archive across accountability cases, tracked entities, locations, and evidence documents."
+          content={
+            description ||
+            "Search Jawafdehi's public archive across accountability cases, tracked entities, locations, and evidence documents."
+          }
           name="description"
         />
-        <link href="https://jawafdehi.org/search" rel="canonical" />
+        <link href={`https://jawafdehi.org${canonicalPath || "/search"}`} rel="canonical" />
       </Helmet>
 
       <div className="container mx-auto px-4">
         <header className="max-w-3xl">
 
           <h1 className="mt-3 text-3xl font-extrabold text-primary md:text-4xl">
-            Archive Search
+            {heading || "Archive Search"}
           </h1>
           <p className="mt-3 text-base leading-7 text-muted-foreground">
-            Search Jawafdehi&apos;s public accountability archive across cases,
-            people, offices, locations, allegations, and evidence documents.
+            {description ||
+              "Search Jawafdehi's public accountability archive across cases, people, offices, locations, allegations, and evidence documents."}
           </p>
         </header>
 

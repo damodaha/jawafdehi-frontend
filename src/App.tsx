@@ -34,6 +34,8 @@ import EmbedCaseCard from "./pages/EmbedCaseCard";
 import Privacy from "./pages/Privacy";
 import TermsOfService from "./pages/TermsOfService";
 import ArchiveSearch from "./pages/ArchiveSearch";
+import Materials from "./pages/Materials";
+import CourtCases from "./pages/CourtCases";
 import NotFound from "./pages/NotFound";
 import { ScrollToTop } from "@/components/ScrollToTop";
 // Casework portal (VOL-3) — mounted at /portal.
@@ -112,6 +114,9 @@ const App = () => (
             <Route path="/case/:id" element={<CaseDetail />} />
             <Route path="/entities" element={<Entities />} />
             <Route path="/search" element={<ArchiveSearch />} />
+            {/* NGM single-type browse pages (unified-archive search, type-pinned). */}
+            <Route path="/materials" element={<Materials />} />
+            <Route path="/courtcases" element={<CourtCases />} />
             {/* Legacy Jawafdehi case-entity profile (numeric id, single segment). */}
             <Route path="/entity/:id" element={<EntityProfile />} />
             {/* NES entity by IRI tail (multi-segment, e.g. organization/.../tu).
