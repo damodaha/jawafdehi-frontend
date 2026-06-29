@@ -106,6 +106,28 @@ async function prefetch(url: string, queryClient: QueryClient): Promise<void> {
     });
     return;
   }
+
+  // NGM court case profile (/courtcase/<court>/<case_number>). Assembles the
+  // composite-key core + hearings + entities into one CourtCase, keyed to match
+  // CourtCaseProfile's useQuery (['ngm-courtcase', court, caseNumber]).
+  const courtcaseMatch = url.match(/^\/courtcase\/([^/]+)\/(.+?)\/?(?:[?#]|$)/);
+  if (courtcaseMatch) {
+    const court = decodeURIComponent(courtcaseMatch[1]);
+    const caseNumber = decodeURIComponent(courtcaseMatch[2]);
+    const base = `${NGM_API_BASE_URL}/cases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}`;
+    await queryClient.prefetchQuery({
+      queryKey: ['ngm-courtcase', court, caseNumber],
+      queryFn: async () => {
+        const [core, hearings, entities] = await Promise.all([
+          axios.get(`${base}/`).then((r) => r.data),
+          axios.get(`${base}/hearings`).then((r) => r.data?.results ?? r.data ?? []),
+          axios.get(`${base}/entities`).then((r) => r.data?.results ?? r.data ?? []),
+        ]);
+        return { ...core, hearings, entities };
+      },
+    });
+    return;
+  }
 }
 
 export async function render(url: string): Promise<RenderResult> {

@@ -19,7 +19,7 @@
 
 import axios from 'axios';
 import { JDSApiError } from './jds-api';
-import type { CourtCase } from '@/types/jds';
+import type { CourtCase, CourtCaseHearing, CourtCaseEntity } from '@/types/jds';
 
 const NGM_API_BASE_URL =
   (typeof import.meta !== 'undefined' && import.meta.env?.VITE_NGM_API_BASE_URL) ||
@@ -103,6 +103,49 @@ export async function getCourtCase(courtOrRef: string, caseNumber?: string): Pro
   } catch (error) {
     handleNgmError(error, endpoint);
   }
+}
+
+interface Paginated<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+
+/** Fetch a composite-key sub-resource list (hearings/entities), unwrapping pages. */
+async function getCaseSubResource<T>(
+  court: string,
+  caseNumber: string,
+  sub: 'hearings' | 'entities' | 'documents',
+): Promise<T[]> {
+  const endpoint = `/cases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}/${sub}`;
+  try {
+    const response = await axios.get<Paginated<T> | T[]>(`${NGM_API_BASE_URL}${endpoint}`);
+    const data = response.data;
+    return Array.isArray(data) ? data : (data.results ?? []);
+  } catch (error) {
+    handleNgmError(error, endpoint);
+  }
+}
+
+/**
+ * Retrieve a FULL court case: the composite-key core plus its hearings and
+ * party entities (separate sub-resource endpoints), assembled into one CourtCase
+ * shaped for CourtCaseCard. Accepts a `<court>:<number>` ref or explicit pair.
+ */
+export async function getCourtCaseFull(ref: string): Promise<CourtCase>;
+export async function getCourtCaseFull(court: string, caseNumber: string): Promise<CourtCase>;
+export async function getCourtCaseFull(courtOrRef: string, caseNumber?: string): Promise<CourtCase> {
+  const { court, caseNumber: number } =
+    caseNumber === undefined
+      ? parseCourtCaseRef(courtOrRef)
+      : { court: courtOrRef, caseNumber };
+  const [core, hearings, entities] = await Promise.all([
+    getCourtCase(court, number),
+    getCaseSubResource<CourtCaseHearing>(court, number, 'hearings'),
+    getCaseSubResource<CourtCaseEntity>(court, number, 'entities'),
+  ]);
+  return { ...core, hearings, entities };
 }
 
 /** Normalize an axios/unknown error into a JDSApiError (shared error shape). */

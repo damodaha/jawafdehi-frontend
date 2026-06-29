@@ -23,6 +23,7 @@ import CaseDetail from "./pages/CaseDetail";
 import EntityProfile from "./pages/EntityProfile";
 import NesEntityProfile from "./pages/NesEntityProfile";
 import MaterialProfile from "./pages/MaterialProfile";
+import CourtCaseProfile from "./pages/CourtCaseProfile";
 import EntityResponse from "./pages/EntityResponse";
 import ModerationDashboard from "./pages/ModerationDashboard";
 import Feedback from "./pages/Feedback";
@@ -119,6 +120,8 @@ const App = () => (
             <Route path="/entity/*" element={<NesEntityProfile />} />
             {/* NGM governance material by IRI tail (/material/<source>/<ident>). */}
             <Route path="/material/*" element={<MaterialProfile />} />
+            {/* NGM court case by IRI tail (/courtcase/<court>/<case_number>). */}
+            <Route path="/courtcase/*" element={<CourtCaseProfile />} />
             <Route path="/ask" element={<GuestChat />} />
             <Route path="/entity-response/:id" element={<EntityResponse />} />
             <Route path="/moderation" element={<ModerationDashboard />} />
