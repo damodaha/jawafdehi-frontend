@@ -12,6 +12,9 @@ import axios from 'axios';
 import type { JawafEntity } from './types/jds';
 
 const JDS_API_BASE_URL = process.env.VITE_JDS_API_BASE_URL || 'https://portal.jawafdehi.org/api';
+// NGM read plane. SSR runs in Node, so a relative base won't resolve — fall back to
+// the production NGM host when no absolute override is set.
+const NGM_API_BASE_URL = process.env.VITE_NGM_API_BASE_URL || 'https://ngm.jawafdehi.org/ngm/api';
 
 export interface RenderResult {
   html: string;
@@ -82,6 +85,22 @@ async function prefetch(url: string, queryClient: QueryClient): Promise<void> {
       queryKey: ['jds-entity', entityId],
       queryFn: async () => {
         const res = await axios.get<JawafEntity>(`${JDS_API_BASE_URL}/entities/${entityId}/`);
+        return res.data;
+      },
+    });
+    return;
+  }
+
+  // NGM material profile (/material/<source>/<ident>). The query key mirrors
+  // MaterialProfile's useQuery (['ngm-material', tail]) so the client hydrates
+  // from the dehydrated cache instead of refetching.
+  const materialMatch = url.match(/^\/material\/(.+?)(?:[?#]|$)/);
+  if (materialMatch) {
+    const tail = decodeURIComponent(materialMatch[1]);
+    await queryClient.prefetchQuery({
+      queryKey: ['ngm-material', tail],
+      queryFn: async () => {
+        const res = await axios.get(`${NGM_API_BASE_URL}/materials/${tail}`);
         return res.data;
       },
     });
