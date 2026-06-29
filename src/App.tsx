@@ -22,6 +22,7 @@ import Information from "./pages/Information";
 import CaseDetail from "./pages/CaseDetail";
 import EntityProfile from "./pages/EntityProfile";
 import NesEntityProfile from "./pages/NesEntityProfile";
+import MaterialProfile from "./pages/MaterialProfile";
 import EntityResponse from "./pages/EntityResponse";
 import ModerationDashboard from "./pages/ModerationDashboard";
 import Feedback from "./pages/Feedback";
@@ -116,6 +117,8 @@ const App = () => (
                 React Router prefers the more specific :id route for single-segment
                 numeric ids, so this splat only catches the hierarchical NES IRIs. */}
             <Route path="/entity/*" element={<NesEntityProfile />} />
+            {/* NGM governance material by IRI tail (/material/<source>/<ident>). */}
+            <Route path="/material/*" element={<MaterialProfile />} />
             <Route path="/ask" element={<GuestChat />} />
             <Route path="/entity-response/:id" element={<EntityResponse />} />
             <Route path="/moderation" element={<ModerationDashboard />} />
