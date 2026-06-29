@@ -243,5 +243,45 @@ export interface CaseStatistics {
   entities_tracked: number;
   cases_under_investigation: number;
   cases_closed: number;
+  // Cross-source data-quality coverage (NES entities + NGM judicial records).
+  // Optional so older cached payloads / partial responses stay type-safe.
+  nes?: NesMetrics;
+  ngm?: NgmMetrics;
   last_updated: string;
+}
+
+/** NES (entities) coverage metrics surfaced by the data quality dashboard. */
+export interface NesMetrics {
+  total: number;
+  by_prefix: { prefix: string; count: number }[];
+  by_type: { entity_type: string; count: number }[];
+  counts: {
+    with_description: number;
+    with_sources: number;
+    with_bilingual_name: number;
+  };
+  completeness: {
+    with_description: number;
+    with_sources: number;
+    with_bilingual_name: number;
+  };
+}
+
+/** NGM (judicial) coverage metrics surfaced by the data quality dashboard. */
+export interface NgmMetrics {
+  court_cases_total: number;
+  materials_total: number;
+  courts_total: number;
+  by_court_type: { court__court_type: string; count: number }[];
+  by_material_type: { material_type: string; count: number }[];
+  counts: {
+    nes_resolved: number;
+    with_registration_date: number;
+    with_document_sources: number;
+  };
+  completeness: {
+    nes_resolved: number;
+    with_registration_date: number;
+    with_document_sources: number;
+  };
 }

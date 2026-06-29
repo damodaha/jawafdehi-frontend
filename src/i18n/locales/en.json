@@ -1170,5 +1170,39 @@
   "courts": {
     "supreme": "Supreme Court",
     "special": "Special Court"
+  },
+  "dataQuality": {
+    "title": "Data Quality & Coverage",
+    "intro": "What our public datasets track today, and how complete the records are.",
+    "error": "Metrics are temporarily unavailable. Please try again later.",
+    "empty": "No data yet",
+    "headlineHeading": "At a glance",
+    "breakdownHeading": "What's tracked",
+    "nes": {
+      "heading": "Entities (NES)",
+      "description": "People, offices, organizations and locations tracked across the archive.",
+      "total": "Entities tracked",
+      "byPrefix": "By category",
+      "byType": "By type"
+    },
+    "ngm": {
+      "heading": "Judicial records (NGM)",
+      "description": "Court cases, hearings and source documents collected from Nepal's judiciary.",
+      "courtCases": "Court records",
+      "materials": "Materials",
+      "courts": "Courts",
+      "byCourtType": "By court type",
+      "byMaterialType": "By material type"
+    },
+    "completeness": {
+      "heading": "Completeness",
+      "withDescription": "Have a description",
+      "withSources": "Have sources",
+      "withBilingualName": "Bilingual name (EN + NE)",
+      "nesResolved": "Resolved to a tracked entity",
+      "withRegistrationDate": "Have a registration date",
+      "withDocumentSources": "Have document sources",
+      "ofTotal": "{{part}} of {{total}} ({{pct}}%)"
+    }
   }
 }
