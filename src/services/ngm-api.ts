@@ -6,8 +6,9 @@
  * public — materials and court cases are derived from public-domain government
  * documents.
  *
- *   GET /ngm/api/materials/<source>/<ident>          -> material JSON-LD (schema.org)
- *   GET /ngm/api/courts/<court>/cases/<case_number>/  -> court case (composite key)
+ *   GET /ngm/api/materials/<source>/<ident>      -> material JSON-LD (schema.org)
+ *   GET /ngm/api/cases/<court>/<case_number>/    -> court case (composite key)
+ *   GET /ngm/api/cases/<court>/<case_number>/{hearings,entities,documents}
  *
  * Base URL defaults to the SAME-ORIGIN relative `/ngm/api` so the Vite dev proxy /
  * monolith ingress resolves it. An absolute override (VITE_NGM_API_BASE_URL) is
@@ -92,8 +93,10 @@ export async function getCourtCase(courtOrRef: string, caseNumber?: string): Pro
     caseNumber === undefined
       ? parseCourtCaseRef(courtOrRef)
       : { court: courtOrRef, caseNumber };
-  // Case numbers contain hyphens but no slashes; encode each segment.
-  const endpoint = `/courts/${encodeURIComponent(court)}/cases/${encodeURIComponent(number)}/`;
+  // Composite-key detail route is /cases/<court>/<case_number>/ (mounted at
+  // /ngm/api/), NOT nested under /courts/. Case numbers contain hyphens but no
+  // slashes; encode each segment.
+  const endpoint = `/cases/${encodeURIComponent(court)}/${encodeURIComponent(number)}/`;
   try {
     const response = await axios.get<CourtCase>(`${NGM_API_BASE_URL}${endpoint}`);
     return response.data;
