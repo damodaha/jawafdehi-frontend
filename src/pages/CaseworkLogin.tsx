@@ -10,7 +10,7 @@ const CaseworkLogin = () => {
 
   // Already signed in (e.g. landed here after the OIDC round-trip) — go inside.
   useEffect(() => {
-    if (user) navigate("/portal/reviews", { replace: true });
+    if (user) navigate("/admin/reviews", { replace: true });
   }, [user, navigate]);
 
   const handleSignIn = () => {

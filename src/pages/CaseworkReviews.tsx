@@ -122,7 +122,7 @@ export default function CaseworkReviews() {
     setConflictId(null);
     try {
       const review = await submitReview(payload);
-      navigate(`/portal/reviews/${review.id}`);
+      navigate(`/admin/reviews/${review.id}`);
       return true;
     } catch (e: unknown) {
       setErr(apiErrorMessage(e, fallback));
@@ -175,7 +175,7 @@ export default function CaseworkReviews() {
                     <button
                       type="button"
                       className="underline font-medium"
-                      onClick={() => navigate(`/portal/reviews/${conflictId}`)}
+                      onClick={() => navigate(`/admin/reviews/${conflictId}`)}
                     >
                       View existing review
                     </button>
@@ -237,7 +237,7 @@ export default function CaseworkReviews() {
                     <ReviewRow
                       key={r.id}
                       review={r}
-                      onClick={() => navigate(`/portal/reviews/${r.id}`)}
+                      onClick={() => navigate(`/admin/reviews/${r.id}`)}
                     />
                   ))}
                 </ul>
