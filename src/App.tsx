@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ClientOnly } from "@/components/ClientOnly";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { SentryErrorFallback } from "@/components/SentryErrorFallback";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import Index from "./pages/Index";
 import Cases from "./pages/Cases";
@@ -38,10 +38,22 @@ import Materials from "./pages/Materials";
 import CourtCases from "./pages/CourtCases";
 import NotFound from "./pages/NotFound";
 import { ScrollToTop } from "@/components/ScrollToTop";
-// Casework portal (VOL-3) — mounted at /portal.
+// Unified admin panel — mounted at /admin (folds in the old /portal casework).
 import { AuthProvider } from "react-oidc-context";
 import { getUserManager, onSigninCallback } from "./services/oidc";
 import { CaseworkAuthProvider } from "./context/CaseworkAuthContext";
+import AdminLayout from "@/components/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/Dashboard";
+import NesEntities from "./pages/admin/nes/NesEntities";
+import NesEntityCreate from "./pages/admin/nes/NesEntityCreate";
+import NesEntityEdit from "./pages/admin/nes/NesEntityEdit";
+import NgmCourtCases from "./pages/admin/ngm/NgmCourtCases";
+import NgmCourtCaseForm from "./pages/admin/ngm/NgmCourtCaseForm";
+import NgmMaterials from "./pages/admin/ngm/NgmMaterials";
+import NgmMaterialForm from "./pages/admin/ngm/NgmMaterialForm";
+import AdminCases from "./pages/admin/jawafdehi/AdminCases";
+import AdminSources from "./pages/admin/jawafdehi/AdminSources";
+import Moderation from "./pages/admin/casework/Moderation";
 import CaseworkLogin from "./pages/CaseworkLogin";
 import CaseworkCallback from "./pages/CaseworkCallback";
 import CaseworkReviews from "./pages/CaseworkReviews";
@@ -61,6 +73,14 @@ const PortalAuthProvider = ({ children }: { children: ReactNode }) => (
     {children}
   </AuthProvider>
 );
+
+// Back-compat redirect: /portal/<rest> -> /admin/<rest> (preserving query).
+const PortalRedirect = () => {
+  const location = useLocation();
+  const dest =
+    location.pathname.replace(/^\/portal/, "/admin") + location.search;
+  return <Navigate to={dest} replace />;
+};
 
 const RouteLoadingFallback = () => (
   <div
@@ -86,10 +106,12 @@ const App = () => (
           {/* Embed route for oEmbed iframe */}
           <Route path="/embed/case/:id" element={<EmbedCaseCard />} />
 
-          {/* Casework portal (VOL-3) — standalone full-screen, mounted at /portal.
-              Auth: OIDC + Contributor role. */}
+          {/* Unified admin panel — standalone full-screen, mounted at /admin.
+              Folds in the former /portal casework pages. Auth: OIDC + an
+              internal role (gated by AdminLayout). login/callback sit OUTSIDE
+              AdminLayout so the auth gate doesn't bounce the entry points. */}
           <Route
-            path="/portal/*"
+            path="/admin/*"
             element={
               <ClientOnly>
                 <PortalAuthProvider>
@@ -97,17 +119,42 @@ const App = () => (
                     <Routes>
                       <Route path="login" element={<CaseworkLogin />} />
                       <Route path="callback" element={<CaseworkCallback />} />
-                      <Route path="reviews" element={<CaseworkReviews />} />
-                      <Route path="reviews/:id" element={<CaseworkReviewDetail />} />
-                      <Route path="rules" element={<CaseworkRules />} />
-                      <Route path="how" element={<CaseworkHow />} />
-                      <Route path="" element={<CaseworkReviews />} />
+                      <Route element={<AdminLayout />}>
+                        <Route path="" element={<AdminDashboard />} />
+                        {/* NES — create/edit before the list so the literal
+                            "new" and "edit" segments win over the splat. */}
+                        <Route path="nes/entities/new" element={<NesEntityCreate />} />
+                        <Route path="nes/entities/edit/*" element={<NesEntityEdit />} />
+                        <Route path="nes/entities" element={<NesEntities />} />
+                        {/* NGM */}
+                        <Route path="ngm/courtcases/new" element={<NgmCourtCaseForm />} />
+                        <Route
+                          path="ngm/courtcases/:court/:caseNumber/edit"
+                          element={<NgmCourtCaseForm />}
+                        />
+                        <Route path="ngm/courtcases" element={<NgmCourtCases />} />
+                        <Route path="ngm/materials/new" element={<NgmMaterialForm />} />
+                        <Route path="ngm/materials/edit/*" element={<NgmMaterialForm />} />
+                        <Route path="ngm/materials" element={<NgmMaterials />} />
+                        {/* Jawafdehi */}
+                        <Route path="jawafdehi/cases" element={<AdminCases />} />
+                        <Route path="jawafdehi/sources" element={<AdminSources />} />
+                        {/* Casework (folded in from /portal) */}
+                        <Route path="reviews" element={<CaseworkReviews />} />
+                        <Route path="reviews/:id" element={<CaseworkReviewDetail />} />
+                        <Route path="rules" element={<CaseworkRules />} />
+                        <Route path="how" element={<CaseworkHow />} />
+                        <Route path="moderation" element={<Moderation />} />
+                      </Route>
                     </Routes>
                   </CaseworkAuthProvider>
                 </PortalAuthProvider>
               </ClientOnly>
             }
           />
+
+          {/* Back-compat: the casework portal moved from /portal to /admin. */}
+          <Route path="/portal/*" element={<PortalRedirect />} />
 
           <Route element={<AppLayout />}>
             <Route path="/" element={<Index />} />
