@@ -180,7 +180,7 @@ const Index = () => {
           casesDocumented={getStatValue(stats?.published_cases)}
           officialsAndEntitiesTracked={getStatValue(stats?.nes?.total)}
           courtRecords={getStatValue(stats?.ngm?.court_cases_total)}
-          materials={getStatValue(stats?.ngm?.materials_total)}
+          materials={getStatValue(stats?.materials?.total)}
         />
 
 

@@ -1178,26 +1178,38 @@
     "empty": "No data yet",
     "headlineHeading": "At a glance",
     "breakdownHeading": "What's tracked",
+    "searchLabel": "Search the Jawafdehi archive",
+    "searchPlaceholder": "Search cases, people, offices, court records, or materials",
+    "searchSubmit": "Search",
+    "showMore": "Show {{count}} more",
+    "showLess": "Show less",
     "nes": {
       "heading": "Entities (NES)",
       "description": "People, offices, organizations and locations tracked across the archive.",
       "total": "Entities tracked",
-      "byPrefix": "By category",
       "byType": "By type"
     },
     "ngm": {
       "heading": "Judicial records (NGM)",
       "description": "Court cases, hearings and source documents collected from Nepal's judiciary.",
       "courtCases": "Court records",
-      "materials": "Materials",
       "courts": "Courts",
-      "byCourtType": "By court type",
-      "byMaterialType": "By material type"
+      "byCourtType": "By court type"
+    },
+    "materials": {
+      "heading": "Materials",
+      "description": "Development projects, financing records and source documents collected from public portals.",
+      "total": "Materials tracked",
+      "byType": "By type",
+      "bySource": "By source",
+      "withDescription": "Have a description",
+      "withUrl": "Have a source link",
+      "withDate": "Have a date"
     },
     "completeness": {
       "heading": "Completeness",
-      "withDescription": "Have a description",
-      "withSources": "Have sources",
+      "withIdentifier": "Have a stable identifier",
+      "withProvenance": "Have provenance",
       "withBilingualName": "Bilingual name (EN + NE)",
       "nesResolved": "Resolved to a tracked entity",
       "withRegistrationDate": "Have a registration date",

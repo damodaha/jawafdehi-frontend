@@ -247,6 +247,7 @@ export interface CaseStatistics {
   // Optional so older cached payloads / partial responses stay type-safe.
   nes?: NesMetrics;
   ngm?: NgmMetrics;
+  materials?: MaterialsMetrics;
   last_updated: string;
 }
 
@@ -256,13 +257,13 @@ export interface NesMetrics {
   by_prefix: { prefix: string; count: number }[];
   by_type: { entity_type: string; count: number }[];
   counts: {
-    with_description: number;
-    with_sources: number;
+    with_identifier: number;
+    with_provenance: number;
     with_bilingual_name: number;
   };
   completeness: {
-    with_description: number;
-    with_sources: number;
+    with_identifier: number;
+    with_provenance: number;
     with_bilingual_name: number;
   };
 }
@@ -270,10 +271,8 @@ export interface NesMetrics {
 /** NGM (judicial) coverage metrics surfaced by the data quality dashboard. */
 export interface NgmMetrics {
   court_cases_total: number;
-  materials_total: number;
   courts_total: number;
   by_court_type: { court__court_type: string; count: number }[];
-  by_material_type: { material_type: string; count: number }[];
   counts: {
     nes_resolved: number;
     with_registration_date: number;
@@ -283,5 +282,22 @@ export interface NgmMetrics {
     nes_resolved: number;
     with_registration_date: number;
     with_document_sources: number;
+  };
+}
+
+/** Materials (NGM development-project / document dataset) coverage metrics. */
+export interface MaterialsMetrics {
+  total: number;
+  by_type: { material_type: string; count: number }[];
+  by_source: { source: string; count: number }[];
+  counts: {
+    with_description: number;
+    with_url: number;
+    with_date: number;
+  };
+  completeness: {
+    with_description: number;
+    with_url: number;
+    with_date: number;
   };
 }

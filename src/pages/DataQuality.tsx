@@ -1,14 +1,21 @@
+import { type FormEvent, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Database, Gavel } from "lucide-react";
+import { Database, FileText, Gavel } from "lucide-react";
 
 import { getStatistics } from "@/services/jds-api";
-import type { NesMetrics, NgmMetrics } from "@/types/jds";
+import type { MaterialsMetrics, NesMetrics, NgmMetrics } from "@/types/jds";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { SearchBar } from "@/components/ui/search-bar";
 import { Skeleton } from "@/components/ui/skeleton";
+
+/** Breakdown lists longer than this collapse behind a "show more" toggle. */
+const BREAKDOWN_VISIBLE_LIMIT = 10;
 
 type BreakdownItem = { label: string; count: number };
 
@@ -16,6 +23,8 @@ type CompletenessItem = { label: string; part: number; whole: number; pct: numbe
 
 const DataQuality = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [query, setQuery] = useState("");
 
   const { data, isLoading, isError } = useQuery({
     // Share the cache with the home hero — same query key + fn.
@@ -26,6 +35,13 @@ const DataQuality = () => {
 
   const nes = data?.nes;
   const ngm = data?.ngm;
+  const materials = data?.materials;
+
+  const submitSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmed = query.trim();
+    navigate(trimmed ? `/search?q=${encodeURIComponent(trimmed)}` : "/search");
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -53,6 +69,22 @@ const DataQuality = () => {
                 "What our public datasets track today, and how complete the records are.",
               )}
             </p>
+
+            <form className="mt-6 w-full max-w-2xl" onSubmit={submitSearch}>
+              <label className="sr-only" htmlFor="data-quality-search">
+                {t("dataQuality.searchLabel", "Search the Jawafdehi archive")}
+              </label>
+              <SearchBar
+                id="data-quality-search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={t(
+                  "dataQuality.searchPlaceholder",
+                  "Search cases, people, offices, court records, or materials",
+                )}
+                submitLabel={t("dataQuality.searchSubmit", "Search")}
+              />
+            </form>
           </div>
         </section>
 
@@ -67,6 +99,7 @@ const DataQuality = () => {
 
           {nes && <NesSection nes={nes} t={t} />}
           {ngm && <NgmSection ngm={ngm} t={t} />}
+          {materials && <MaterialsSection materials={materials} t={t} />}
         </div>
       </main>
     </div>
@@ -78,16 +111,16 @@ type Translate = ReturnType<typeof useTranslation>["t"];
 function NesSection({ nes, t }: Readonly<{ nes: NesMetrics; t: Translate }>) {
   const completeness: CompletenessItem[] = [
     {
-      label: t("dataQuality.completeness.withDescription", "Have a description"),
-      part: nes.counts.with_description,
+      label: t("dataQuality.completeness.withIdentifier", "Have a stable identifier"),
+      part: nes.counts.with_identifier,
       whole: nes.total,
-      pct: nes.completeness.with_description,
+      pct: nes.completeness.with_identifier,
     },
     {
-      label: t("dataQuality.completeness.withSources", "Have sources"),
-      part: nes.counts.with_sources,
+      label: t("dataQuality.completeness.withProvenance", "Have provenance"),
+      part: nes.counts.with_provenance,
       whole: nes.total,
-      pct: nes.completeness.with_sources,
+      pct: nes.completeness.with_provenance,
     },
     {
       label: t("dataQuality.completeness.withBilingualName", "Bilingual name (EN + NE)"),
@@ -108,10 +141,6 @@ function NesSection({ nes, t }: Readonly<{ nes: NesMetrics; t: Translate }>) {
       headlineLabel={t("dataQuality.nes.total", "Entities tracked")}
       headlineValue={nes.total}
       breakdowns={[
-        {
-          title: t("dataQuality.nes.byPrefix", "By category"),
-          items: nes.by_prefix.map((r) => ({ label: r.prefix, count: r.count })),
-        },
         {
           title: t("dataQuality.nes.byType", "By type"),
           items: nes.by_type.map((r) => ({ label: r.entity_type, count: r.count })),
@@ -156,7 +185,6 @@ function NgmSection({ ngm, t }: Readonly<{ ngm: NgmMetrics; t: Translate }>) {
       headlineLabel={t("dataQuality.ngm.courtCases", "Court records")}
       headlineValue={ngm.court_cases_total}
       secondaryHeadlines={[
-        { label: t("dataQuality.ngm.materials", "Materials"), value: ngm.materials_total },
         { label: t("dataQuality.ngm.courts", "Courts"), value: ngm.courts_total },
       ]}
       breakdowns={[
@@ -167,10 +195,60 @@ function NgmSection({ ngm, t }: Readonly<{ ngm: NgmMetrics; t: Translate }>) {
             count: r.count,
           })),
         },
+      ]}
+      completeness={completeness}
+      t={t}
+    />
+  );
+}
+
+function MaterialsSection({
+  materials,
+  t,
+}: Readonly<{ materials: MaterialsMetrics; t: Translate }>) {
+  const completeness: CompletenessItem[] = [
+    {
+      label: t("dataQuality.materials.withDescription", "Have a description"),
+      part: materials.counts.with_description,
+      whole: materials.total,
+      pct: materials.completeness.with_description,
+    },
+    {
+      label: t("dataQuality.materials.withUrl", "Have a source link"),
+      part: materials.counts.with_url,
+      whole: materials.total,
+      pct: materials.completeness.with_url,
+    },
+    {
+      label: t("dataQuality.materials.withDate", "Have a date"),
+      part: materials.counts.with_date,
+      whole: materials.total,
+      pct: materials.completeness.with_date,
+    },
+  ];
+
+  return (
+    <SourceSection
+      icon={<FileText className="h-6 w-6 text-accent" />}
+      heading={t("dataQuality.materials.heading", "Materials")}
+      description={t(
+        "dataQuality.materials.description",
+        "Development projects, financing records and source documents collected from public portals.",
+      )}
+      headlineLabel={t("dataQuality.materials.total", "Materials tracked")}
+      headlineValue={materials.total}
+      breakdowns={[
         {
-          title: t("dataQuality.ngm.byMaterialType", "By material type"),
-          items: ngm.by_material_type.map((r) => ({
+          title: t("dataQuality.materials.byType", "By type"),
+          items: materials.by_type.map((r) => ({
             label: r.material_type,
+            count: r.count,
+          })),
+        },
+        {
+          title: t("dataQuality.materials.bySource", "By source"),
+          items: materials.by_source.map((r) => ({
+            label: r.source,
             count: r.count,
           })),
         },
@@ -276,6 +354,12 @@ function BreakdownList({
   items,
   t,
 }: Readonly<{ title: string; items: BreakdownItem[]; t: Translate }>) {
+  const [expanded, setExpanded] = useState(false);
+  const canCollapse = items.length > BREAKDOWN_VISIBLE_LIMIT;
+  const visibleItems =
+    canCollapse && !expanded ? items.slice(0, BREAKDOWN_VISIBLE_LIMIT) : items;
+  const hiddenCount = items.length - BREAKDOWN_VISIBLE_LIMIT;
+
   return (
     <div>
       <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -284,18 +368,34 @@ function BreakdownList({
       {items.length === 0 ? (
         <p className="text-sm text-muted-foreground">{t("dataQuality.empty", "No data yet")}</p>
       ) : (
-        <ul className="space-y-1.5">
-          {items.map((item) => (
-            <li key={item.label} className="flex items-center justify-between gap-2">
-              <Badge variant="secondary" className="font-normal capitalize">
-                {item.label}
-              </Badge>
-              <span className="text-sm font-semibold tabular-nums text-foreground">
-                {item.count.toLocaleString()}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="space-y-1.5">
+            {visibleItems.map((item) => (
+              <li key={item.label} className="flex items-center justify-between gap-2">
+                <Badge variant="secondary" className="font-normal capitalize">
+                  {item.label}
+                </Badge>
+                <span className="text-sm font-semibold tabular-nums text-foreground">
+                  {item.count.toLocaleString()}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {canCollapse && (
+            <Button
+              variant="link"
+              size="sm"
+              className="mt-1 h-auto p-0 text-xs"
+              onClick={() => setExpanded((prev) => !prev)}
+            >
+              {expanded
+                ? t("dataQuality.showLess", "Show less")
+                : t("dataQuality.showMore", "Show {{count}} more", {
+                    count: hiddenCount,
+                  })}
+            </Button>
+          )}
+        </>
       )}
     </div>
   );
