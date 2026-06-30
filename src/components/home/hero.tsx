@@ -69,11 +69,11 @@ export function Hero({
     const trimmedQuery = query.trim();
 
     if (!trimmedQuery) {
-      navigate("/search?type=case");
+      navigate("/search");
       return;
     }
 
-    const params = new URLSearchParams({ q: trimmedQuery, type: "case" });
+    const params = new URLSearchParams({ q: trimmedQuery });
     navigate(`/search?${params.toString()}`);
   };
 
