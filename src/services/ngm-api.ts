@@ -1,16 +1,16 @@
 /**
  * NGM API Client (governance / judicial materials + court cases)
  *
- * NGM data lives on the Think-Big monolith under the host-root `/ngm/api/` prefix
- * (distinct from the Jawafdehi `/api/` tree and the NES `/nes/api/` tree). Reads are
+ * NGM data lives on the Think-Big monolith under the host-root `/api/ngm/` prefix
+ * (distinct from the Jawafdehi `/api/` tree and the NES `/api/nes/` tree). Reads are
  * public — materials and court cases are derived from public-domain government
  * documents.
  *
- *   GET /ngm/api/materials/<source>/<ident>      -> material JSON-LD (schema.org)
- *   GET /ngm/api/cases/<court>/<case_number>/    -> court case (composite key)
- *   GET /ngm/api/cases/<court>/<case_number>/{hearings,entities,documents}
+ *   GET /api/ngm/materials/<source>/<ident>      -> material JSON-LD (schema.org)
+ *   GET /api/ngm/cases/<court>/<case_number>/    -> court case (composite key)
+ *   GET /api/ngm/cases/<court>/<case_number>/{hearings,entities,documents}
  *
- * Base URL defaults to the SAME-ORIGIN relative `/ngm/api` so the Vite dev proxy /
+ * Base URL defaults to the SAME-ORIGIN relative `/api/ngm` so the Vite dev proxy /
  * monolith ingress resolves it. An absolute override (VITE_NGM_API_BASE_URL) is
  * supported for split-host deployments. NOTE: keep the default RELATIVE — an
  * absolute prod default would make a containerized frontend bypass the proxy and
@@ -23,7 +23,7 @@ import type { CourtCase, CourtCaseHearing, CourtCaseEntity } from '@/types/jds';
 
 const NGM_API_BASE_URL =
   (typeof import.meta !== 'undefined' && import.meta.env?.VITE_NGM_API_BASE_URL) ||
-  '/ngm/api';
+  '/api/ngm';
 
 // A material @id IRI path component (`<source>/<ident>`) or a full IRI. The detail
 // route is a splat, so the tail may already be the `<source>/<ident>` form.
@@ -99,7 +99,7 @@ export async function getCourtCase(courtOrRef: string, caseNumber?: string): Pro
       ? parseCourtCaseRef(courtOrRef)
       : { court: courtOrRef, caseNumber };
   // Composite-key detail route is /cases/<court>/<case_number>/ (mounted at
-  // /ngm/api/), NOT nested under /courts/. Case numbers contain hyphens but no
+  // /api/ngm/), NOT nested under /courts/. Case numbers contain hyphens but no
   // slashes; encode each segment.
   const endpoint = `/cases/${encodeURIComponent(court)}/${encodeURIComponent(number)}/`;
   try {

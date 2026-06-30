@@ -4,8 +4,8 @@
 // portal.jawafdehi.org), the admin panel talks to the CONSOLIDATED monolith on
 // ONE host, addressing each former service by its URL path prefix:
 //
-//     /nes/api/...   NES entities (JSON-LD read/write + reindex)
-//     /ngm/api/...   NGM courts + materials (read plane + ingestion)
+//     /api/nes/...   NES entities (JSON-LD read/write + reindex)
+//     /api/ngm/...   NGM courts + materials (read plane + ingestion)
 //     /api/...       Jawafdehi cases / sources / casework
 //
 // Auth is OIDC/Zitadel only (DRF token auth was dropped in the monolith): every
@@ -82,7 +82,7 @@ export interface ListEntitiesParams {
 export async function listNesEntities(
   params: ListEntitiesParams = {},
 ): Promise<NesEntityListResponse> {
-  const { data } = await client.get<NesEntityListResponse>("/nes/api/entities", {
+  const { data } = await client.get<NesEntityListResponse>("/api/nes/entities", {
     params,
   });
   return data;
@@ -100,7 +100,7 @@ function encodeRef(ref: string): string {
 // Detail by ref: a bare `<prefix>/<slug>` path or a url-encoded @id IRI.
 export async function getNesEntity(ref: string): Promise<NesEntity> {
   const { data } = await client.get<NesEntity>(
-    `/nes/api/entities/${encodeRef(ref)}`,
+    `/api/nes/entities/${encodeRef(ref)}`,
   );
   return data;
 }
@@ -122,7 +122,7 @@ export interface CreateEntityPayload {
 export async function createNesEntity(
   payload: CreateEntityPayload,
 ): Promise<NesEntity> {
-  const { data } = await client.post<NesEntity>("/nes/api/entities", payload);
+  const { data } = await client.post<NesEntity>("/api/nes/entities", payload);
   return data;
 }
 
@@ -135,14 +135,14 @@ export interface PatchOp {
   from?: string;
 }
 
-// EDIT is an RFC-6902 patch: PATCH /nes/api/entities/{ref} with { patch_ops }.
+// EDIT is an RFC-6902 patch: PATCH /api/nes/entities/{ref} with { patch_ops }.
 export async function patchNesEntity(
   ref: string,
   patchOps: PatchOp[],
   changeDescription?: string,
 ): Promise<NesEntity> {
   const { data } = await client.patch<NesEntity>(
-    `/nes/api/entities/${encodeRef(ref)}`,
+    `/api/nes/entities/${encodeRef(ref)}`,
     { patch_ops: patchOps, change_description: changeDescription },
   );
   return data;
@@ -153,19 +153,19 @@ export async function getNesEntityVersions(ref: string): Promise<{
   total: number;
 }> {
   const { data } = await client.get(
-    `/nes/api/entities/${encodeRef(ref)}/versions`,
+    `/api/nes/entities/${encodeRef(ref)}/versions`,
   );
   return data;
 }
 
 export async function listNesEntityPrefixes(): Promise<{ prefixes: string[] }> {
-  const { data } = await client.get("/nes/api/entity_prefixes");
+  const { data } = await client.get("/api/nes/entity_prefixes");
   return data;
 }
 
 // Trigger an OpenSearch reindex (admin only). Returns whatever the job emits.
 export async function reindexNes(): Promise<unknown> {
-  const { data } = await client.post("/nes/api/admin/reindex", {});
+  const { data } = await client.post("/api/nes/admin/reindex", {});
   return data;
 }
 
@@ -183,19 +183,19 @@ export interface Paginated<T> {
 export async function listCourtCases<T = Record<string, unknown>>(
   params: Record<string, unknown> = {},
 ): Promise<Paginated<T>> {
-  const { data } = await client.get<Paginated<T>>("/ngm/api/cases/", { params });
+  const { data } = await client.get<Paginated<T>>("/api/ngm/cases/", { params });
   return data;
 }
 
 export async function listCourts<T = Record<string, unknown>>(): Promise<Paginated<T>> {
-  const { data } = await client.get<Paginated<T>>("/ngm/api/courts/");
+  const { data } = await client.get<Paginated<T>>("/api/ngm/courts/");
   return data;
 }
 
 export async function listBlacklistedFirms<T = Record<string, unknown>>(): Promise<
   Paginated<T>
 > {
-  const { data } = await client.get<Paginated<T>>("/ngm/api/firms/");
+  const { data } = await client.get<Paginated<T>>("/api/ngm/firms/");
   return data;
 }
 
@@ -222,7 +222,7 @@ export async function getCourtCase<T = Record<string, unknown>>(
   caseNumber: string,
 ): Promise<T> {
   const { data } = await client.get<T>(
-    `/ngm/api/cases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}`,
+    `/api/ngm/cases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}`,
   );
   return data;
 }
@@ -230,7 +230,7 @@ export async function getCourtCase<T = Record<string, unknown>>(
 export async function createCourtCase<T = Record<string, unknown>>(
   payload: CourtCaseWrite,
 ): Promise<T> {
-  const { data } = await client.post<T>("/ngm/api/cases/", payload);
+  const { data } = await client.post<T>("/api/ngm/cases/", payload);
   return data;
 }
 
@@ -240,7 +240,7 @@ export async function updateCourtCase<T = Record<string, unknown>>(
   payload: Partial<CourtCaseWrite>,
 ): Promise<T> {
   const { data } = await client.patch<T>(
-    `/ngm/api/cases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}`,
+    `/api/ngm/cases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}`,
     payload,
   );
   return data;
@@ -250,7 +250,7 @@ export async function updateCourtCase<T = Record<string, unknown>>(
 export async function getMaterialByIri<T = Record<string, unknown>>(
   iri: string,
 ): Promise<T> {
-  const { data } = await client.get<T>("/ngm/api/materials/", {
+  const { data } = await client.get<T>("/api/ngm/materials/", {
     params: { iri },
   });
   return data;
@@ -264,7 +264,7 @@ export async function getMaterialByPath<T = Record<string, unknown>>(
   ident: string,
 ): Promise<T> {
   const { data } = await client.get<T>(
-    `/ngm/api/materials/${source}/${encodeURIComponent(ident)}`,
+    `/api/ngm/materials/${source}/${encodeURIComponent(ident)}`,
   );
   return data;
 }
@@ -279,7 +279,7 @@ export async function createMaterial<T = Record<string, unknown>>(
   const body = materialType
     ? { material: jsonld, material_type: materialType }
     : jsonld;
-  const { data } = await client.post<T>("/ngm/api/materials/", body);
+  const { data } = await client.post<T>("/api/ngm/materials/", body);
   return data;
 }
 
@@ -289,7 +289,7 @@ export async function replaceMaterial<T = Record<string, unknown>>(
   jsonld: Record<string, unknown>,
 ): Promise<T> {
   const { data } = await client.put<T>(
-    `/ngm/api/materials/${encodeURIComponent(source)}/${encodeURIComponent(ident)}`,
+    `/api/ngm/materials/${encodeURIComponent(source)}/${encodeURIComponent(ident)}`,
     jsonld,
   );
   return data;

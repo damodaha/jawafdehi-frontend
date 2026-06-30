@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Loader2, Pencil, Plus, Search } from "lucide-react";
 
 // NGM materials have NO list endpoint today — the read plane only resolves a
-// material by its @id IRI (GET /ngm/api/materials/?iri=… or the path form).
+// material by its @id IRI (GET /api/ngm/materials/?iri=… or the path form).
 // Materials enter the lake via bulk ingestion, so the admin surface here is a
 // single-material lookup, not a browse table. A browse view waits on a list
 // endpoint (tracked as a backend follow-up).

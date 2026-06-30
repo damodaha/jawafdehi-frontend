@@ -13,8 +13,9 @@ import type { JawafEntity } from './types/jds';
 
 const JDS_API_BASE_URL = process.env.VITE_JDS_API_BASE_URL || 'https://portal.jawafdehi.org/api';
 // NGM read plane. SSR runs in Node, so a relative base won't resolve — fall back to
-// the production NGM host when no absolute override is set.
-const NGM_API_BASE_URL = process.env.VITE_NGM_API_BASE_URL || 'https://ngm.jawafdehi.org/ngm/api';
+// the production host when no absolute override is set. Post-consolidation NGM
+// lives on the same monolith as JDS under /api/ngm (not a separate ngm host).
+const NGM_API_BASE_URL = process.env.VITE_NGM_API_BASE_URL || 'https://portal.jawafdehi.org/api/ngm';
 
 export interface RenderResult {
   html: string;

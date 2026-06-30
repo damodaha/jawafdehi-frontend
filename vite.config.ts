@@ -41,22 +41,28 @@ export default defineConfig(({ mode, isSsrBuild }) => {
       host: process.env.VITE_DEV_HOST || "127.0.0.1",
       port: 40114,
       strictPort: true,
-      // Same-origin /api, /admin, /static, /media -> the Think-Big monolith (the
+      // Same-origin /api, /static, /media -> the Think-Big monolith (the
       // consolidated backend that serves unified search AND the per-app APIs like
       // /api/cases/ used to hydrate result cards). One target, env-overridable so
       // the same config works on the host (default :48000) and inside compose
       // (VITE_API_PROXY_TARGET=http://platform:8080).
+      //
+      // NOTE: /admin is intentionally NOT proxied — the React admin panel (this
+      // SPA) owns /admin/*. Django's own admin lives at /django-admin/ (see the
+      // monolith's config/urls.py) and is proxied below. The admin panel talks to
+      // the backend only via /api (NES at /api/nes, NGM at /api/ngm).
       proxy: (() => {
         const apiTarget =
           process.env.VITE_API_PROXY_TARGET || "http://127.0.0.1:48000";
         const proxyOpts = { target: apiTarget, changeOrigin: true };
         return {
           "/api": proxyOpts,
-          // NES (entities) lives under /nes/api and NGM under /ngm/api on the same
-          // monolith; proxy both so NES entity pages / per-app calls resolve.
+          // Legacy host-root NES/NGM prefixes (pre-renamespace); harmless to keep
+          // proxied for any client still resolving an old /nes or /ngm base.
           "/nes": proxyOpts,
           "/ngm": proxyOpts,
-          "/admin": proxyOpts,
+          // Django's built-in admin (relocated off /admin so the SPA can own it).
+          "/django-admin": proxyOpts,
           // Django/WhiteNoise static (admin CSS etc.) lives under /static.
           "/static": proxyOpts,
           // Wagtail-managed media (uploaded images/renditions, documents).
