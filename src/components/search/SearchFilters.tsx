@@ -36,6 +36,9 @@ type SearchFiltersProps = {
   onTypeChange: (type?: ArchiveSearchType) => void;
   onToggle: (name: SidebarFilterName, value: string) => void;
   onClear: () => void;
+  // Hide the record-type radios on single-type browse pages (NGM Materials /
+  // Court-cases) where the type is pinned by the route, not user-selectable.
+  hideTypeSelector?: boolean;
 };
 
 export function SearchFilters({
@@ -46,6 +49,7 @@ export function SearchFilters({
   onTypeChange,
   onToggle,
   onClear,
+  hideTypeSelector,
 }: Readonly<SearchFiltersProps>) {
   return (
     <aside
@@ -61,11 +65,13 @@ export function SearchFilters({
         </Button>
       </div>
 
-      <RecordTypeFilter
-        counts={counts}
-        onChange={onTypeChange}
-        selectedType={selectedType}
-      />
+      {hideTypeSelector ? null : (
+        <RecordTypeFilter
+          counts={counts}
+          onChange={onTypeChange}
+          selectedType={selectedType}
+        />
+      )}
       {FILTER_GROUPS.map(({ name, title }) => (
         <FilterGroup
           items={facets[name]}

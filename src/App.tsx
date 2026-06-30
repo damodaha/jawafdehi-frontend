@@ -22,6 +22,8 @@ import Information from "./pages/Information";
 import CaseDetail from "./pages/CaseDetail";
 import EntityProfile from "./pages/EntityProfile";
 import NesEntityProfile from "./pages/NesEntityProfile";
+import MaterialProfile from "./pages/MaterialProfile";
+import CourtCaseProfile from "./pages/CourtCaseProfile";
 import EntityResponse from "./pages/EntityResponse";
 import ModerationDashboard from "./pages/ModerationDashboard";
 import Feedback from "./pages/Feedback";
@@ -32,6 +34,8 @@ import EmbedCaseCard from "./pages/EmbedCaseCard";
 import Privacy from "./pages/Privacy";
 import TermsOfService from "./pages/TermsOfService";
 import ArchiveSearch from "./pages/ArchiveSearch";
+import Materials from "./pages/Materials";
+import CourtCases from "./pages/CourtCases";
 import NotFound from "./pages/NotFound";
 import { ScrollToTop } from "@/components/ScrollToTop";
 // Casework portal (VOL-3) — mounted at /portal.
@@ -110,12 +114,19 @@ const App = () => (
             <Route path="/case/:id" element={<CaseDetail />} />
             <Route path="/entities" element={<Entities />} />
             <Route path="/search" element={<ArchiveSearch />} />
+            {/* NGM single-type browse pages (unified-archive search, type-pinned). */}
+            <Route path="/materials" element={<Materials />} />
+            <Route path="/courtcases" element={<CourtCases />} />
             {/* Legacy Jawafdehi case-entity profile (numeric id, single segment). */}
             <Route path="/entity/:id" element={<EntityProfile />} />
             {/* NES entity by IRI tail (multi-segment, e.g. organization/.../tu).
                 React Router prefers the more specific :id route for single-segment
                 numeric ids, so this splat only catches the hierarchical NES IRIs. */}
             <Route path="/entity/*" element={<NesEntityProfile />} />
+            {/* NGM governance material by IRI tail (/material/<source>/<ident>). */}
+            <Route path="/material/*" element={<MaterialProfile />} />
+            {/* NGM court case by IRI tail (/courtcase/<court>/<case_number>). */}
+            <Route path="/courtcase/*" element={<CourtCaseProfile />} />
             <Route path="/ask" element={<GuestChat />} />
             <Route path="/entity-response/:id" element={<EntityResponse />} />
             <Route path="/moderation" element={<ModerationDashboard />} />
