@@ -62,7 +62,6 @@ const NAV: NavGroup[] = [
     heading: "Jawafdehi — Cases",
     items: [
       { to: "/admin/jawafdehi/cases", label: "Cases", icon: FileText },
-      { to: "/admin/jawafdehi/sources", label: "Sources", icon: Building2 },
     ],
   },
   {

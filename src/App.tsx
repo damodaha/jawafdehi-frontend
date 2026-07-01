@@ -57,8 +57,6 @@ import NgmFirms from "./pages/admin/ngm/NgmFirms";
 import NgmFirmForm from "./pages/admin/ngm/NgmFirmForm";
 import AdminCases from "./pages/admin/jawafdehi/AdminCases";
 import AdminCaseForm from "./pages/admin/jawafdehi/AdminCaseForm";
-import AdminSources from "./pages/admin/jawafdehi/AdminSources";
-import AdminSourceForm from "./pages/admin/jawafdehi/AdminSourceForm";
 import Moderation from "./pages/admin/casework/Moderation";
 import CaseworkLogin from "./pages/CaseworkLogin";
 import CaseworkCallback from "./pages/CaseworkCallback";
@@ -159,12 +157,11 @@ const App = () => (
                           element={<AdminCaseForm />}
                         />
                         <Route path="jawafdehi/cases" element={<AdminCases />} />
-                        <Route path="jawafdehi/sources/new" element={<AdminSourceForm />} />
-                        <Route
-                          path="jawafdehi/sources/:id/edit"
-                          element={<AdminSourceForm />}
-                        />
-                        <Route path="jawafdehi/sources" element={<AdminSources />} />
+                        {/* Document Sources removed: the "cases own no documents"
+                            ADR collapsed sources into NGM Materials, so there is no
+                            /api/sources/ write endpoint. Evidence is linked as
+                            material IRIs on the case; manage docs under NGM →
+                            Materials. */}
                         {/* Casework (folded in from /portal) */}
                         <Route path="reviews" element={<CaseworkReviews />} />
                         <Route path="reviews/:id" element={<CaseworkReviewDetail />} />
