@@ -14,7 +14,9 @@ import {
 } from "@/lib/datalake-forms";
 import DeleteButton from "@/components/admin/DeleteButton";
 import MaterialFileUpload from "@/components/admin/datalake/MaterialFileUpload";
-import { Button } from "@/components/ui/button";
+import FormPageShell from "@/components/admin/FormPageShell";
+import AdminFormActions from "@/components/admin/AdminFormActions";
+import { FieldError } from "@/components/admin/FormError";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -25,7 +27,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { ArrowLeft, Loader2, Save } from "lucide-react";
 
 // A starter JSON-LD skeleton for a new material. @id is the canonical material
 // IRI (the upsert key); name is required by the backend validator.
@@ -126,42 +127,22 @@ export default function MaterialForm() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-2xl space-y-6">
-      <div>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="mb-2 -ml-2"
-          onClick={() => navigate("/admin/datalake/materials")}
-        >
-          <ArrowLeft className="mr-1 h-4 w-4" /> Materials
-        </Button>
-        <h1 className="text-2xl font-bold tracking-tight">
-          {editing ? "Edit Material" : "New Material"}
-        </h1>
-        <p className="text-sm text-muted-foreground">
+    <FormPageShell
+      title={editing ? "Edit Material" : "New Material"}
+      backLabel="Materials"
+      onBack={() => navigate("/admin/datalake/materials")}
+      error={error}
+      loading={loading}
+      subtitle={
+        <>
           A schema.org JSON-LD document keyed by its <code>@id</code> IRI.{" "}
           {editing
             ? "Saving replaces the stored document."
             : "Saving upserts by @id."}
-        </p>
-      </div>
-
-      {error && (
-        <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
-          {error}
-        </p>
-      )}
-
+        </>
+      }
+    >
       <form onSubmit={onSubmit} className="space-y-5">
         {/* material_type only drives the create upsert's @type derivation; a
             PUT replace stores the @type in the doc verbatim, so hide it then. */}
@@ -192,38 +173,27 @@ export default function MaterialForm() {
             rows={16}
             className="font-mono text-xs"
           />
-          {parseError && <p className="text-xs text-red-600">{parseError}</p>}
-          {!parseError && iri !== "" && !iriValid && (
+          {parseError ? (
+            <FieldError message={parseError} />
+          ) : iri !== "" && !iriValid ? (
             <p className="text-xs text-red-600">
               <code>@id</code> must be a valid material IRI
               (https://&lt;base&gt;/material/&lt;source&gt;/&lt;ident&gt;).
             </p>
-          )}
-          {!parseError && iri === "" && (
+          ) : iri === "" ? (
             <p className="text-xs text-red-600">
               The document needs an <code>@id</code> material IRI.
             </p>
-          )}
+          ) : null}
         </div>
 
-        <div className="flex gap-2">
-          <Button type="submit" disabled={!canSave}>
-            {saving ? (
-              <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="mr-1 h-4 w-4" />
-            )}
-            Save material
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate("/admin/datalake/materials")}
-          >
-            Cancel
-          </Button>
-          {editing && (
-            <div className="ml-auto">
+        <AdminFormActions
+          saving={saving}
+          canSave={canSave}
+          submitLabel="Save material"
+          onCancel={() => navigate("/admin/datalake/materials")}
+          deleteSlot={
+            editing ? (
               <DeleteButton
                 resourceLabel="material"
                 onDelete={() => {
@@ -237,9 +207,9 @@ export default function MaterialForm() {
                 }}
                 onDeleted={() => navigate("/admin/datalake/materials")}
               />
-            </div>
-          )}
-        </div>
+            ) : undefined
+          }
+        />
       </form>
 
       {/* F8 — file upload. Only in edit mode (the material must exist so its
@@ -265,6 +235,6 @@ export default function MaterialForm() {
             />
           );
         })()}
-    </div>
+    </FormPageShell>
   );
 }

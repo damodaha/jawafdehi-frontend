@@ -34,6 +34,8 @@ import TimelineEditor from "@/components/admin/case/TimelineEditor";
 import EvidenceEditor from "@/components/admin/case/EvidenceEditor";
 import ChipListEditor from "@/components/admin/case/ChipListEditor";
 import CaseStateControl from "@/components/admin/case/CaseStateControl";
+import DatePairInput from "@/components/admin/DatePairInput";
+import { FormError, FieldError } from "@/components/admin/FormError";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -373,11 +375,7 @@ export default function AdminCaseForm() {
         )}
       </div>
 
-      {error && (
-        <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
-          {error}
-        </p>
-      )}
+      <FormError message={error} />
 
       {/* F2 — state transitions. Edit mode only (a persisted case has a state).
           Privileged targets are gated to admin/moderator in the UI; the API is
@@ -415,11 +413,9 @@ export default function AdminCaseForm() {
               className="font-mono text-xs"
               placeholder="auto-derived from title"
             />
-            {!slugValid && (
-              <p className="text-xs text-red-600">
-                Lowercase alphanumeric, hyphen-separated.
-              </p>
-            )}
+            <FieldError
+              message={!slugValid && "Lowercase alphanumeric, hyphen-separated."}
+            />
             {editing && (
               <p className="text-xs text-muted-foreground">
                 Slug is immutable once the case leaves DRAFT (API enforces).
@@ -496,9 +492,7 @@ export default function AdminCaseForm() {
               onChange={(e) => set("bigo", e.target.value)}
               placeholder="e.g. 1250000"
             />
-            {!bigoValid && (
-              <p className="text-xs text-red-600">Must be a number.</p>
-            )}
+            <FieldError message={!bigoValid && "Must be a number."} />
           </div>
           <ChipListEditor
             label="Tags"
@@ -542,39 +536,23 @@ export default function AdminCaseForm() {
           invalidHint="Use the form <court>:<case_number>."
         />
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1">
-            <Label className="text-xs">Case start (AD)</Label>
-            <Input
-              type="date"
-              value={form.case_start_date}
-              onChange={(e) => set("case_start_date", e.target.value)}
-            />
-            <Label className="text-xs">Case start (BS)</Label>
-            <Input
-              value={form.case_start_date_bs}
-              onChange={(e) => set("case_start_date_bs", e.target.value)}
-              placeholder="2080-09-18"
-            />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Case end (AD)</Label>
-            <Input
-              type="date"
-              value={form.case_end_date}
-              onChange={(e) => set("case_end_date", e.target.value)}
-            />
-            <Label className="text-xs">Case end (BS)</Label>
-            <Input
-              value={form.case_end_date_bs}
-              onChange={(e) => set("case_end_date_bs", e.target.value)}
-              placeholder="2081-03-05"
-            />
-          </div>
-        </div>
-        {!datesValid && (
-          <p className="text-xs text-red-600">BS dates must be YYYY-MM-DD.</p>
-        )}
+        <DatePairInput
+          label="Case start"
+          idBase="case-start"
+          adValue={form.case_start_date}
+          bsValue={form.case_start_date_bs}
+          onAdChange={(v) => set("case_start_date", v)}
+          onBsChange={(v) => set("case_start_date_bs", v)}
+        />
+        <DatePairInput
+          label="Case end"
+          idBase="case-end"
+          adValue={form.case_end_date}
+          bsValue={form.case_end_date_bs}
+          onAdChange={(v) => set("case_end_date", v)}
+          onBsChange={(v) => set("case_end_date_bs", v)}
+        />
+        <FieldError message={!datesValid && "BS dates must be YYYY-MM-DD."} />
 
         {/* Sub-resource editors (F3/F4/F5). Shown only in edit mode: a case
             must exist (have a slug) before entities/evidence can be linked. On
@@ -601,16 +579,20 @@ export default function AdminCaseForm() {
           </p>
         )}
 
-        {editing && !timelineRowsValid && (
-          <p className="text-xs text-red-600">
-            Every timeline event needs a title and a valid date (YYYY-MM-DD).
-          </p>
-        )}
-        {editing && !entityRowsValid && (
-          <p className="text-xs text-red-600">
-            Every entity row needs a valid entity IRI and a relationship type.
-          </p>
-        )}
+        <FieldError
+          message={
+            editing &&
+            !timelineRowsValid &&
+            "Every timeline event needs a title and a valid date (YYYY-MM-DD)."
+          }
+        />
+        <FieldError
+          message={
+            editing &&
+            !entityRowsValid &&
+            "Every entity row needs a valid entity IRI and a relationship type."
+          }
+        />
 
         <div className="flex gap-2">
           <Button type="submit" disabled={!canSave}>

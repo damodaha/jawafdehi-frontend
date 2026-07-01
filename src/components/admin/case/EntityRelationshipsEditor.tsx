@@ -5,6 +5,7 @@ import {
   type EntityRelationshipRow,
 } from "@/lib/jawafdehi-forms";
 import { isValidEntityIri } from "@/lib/datalake-forms";
+import { FieldError } from "@/components/admin/FormError";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -99,7 +100,7 @@ export default function EntityRelationshipsEditor({ rows, onChange }: Props) {
             )}
           </Button>
         </div>
-        {searchErr && <p className="mt-1 text-xs text-red-600">{searchErr}</p>}
+        <FieldError message={searchErr} className="mt-1" />
         {results.length > 0 && (
           <ul className="mt-2 max-h-40 space-y-1 overflow-auto">
             {results.map((e) => {
@@ -144,9 +145,7 @@ export default function EntityRelationshipsEditor({ rows, onChange }: Props) {
                     className="font-mono text-xs"
                     placeholder="https://jawafdehi.org/entity/person/…"
                   />
-                  {iriBad && (
-                    <p className="text-xs text-red-600">Not a canonical entity @id IRI.</p>
-                  )}
+                  <FieldError message={iriBad && "Not a canonical entity @id IRI."} />
                   <Input
                     value={r.notes}
                     onChange={(e) => update(i, { notes: e.target.value })}

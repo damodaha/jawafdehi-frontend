@@ -1,33 +1,29 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
 import {
   createFirm,
   updateFirm,
   getFirm,
-  adminErrorMessage,
   type FirmWrite,
 } from "@/services/admin-api";
-import { Button } from "@/components/ui/button";
+import { useAdminForm } from "@/hooks/useAdminForm";
+import FormPageShell from "@/components/admin/FormPageShell";
+import AdminFormActions from "@/components/admin/AdminFormActions";
+import DatePairInput from "@/components/admin/DatePairInput";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/hooks/use-toast";
-import { ArrowLeft, Loader2, Save } from "lucide-react";
 
 const str = (v: unknown): string => (v == null ? "" : String(v));
+const LIST_PATH = "/admin/datalake/firms";
 
 // F7 — create + edit a blocklisted firm. The record is keyed by its numeric
 // `id` (the PK; firm names are not unique). Fields mirror BlacklistedFirmSerializer.
 // Create POSTs; edit PATCHes.
 export default function FirmForm() {
   const params = useParams();
-  const navigate = useNavigate();
   const editing = Boolean(params.id);
   const id = params.id ?? "";
-
-  const [loading, setLoading] = useState(editing);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const [form, setForm] = useState<FirmWrite>({
     firm_name: "",
@@ -46,13 +42,11 @@ export default function FirmForm() {
   const set = <K extends keyof FirmWrite>(k: K, v: FirmWrite[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
 
-  useEffect(() => {
-    if (!editing) return;
-    let alive = true;
-    setLoading(true);
-    getFirm<Record<string, unknown>>(id)
-      .then((f) => {
-        if (!alive) return;
+  const { loading, saving, error, handleSubmit, navigate } =
+    useAdminForm<Record<string, unknown>>({
+      editing,
+      load: () => getFirm<Record<string, unknown>>(id),
+      hydrate: (f) =>
         setForm({
           firm_name: str(f.firm_name),
           proprietor_name: str(f.proprietor_name),
@@ -65,22 +59,14 @@ export default function FirmForm() {
           effective_until_ad: str(f.effective_until_ad),
           duration: str(f.duration),
           nes_id: str(f.nes_id),
-        });
-      })
-      .catch((err) => alive && setError(adminErrorMessage(err, "Failed to load firm")))
-      .finally(() => alive && setLoading(false));
-    return () => {
-      alive = false;
-    };
-  }, [editing, id]);
+        }),
+      listPath: LIST_PATH,
+      resourceLabel: "firm",
+    });
 
   const canSave = !saving && str(form.firm_name).trim() !== "";
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!canSave) return;
-    setSaving(true);
-    setError(null);
+  const onSubmit = handleSubmit(canSave, async () => {
     // Blank optional fields → null so the backend clears rather than stores "".
     const payload: FirmWrite = {
       firm_name: str(form.firm_name).trim(),
@@ -95,52 +81,18 @@ export default function FirmForm() {
       duration: form.duration || null,
       nes_id: form.nes_id || null,
     };
-    try {
-      if (editing) {
-        await updateFirm(id, payload);
-        toast({ title: "Firm updated" });
-      } else {
-        await createFirm(payload);
-        toast({ title: "Firm created" });
-      }
-      navigate("/admin/datalake/firms");
-    } catch (err) {
-      setError(adminErrorMessage(err, "Failed to save firm"));
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
+    if (editing) await updateFirm(id, payload);
+    else await createFirm(payload);
+  });
 
   return (
-    <div className="max-w-2xl space-y-6">
-      <div>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="mb-2 -ml-2"
-          onClick={() => navigate("/admin/datalake/firms")}
-        >
-          <ArrowLeft className="mr-1 h-4 w-4" /> Firms
-        </Button>
-        <h1 className="text-2xl font-bold tracking-tight">
-          {editing ? "Edit Firm" : "New Firm"}
-        </h1>
-      </div>
-
-      {error && (
-        <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
-          {error}
-        </p>
-      )}
-
+    <FormPageShell
+      title={editing ? "Edit Firm" : "New Firm"}
+      backLabel="Firms"
+      onBack={() => navigate(LIST_PATH)}
+      error={error}
+      loading={loading}
+    >
       <form onSubmit={onSubmit} className="space-y-5">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1">
@@ -189,47 +141,23 @@ export default function FirmForm() {
           />
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1">
-            <Label htmlFor="bl_ad">Blocklisted date (AD)</Label>
-            <Input
-              id="bl_ad"
-              type="date"
-              value={str(form.blacklist_date_ad)}
-              onChange={(e) => set("blacklist_date_ad", e.target.value)}
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="bl_bs">Blocklisted date (BS)</Label>
-            <Input
-              id="bl_bs"
-              value={str(form.blacklist_date_bs)}
-              onChange={(e) => set("blacklist_date_bs", e.target.value)}
-              placeholder="2080-09-18"
-            />
-          </div>
-        </div>
+        <DatePairInput
+          label="Blocklisted date"
+          idBase="bl"
+          adValue={str(form.blacklist_date_ad)}
+          bsValue={str(form.blacklist_date_bs)}
+          onAdChange={(v) => set("blacklist_date_ad", v)}
+          onBsChange={(v) => set("blacklist_date_bs", v)}
+        />
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1">
-            <Label htmlFor="eu_ad">Effective until (AD)</Label>
-            <Input
-              id="eu_ad"
-              type="date"
-              value={str(form.effective_until_ad)}
-              onChange={(e) => set("effective_until_ad", e.target.value)}
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="eu_bs">Effective until (BS)</Label>
-            <Input
-              id="eu_bs"
-              value={str(form.effective_until_bs)}
-              onChange={(e) => set("effective_until_bs", e.target.value)}
-              placeholder="2081-03-05"
-            />
-          </div>
-        </div>
+        <DatePairInput
+          label="Effective until"
+          idBase="eu"
+          adValue={str(form.effective_until_ad)}
+          bsValue={str(form.effective_until_bs)}
+          onAdChange={(v) => set("effective_until_ad", v)}
+          onBsChange={(v) => set("effective_until_bs", v)}
+        />
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1">
@@ -253,24 +181,13 @@ export default function FirmForm() {
           </div>
         </div>
 
-        <div className="flex gap-2">
-          <Button type="submit" disabled={!canSave}>
-            {saving ? (
-              <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="mr-1 h-4 w-4" />
-            )}
-            {editing ? "Save changes" : "Create firm"}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate("/admin/datalake/firms")}
-          >
-            Cancel
-          </Button>
-        </div>
+        <AdminFormActions
+          saving={saving}
+          canSave={canSave}
+          submitLabel={editing ? "Save changes" : "Create firm"}
+          onCancel={() => navigate(LIST_PATH)}
+        />
       </form>
-    </div>
+    </FormPageShell>
   );
 }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { uploadMaterialFile, adminErrorMessage } from "@/services/admin-api";
 import { MATERIAL_TYPES } from "@/lib/datalake-forms";
+import { FieldError } from "@/components/admin/FormError";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -110,7 +111,7 @@ export default function MaterialFileUpload({
         )}
       </div>
 
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      <FieldError message={error} />
 
       <Button type="button" onClick={upload} disabled={!file || uploading}>
         {uploading ? (

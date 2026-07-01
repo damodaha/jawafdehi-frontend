@@ -7,6 +7,7 @@ import {
   adminErrorMessage,
 } from "@/services/admin-api";
 import { parseMaterialIri } from "@/lib/datalake-forms";
+import { FormError } from "@/components/admin/FormError";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -107,11 +108,7 @@ export default function Materials() {
           Look up
         </Button>
       </form>
-      {lookupError && (
-        <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
-          {lookupError}
-        </p>
-      )}
+      <FormError message={lookupError} />
 
       <ResourceTable<Row>
         title="Materials"

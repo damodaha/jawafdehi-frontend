@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCaseworkAuth } from "@/context/CaseworkAuthContext";
+import { FormError } from "@/components/admin/FormError";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,11 +59,7 @@ const CaseworkLogin = () => {
         </div>
 
         <div className="space-y-4">
-          {error && (
-            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
-              {error}
-            </p>
-          )}
+          <FormError message={error} />
 
           <Button
             onClick={handleSignIn}
@@ -87,11 +84,7 @@ const CaseworkLogin = () => {
               </div>
 
               <form onSubmit={handleDevLogin} className="space-y-3">
-                {devError && (
-                  <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
-                    {devError}
-                  </p>
-                )}
+                <FormError message={devError} />
                 <div className="space-y-1">
                   <Label htmlFor="dev-username" className="text-xs">
                     Username

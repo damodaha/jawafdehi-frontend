@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   createCourtCase,
   updateCourtCase,
   getCourtCase,
   deleteCourtCase,
   listCourts,
-  adminErrorMessage,
   type CourtCaseWrite,
 } from "@/services/admin-api";
 import { isValidEntityIri } from "@/lib/datalake-forms";
+import { useAdminForm } from "@/hooks/useAdminForm";
+import FormPageShell from "@/components/admin/FormPageShell";
+import AdminFormActions from "@/components/admin/AdminFormActions";
+import DatePairInput from "@/components/admin/DatePairInput";
+import { FieldError } from "@/components/admin/FormError";
 import DeleteButton from "@/components/admin/DeleteButton";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,8 +25,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "@/hooks/use-toast";
-import { ArrowLeft, Loader2, Save } from "lucide-react";
 
 interface CourtOption {
   identifier: string;
@@ -32,18 +33,15 @@ interface CourtOption {
 }
 
 const str = (v: unknown): string => (v == null ? "" : String(v));
+const LIST_PATH = "/admin/datalake/courtcases";
 
 // Create + edit a data-lake court case. The natural key is (court, case_number); in
 // edit mode both come from the route and are locked (they're the PK).
 export default function CourtCaseForm() {
   const params = useParams();
-  const navigate = useNavigate();
   const editing = Boolean(params.court && params.caseNumber);
 
   const [courts, setCourts] = useState<CourtOption[]>([]);
-  const [loading, setLoading] = useState(editing);
-  const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
 
   const [form, setForm] = useState<CourtCaseWrite>({
     case_number: params.caseNumber ?? "",
@@ -66,13 +64,11 @@ export default function CourtCaseForm() {
       .catch(() => {});
   }, []);
 
-  useEffect(() => {
-    if (!editing) return;
-    let alive = true;
-    setLoading(true);
-    getCourtCase<Record<string, unknown>>(params.court!, params.caseNumber!)
-      .then((c) => {
-        if (!alive) return;
+  const { loading, saving, error, handleSubmit, navigate } =
+    useAdminForm<Record<string, unknown>>({
+      editing,
+      load: () => getCourtCase<Record<string, unknown>>(params.court!, params.caseNumber!),
+      hydrate: (c) =>
         setForm({
           case_number: str(c.case_number),
           court_identifier: str(c.court_identifier),
@@ -83,14 +79,10 @@ export default function CourtCaseForm() {
           plaintiff: str(c.plaintiff),
           defendant: str(c.defendant),
           nes_id: str(c.nes_id),
-        });
-      })
-      .catch((err) => alive && setError(adminErrorMessage(err, "Failed to load case")))
-      .finally(() => alive && setLoading(false));
-    return () => {
-      alive = false;
-    };
-  }, [editing, params.court, params.caseNumber]);
+        }),
+      listPath: LIST_PATH,
+      resourceLabel: "case",
+    });
 
   const nesIdValid = !form.nes_id || isValidEntityIri(form.nes_id);
   const canSave =
@@ -99,12 +91,7 @@ export default function CourtCaseForm() {
     form.court_identifier.trim() !== "" &&
     nesIdValid;
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!canSave) return;
-    setSaving(true);
-    setError(null);
-
+  const onSubmit = handleSubmit(canSave, async () => {
     // Send empty optional strings as null so the backend stores NULL, not "".
     const payload: CourtCaseWrite = {
       ...form,
@@ -116,53 +103,18 @@ export default function CourtCaseForm() {
       defendant: form.defendant || null,
       nes_id: form.nes_id || null,
     };
-
-    try {
-      if (editing) {
-        await updateCourtCase(params.court!, params.caseNumber!, payload);
-        toast({ title: "Case updated" });
-      } else {
-        await createCourtCase(payload);
-        toast({ title: "Case created" });
-      }
-      navigate("/admin/datalake/courtcases");
-    } catch (err) {
-      setError(adminErrorMessage(err, "Failed to save case"));
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
+    if (editing) await updateCourtCase(params.court!, params.caseNumber!, payload);
+    else await createCourtCase(payload);
+  });
 
   return (
-    <div className="max-w-2xl space-y-6">
-      <div>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="mb-2 -ml-2"
-          onClick={() => navigate("/admin/datalake/courtcases")}
-        >
-          <ArrowLeft className="mr-1 h-4 w-4" /> Court cases
-        </Button>
-        <h1 className="text-2xl font-bold tracking-tight">
-          {editing ? "Edit Court Case" : "New Court Case"}
-        </h1>
-      </div>
-
-      {error && (
-        <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
-          {error}
-        </p>
-      )}
-
+    <FormPageShell
+      title={editing ? "Edit Court Case" : "New Court Case"}
+      backLabel="Court cases"
+      onBack={() => navigate(LIST_PATH)}
+      error={error}
+      loading={loading}
+    >
       <form onSubmit={onSubmit} className="space-y-5">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1">
@@ -196,26 +148,14 @@ export default function CourtCaseForm() {
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1">
-            <Label htmlFor="reg_bs">Registration date (BS)</Label>
-            <Input
-              id="reg_bs"
-              value={str(form.registration_date_bs)}
-              onChange={(e) => set("registration_date_bs", e.target.value)}
-              placeholder="2082-03-15"
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="reg_ad">Registration date (AD)</Label>
-            <Input
-              id="reg_ad"
-              type="date"
-              value={str(form.registration_date_ad)}
-              onChange={(e) => set("registration_date_ad", e.target.value)}
-            />
-          </div>
-        </div>
+        <DatePairInput
+          label="Registration date"
+          idBase="reg"
+          adValue={str(form.registration_date_ad)}
+          bsValue={str(form.registration_date_bs)}
+          onAdChange={(v) => set("registration_date_ad", v)}
+          onBsChange={(v) => set("registration_date_bs", v)}
+        />
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1">
@@ -264,43 +204,30 @@ export default function CourtCaseForm() {
             className="font-mono text-xs"
             placeholder="https://jawafdehi.org/entity/person/ram-bahadur"
           />
-          {!nesIdValid && (
-            <p className="text-xs text-red-600">
-              Must be a canonical entity @id IRI
-              (https://&lt;base&gt;/entity/&lt;prefix&gt;/&lt;slug&gt;).
-            </p>
-          )}
+          <FieldError
+            message={
+              !nesIdValid &&
+              "Must be a canonical entity @id IRI (https://<base>/entity/<prefix>/<slug>)."
+            }
+          />
         </div>
 
-        <div className="flex gap-2">
-          <Button type="submit" disabled={!canSave}>
-            {saving ? (
-              <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="mr-1 h-4 w-4" />
-            )}
-            {editing ? "Save changes" : "Create case"}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate("/admin/datalake/courtcases")}
-          >
-            Cancel
-          </Button>
-          {editing && (
-            <div className="ml-auto">
+        <AdminFormActions
+          saving={saving}
+          canSave={canSave}
+          submitLabel={editing ? "Save changes" : "Create case"}
+          onCancel={() => navigate(LIST_PATH)}
+          deleteSlot={
+            editing ? (
               <DeleteButton
                 resourceLabel="court case"
-                onDelete={() =>
-                  deleteCourtCase(params.court!, params.caseNumber!)
-                }
-                onDeleted={() => navigate("/admin/datalake/courtcases")}
+                onDelete={() => deleteCourtCase(params.court!, params.caseNumber!)}
+                onDeleted={() => navigate(LIST_PATH)}
               />
-            </div>
-          )}
-        </div>
+            ) : undefined
+          }
+        />
       </form>
-    </div>
+    </FormPageShell>
   );
 }

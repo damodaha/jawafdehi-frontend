@@ -10,6 +10,7 @@ import {
 } from "@/services/admin-api";
 import { diffToPatchOps } from "@/lib/entity-jsonld";
 import DeleteButton from "@/components/admin/DeleteButton";
+import { FormError, FieldError } from "@/components/admin/FormError";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -169,9 +170,7 @@ export default function EntityEdit() {
         <Button variant="ghost" size="sm" onClick={() => navigate("/admin/entities")}>
           <ArrowLeft className="mr-1 h-4 w-4" /> Entities
         </Button>
-        <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
-          {error}
-        </p>
+        <FormError message={error} />
       </div>
     );
   }
@@ -199,11 +198,7 @@ export default function EntityEdit() {
         </div>
       </div>
 
-      {error && (
-        <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
-          {error}
-        </p>
-      )}
+      <FormError message={error} />
 
       <form onSubmit={onSave} className="space-y-5">
         <div className="grid gap-4 sm:grid-cols-2">
@@ -216,11 +211,12 @@ export default function EntityEdit() {
             <Input id="name-ne" value={nameNe} onChange={(e) => setNameNe(e.target.value)} />
           </div>
         </div>
-        {!nameValid && (
-          <p className="-mt-3 text-xs text-red-600">
-            At least one of English / Nepali name is required.
-          </p>
-        )}
+        <FieldError
+          message={
+            !nameValid && "At least one of English / Nepali name is required."
+          }
+          className="-mt-3"
+        />
 
         <div className="space-y-1">
           <Label htmlFor="extra">
@@ -234,7 +230,7 @@ export default function EntityEdit() {
             rows={14}
             className="font-mono text-xs"
           />
-          {extraError && <p className="text-xs text-red-600">{extraError}</p>}
+          <FieldError message={extraError} />
         </div>
 
         <div className="space-y-1">

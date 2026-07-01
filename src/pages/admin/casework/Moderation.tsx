@@ -8,6 +8,7 @@ import {
 } from "@/services/admin-api";
 import { replaceOp, type CaseState } from "@/lib/jawafdehi-forms";
 import { useCaseworkAuth } from "@/context/CaseworkAuthContext";
+import { FormError } from "@/components/admin/FormError";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
@@ -86,11 +87,7 @@ export default function Moderation() {
         </Button>
       </div>
 
-      {error && (
-        <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
-          {error}
-        </p>
-      )}
+      <FormError message={error} />
 
       {loading ? (
         <div className="flex min-h-[30vh] items-center justify-center">

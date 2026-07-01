@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { adminErrorMessage, type Paginated } from "@/services/admin-api";
+import { FormError } from "@/components/admin/FormError";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -105,11 +106,7 @@ export default function ResourceTable<T>({
         </div>
       </div>
 
-      {error && (
-        <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
-          {error}
-        </p>
-      )}
+      <FormError message={error} />
 
       <div className="rounded-md border bg-white">
         <Table>

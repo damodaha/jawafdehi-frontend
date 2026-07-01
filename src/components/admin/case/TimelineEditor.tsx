@@ -1,7 +1,5 @@
-import {
-  isValidDateField,
-  type TimelineEventRow,
-} from "@/lib/jawafdehi-forms";
+import { type TimelineEventRow } from "@/lib/jawafdehi-forms";
+import DatePairInput from "@/components/admin/DatePairInput";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,8 +44,6 @@ export default function TimelineEditor({ rows, onChange }: Props) {
       ) : (
         <div className="space-y-3">
           {rows.map((r, i) => {
-            const adBad = r.date.trim() !== "" && !isValidDateField(r.date);
-            const bsBad = r.date_bs.trim() !== "" && !isValidDateField(r.date_bs);
             return (
               <div key={i} className="space-y-2 rounded border p-3">
                 <div className="flex items-center justify-between">
@@ -86,26 +82,14 @@ export default function TimelineEditor({ rows, onChange }: Props) {
                     </Button>
                   </div>
                 </div>
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <div className="space-y-1">
-                    <Label className="text-xs">Date (AD)</Label>
-                    <Input
-                      type="date"
-                      value={r.date}
-                      onChange={(e) => update(i, { date: e.target.value })}
-                    />
-                    {adBad && <p className="text-xs text-red-600">Use YYYY-MM-DD.</p>}
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs">Date (BS)</Label>
-                    <Input
-                      value={r.date_bs}
-                      onChange={(e) => update(i, { date_bs: e.target.value })}
-                      placeholder="2080-09-18"
-                    />
-                    {bsBad && <p className="text-xs text-red-600">Use YYYY-MM-DD.</p>}
-                  </div>
-                </div>
+                <DatePairInput
+                  label="Date"
+                  idBase={`tl-${i}`}
+                  adValue={r.date}
+                  bsValue={r.date_bs}
+                  onAdChange={(v) => update(i, { date: v })}
+                  onBsChange={(v) => update(i, { date_bs: v })}
+                />
                 <div className="space-y-1">
                   <Label className="text-xs">Title</Label>
                   <Input

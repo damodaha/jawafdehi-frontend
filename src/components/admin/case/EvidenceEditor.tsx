@@ -2,6 +2,7 @@ import { useState } from "react";
 import { listMaterials, adminErrorMessage } from "@/services/admin-api";
 import { type EvidenceRow } from "@/lib/jawafdehi-forms";
 import { isValidMaterialIri } from "@/lib/datalake-forms";
+import { FieldError } from "@/components/admin/FormError";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -92,7 +93,7 @@ export default function EvidenceEditor({ rows, onChange }: Props) {
             )}
           </Button>
         </div>
-        {searchErr && <p className="text-xs text-red-600">{searchErr}</p>}
+        <FieldError message={searchErr} />
         {results.length > 0 && (
           <ul className="max-h-40 space-y-1 overflow-auto">
             {results.map((m) => {
@@ -143,11 +144,13 @@ export default function EvidenceEditor({ rows, onChange }: Props) {
             <Plus className="mr-1 h-4 w-4" /> Add
           </Button>
         </div>
-        {manualIri.trim() && !manualValid && (
-          <p className="text-xs text-red-600">
-            Not a canonical material IRI (expected https://…/material/&lt;source&gt;/&lt;ident&gt;).
-          </p>
-        )}
+        <FieldError
+          message={
+            manualIri.trim() !== "" &&
+            !manualValid &&
+            "Not a canonical material IRI (expected https://…/material/<source>/<ident>)."
+          }
+        />
       </div>
 
       {rows.length === 0 ? (

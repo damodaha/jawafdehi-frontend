@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { patchCase, adminErrorMessage, type PatchOp } from "@/services/admin-api";
 import { replaceOp, type CaseState } from "@/lib/jawafdehi-forms";
+import { FieldError } from "@/components/admin/FormError";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
@@ -79,7 +80,7 @@ export default function CaseStateControl({
         <span className="text-sm font-semibold">State</span>
         <Badge variant="secondary">{state || "—"}</Badge>
       </div>
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      <FieldError message={error} />
       {available.length === 0 ? (
         <p className="text-xs text-muted-foreground">
           No transitions available from this state

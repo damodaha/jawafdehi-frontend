@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FieldError } from "@/components/admin/FormError";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -76,7 +77,7 @@ export default function ChipListEditor({
           <Plus className="h-4 w-4" />
         </Button>
       </div>
-      {err && <p className="text-xs text-red-600">{err}</p>}
+      <FieldError message={err} />
       {items.length > 0 && (
         <div className="flex flex-wrap gap-1 pt-1">
           {items.map((item) => (

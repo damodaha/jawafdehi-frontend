@@ -5,6 +5,7 @@ import {
   adminErrorMessage,
   type EntityRecord,
 } from "@/services/admin-api";
+import { FormError } from "@/components/admin/FormError";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -122,11 +123,7 @@ export default function EntitiesList() {
         </Button>
       </form>
 
-      {error && (
-        <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
-          {error}
-        </p>
-      )}
+      <FormError message={error} />
 
       <div className="rounded-md border bg-white">
         <Table>

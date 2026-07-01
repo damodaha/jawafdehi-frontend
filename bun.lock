@@ -33,6 +33,7 @@
         "@radix-ui/react-toggle": "^1.1.9",
         "@radix-ui/react-toggle-group": "^1.1.10",
         "@radix-ui/react-tooltip": "^1.2.7",
+        "@sbmdkl/nepali-datepicker-reactjs": "^1.2.5",
         "@sentry/react": "^8.55.0",
         "@tanstack/react-query": "^5.83.0",
         "@uiw/react-md-editor": "^4.1.1",
@@ -464,6 +465,8 @@
     "@rollup/rollup-win32-x64-gnu": ["@rollup/rollup-win32-x64-gnu@4.60.3", "", { "os": "win32", "cpu": "x64" }, "sha512-E5Eb5H/DpxaoXH++Qkv28RcUJboMopmdDUALBczvHMf7hNIxaDZqwY5lK12UK1BHacSmvupoEWGu+n993Z0y1A=="],
 
     "@rollup/rollup-win32-x64-msvc": ["@rollup/rollup-win32-x64-msvc@4.60.3", "", { "os": "win32", "cpu": "x64" }, "sha512-hPt/bgL5cE+Qp+/TPHBqptcAgPzgj46mPcg/16zNUmbQk0j+mOEQV/+Lqu8QRtDV3Ek95Q6FeFITpuhl6OTsAA=="],
+
+    "@sbmdkl/nepali-datepicker-reactjs": ["@sbmdkl/nepali-datepicker-reactjs@1.2.5", "", { "peerDependencies": { "react": "*" } }, "sha512-xhua5fa/FYbWURqp0JUZtmoxxXsKHzdjWqSDbdX7DYDFYKtZlVr7uSY7QDhLkg4ZUr3Vxz9VVDJfqZHkuScX+w=="],
 
     "@sentry-internal/browser-utils": ["@sentry-internal/browser-utils@8.55.2", "", { "dependencies": { "@sentry/core": "8.55.2" } }, "sha512-GnKod+gL/Y+1FUM/RGV8q6le1CoyiGbT40MitEK7eVwWe+bfTRq1gN7ioupyHFMUg1RlQkDQ4/sENmio/uow5A=="],
 

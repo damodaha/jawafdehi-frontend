@@ -2,6 +2,7 @@ import React, { createContext, useContext, useMemo, useState } from "react";
 import { useAuth } from "react-oidc-context";
 import type { CaseworkUser } from "@/types/casework";
 import { getUserManager } from "@/services/oidc";
+import { isAdmin as rolesIsAdmin, isModerator as rolesIsModerator } from "@/lib/roles";
 import {
   DEV_AUTH_ENABLED,
   getStoredDevUser,
@@ -96,12 +97,8 @@ export function CaseworkAuthProvider({ children }: { children: React.ReactNode }
         error: auth.error?.message ?? null,
         login,
         logout,
-        isAdmin: !!user?.is_admin,
-        isModerator:
-          !!user &&
-          user.roles.some(
-            (r) => r.toLowerCase() === "admin" || r.toLowerCase() === "moderator",
-          ),
+        isAdmin: rolesIsAdmin(user?.roles),
+        isModerator: rolesIsModerator(user?.roles),
         devAuthEnabled: DEV_AUTH_ENABLED,
         devLogin,
       }}
