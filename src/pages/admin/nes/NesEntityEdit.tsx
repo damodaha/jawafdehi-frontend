@@ -4,10 +4,12 @@ import {
   getNesEntity,
   patchNesEntity,
   getNesEntityVersions,
+  deleteNesEntity,
   adminErrorMessage,
   type NesEntity,
 } from "@/services/admin-api";
 import { diffToPatchOps } from "@/lib/nes-jsonld";
+import DeleteButton from "@/components/admin/DeleteButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -259,6 +261,13 @@ export default function NesEntityEdit() {
               ? "No changes"
               : `${patchOps.length} change${patchOps.length === 1 ? "" : "s"} pending`}
           </span>
+          <div className="ml-auto">
+            <DeleteButton
+              resourceLabel="entity"
+              onDelete={() => deleteNesEntity(ref)}
+              onDeleted={() => navigate("/admin/nes/entities")}
+            />
+          </div>
         </div>
       </form>
     </div>

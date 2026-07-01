@@ -52,7 +52,9 @@ import NgmCourtCaseForm from "./pages/admin/ngm/NgmCourtCaseForm";
 import NgmMaterials from "./pages/admin/ngm/NgmMaterials";
 import NgmMaterialForm from "./pages/admin/ngm/NgmMaterialForm";
 import AdminCases from "./pages/admin/jawafdehi/AdminCases";
+import AdminCaseForm from "./pages/admin/jawafdehi/AdminCaseForm";
 import AdminSources from "./pages/admin/jawafdehi/AdminSources";
+import AdminSourceForm from "./pages/admin/jawafdehi/AdminSourceForm";
 import Moderation from "./pages/admin/casework/Moderation";
 import CaseworkLogin from "./pages/CaseworkLogin";
 import CaseworkCallback from "./pages/CaseworkCallback";
@@ -136,8 +138,19 @@ const App = () => (
                         <Route path="ngm/materials/new" element={<NgmMaterialForm />} />
                         <Route path="ngm/materials/edit/*" element={<NgmMaterialForm />} />
                         <Route path="ngm/materials" element={<NgmMaterials />} />
-                        {/* Jawafdehi */}
+                        {/* Jawafdehi — create/edit before the list so the
+                            literal "new" segment wins over the :slug/:id param. */}
+                        <Route path="jawafdehi/cases/new" element={<AdminCaseForm />} />
+                        <Route
+                          path="jawafdehi/cases/:slug/edit"
+                          element={<AdminCaseForm />}
+                        />
                         <Route path="jawafdehi/cases" element={<AdminCases />} />
+                        <Route path="jawafdehi/sources/new" element={<AdminSourceForm />} />
+                        <Route
+                          path="jawafdehi/sources/:id/edit"
+                          element={<AdminSourceForm />}
+                        />
                         <Route path="jawafdehi/sources" element={<AdminSources />} />
                         {/* Casework (folded in from /portal) */}
                         <Route path="reviews" element={<CaseworkReviews />} />
