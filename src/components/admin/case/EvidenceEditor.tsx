@@ -1,16 +1,10 @@
 import { useState } from "react";
-import { listSources, adminErrorMessage } from "@/services/admin-api";
-import { EVIDENCE_TIERS, type EvidenceRow } from "@/lib/jawafdehi-forms";
+import { listMaterials, adminErrorMessage } from "@/services/admin-api";
+import { type EvidenceRow } from "@/lib/jawafdehi-forms";
+import { isValidMaterialIri } from "@/lib/ngm-forms";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Loader2, Plus, Search, Trash2 } from "lucide-react";
 
 interface Props {
@@ -18,29 +12,36 @@ interface Props {
   onChange: (rows: EvidenceRow[]) => void;
 }
 
-function sourceTitle(s: Record<string, unknown>): string {
-  return String(s.title ?? s.name ?? `Source #${s.id}`);
+function materialIri(m: Record<string, unknown>): string {
+  return String(m["@id"] ?? m.iri ?? m.id ?? "");
 }
 
-// F5 — evidence linker. Links existing DocumentSources by id with a tier; the
-// parent diffs into a replace op on /evidence (§3). Includes a source search
-// (GET /api/sources/?search=) and a manual "by id" add.
+function materialTitle(m: Record<string, unknown>): string {
+  return String(m.name ?? m.title ?? materialIri(m));
+}
+
+// F5 — evidence linker. Case evidence is a reference to an NGM material (the
+// CaseMaterialReference join; ADR "cases own no documents"), NOT a document
+// source. Each row is { material_iri, additional_details }; the parent diffs
+// into a replace op on /evidence (§3). Includes a materials search
+// (GET /api/materials/) and a manual "add by material IRI" input.
 export default function EvidenceEditor({ rows, onChange }: Props) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Record<string, unknown>[]>([]);
   const [searching, setSearching] = useState(false);
   const [searchErr, setSearchErr] = useState<string | null>(null);
-  const [manualId, setManualId] = useState("");
+  const [manualIri, setManualIri] = useState("");
 
   const update = (i: number, patch: Partial<EvidenceRow>) =>
     onChange(rows.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
 
   const remove = (i: number) => onChange(rows.filter((_, idx) => idx !== i));
 
-  const addRow = (source_id: number) => {
-    if (!Number.isFinite(source_id) || source_id <= 0) return;
-    if (rows.some((r) => r.source_id === source_id)) return; // no dupes
-    onChange([...rows, { source_id, tier: "PRIMARY" }]);
+  const addRow = (iri: string) => {
+    const value = iri.trim();
+    if (!isValidMaterialIri(value)) return;
+    if (rows.some((r) => r.material_iri === value)) return; // no dupes
+    onChange([...rows, { material_iri: value, additional_details: "" }]);
   };
 
   const runSearch = async () => {
@@ -48,7 +49,7 @@ export default function EvidenceEditor({ rows, onChange }: Props) {
     setSearching(true);
     setSearchErr(null);
     try {
-      const page = await listSources<Record<string, unknown>>({
+      const page = await listMaterials<Record<string, unknown>>({
         search: query.trim(),
         page_size: 15,
       });
@@ -60,11 +61,14 @@ export default function EvidenceEditor({ rows, onChange }: Props) {
     }
   };
 
+  const manualValid = isValidMaterialIri(manualIri.trim());
+
   return (
     <div className="space-y-3 rounded-md border bg-white p-4">
-      <Label className="text-sm font-semibold">Evidence (document sources)</Label>
+      <Label className="text-sm font-semibold">Evidence (NGM materials)</Label>
       <p className="text-xs text-muted-foreground">
-        Link existing document sources with a tier (PRIMARY / LEGAL / SECONDARY).
+        Link NGM materials by their canonical <code>@id</code> IRI. Add an
+        optional case-specific note per link.
       </p>
 
       <div className="rounded-md bg-slate-50 p-3 space-y-2">
@@ -78,7 +82,7 @@ export default function EvidenceEditor({ rows, onChange }: Props) {
                 runSearch();
               }
             }}
-            placeholder="Search document sources…"
+            placeholder="Search materials…"
           />
           <Button type="button" variant="outline" onClick={runSearch} disabled={searching}>
             {searching ? (
@@ -91,20 +95,23 @@ export default function EvidenceEditor({ rows, onChange }: Props) {
         {searchErr && <p className="text-xs text-red-600">{searchErr}</p>}
         {results.length > 0 && (
           <ul className="max-h-40 space-y-1 overflow-auto">
-            {results.map((s) => {
-              const id = Number(s.id);
+            {results.map((m) => {
+              const iri = materialIri(m);
               return (
-                <li key={id} className="flex items-center justify-between gap-2 text-sm">
+                <li key={iri} className="flex items-center justify-between gap-2 text-sm">
                   <span className="min-w-0 truncate">
-                    <span className="font-mono text-xs text-muted-foreground">#{id}</span>{" "}
-                    {sourceTitle(s)}
+                    {materialTitle(m)}
+                    <span className="block truncate font-mono text-xs text-muted-foreground">
+                      {iri}
+                    </span>
                   </span>
                   <Button
                     type="button"
                     size="sm"
                     variant="ghost"
+                    disabled={!isValidMaterialIri(iri)}
                     onClick={() => {
-                      addRow(id);
+                      addRow(iri);
                       setResults([]);
                       setQuery("");
                     }}
@@ -118,25 +125,29 @@ export default function EvidenceEditor({ rows, onChange }: Props) {
         )}
         <div className="flex items-center gap-2">
           <Input
-            value={manualId}
-            onChange={(e) => setManualId(e.target.value)}
-            type="number"
-            className="max-w-[10rem]"
-            placeholder="…or add by id"
+            value={manualIri}
+            onChange={(e) => setManualIri(e.target.value)}
+            className="font-mono text-xs"
+            placeholder="…or add by material IRI (https://…/material/<source>/<ident>)"
           />
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={() => {
-              addRow(Number(manualId));
-              setManualId("");
+              addRow(manualIri);
+              setManualIri("");
             }}
-            disabled={!manualId.trim()}
+            disabled={!manualValid}
           >
             <Plus className="mr-1 h-4 w-4" /> Add
           </Button>
         </div>
+        {manualIri.trim() && !manualValid && (
+          <p className="text-xs text-red-600">
+            Not a canonical material IRI (expected https://…/material/&lt;source&gt;/&lt;ident&gt;).
+          </p>
+        )}
       </div>
 
       {rows.length === 0 ? (
@@ -145,25 +156,18 @@ export default function EvidenceEditor({ rows, onChange }: Props) {
         <div className="space-y-2">
           {rows.map((r, i) => (
             <div
-              key={r.source_id}
-              className="grid items-center gap-2 rounded border p-2 sm:grid-cols-[1fr_10rem_auto]"
+              key={r.material_iri}
+              className="grid items-center gap-2 rounded border p-2 sm:grid-cols-[1fr_auto]"
             >
-              <span className="font-mono text-sm">Source #{r.source_id}</span>
-              <Select
-                value={r.tier}
-                onValueChange={(v) => update(i, { tier: v as EvidenceRow["tier"] })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {EVIDENCE_TIERS.map((t) => (
-                    <SelectItem key={t} value={t}>
-                      {t}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="min-w-0 space-y-1">
+                <span className="block truncate font-mono text-xs">{r.material_iri}</span>
+                <Input
+                  value={r.additional_details}
+                  onChange={(e) => update(i, { additional_details: e.target.value })}
+                  className="h-8 text-sm"
+                  placeholder="Optional note (why this material matters)…"
+                />
+              </div>
               <Button
                 type="button"
                 size="icon"

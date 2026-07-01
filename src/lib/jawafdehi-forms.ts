@@ -83,10 +83,6 @@ export const RELATIONSHIP_TYPES = [
 ] as const;
 export type RelationshipType = (typeof RELATIONSHIP_TYPES)[number];
 
-// Evidence tiers (EvidenceItemSerializer tier enum).
-export const EVIDENCE_TIERS = ["PRIMARY", "LEGAL", "SECONDARY"] as const;
-export type EvidenceTier = (typeof EVIDENCE_TIERS)[number];
-
 // --- Row shapes for the sub-resource editors (match §3 patch value shapes) ----
 
 export interface EntityRelationshipRow {
@@ -102,9 +98,12 @@ export interface TimelineEventRow {
   description: string;
 }
 
+// One evidence entry = a reference to an NGM material (the CaseMaterialReference
+// join; ADR "cases own no documents"). material_iri is a canonical material @id
+// IRI; additional_details is an optional case-specific note.
 export interface EvidenceRow {
-  source_id: number;
-  tier: EvidenceTier;
+  material_iri: string;
+  additional_details: string;
 }
 
 // --- Validators --------------------------------------------------------------
@@ -189,11 +188,14 @@ export function buildTimelinePatch(rows: TimelineEventRow[]): PatchOp {
   return replaceOp("/timeline", value);
 }
 
-// Evidence links → replace /evidence. Drops rows without a source id.
+// Evidence links → replace /evidence. Drops rows without a material IRI.
 export function buildEvidencePatch(rows: EvidenceRow[]): PatchOp {
   const value = rows
-    .filter((r) => Number.isFinite(r.source_id) && r.source_id > 0)
-    .map((r) => ({ source_id: r.source_id, tier: r.tier }));
+    .filter((r) => r.material_iri.trim())
+    .map((r) => ({
+      material_iri: r.material_iri.trim(),
+      additional_details: r.additional_details.trim(),
+    }));
   return replaceOp("/evidence", value);
 }
 

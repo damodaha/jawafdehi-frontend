@@ -131,15 +131,23 @@ describe("buildTimelinePatch", () => {
 });
 
 describe("buildEvidencePatch", () => {
-  it("replaces /evidence and drops invalid source ids", () => {
+  it("replaces /evidence with material references and drops blank IRIs", () => {
     const rows: EvidenceRow[] = [
-      { source_id: 42, tier: "PRIMARY" },
-      { source_id: 0, tier: "LEGAL" },
+      {
+        material_iri: "https://jawafdehi.org/material/ciaa/report-1",
+        additional_details: " key filing ",
+      },
+      { material_iri: "  ", additional_details: "orphan" },
     ];
     expect(buildEvidencePatch(rows)).toEqual({
       op: "replace",
       path: "/evidence",
-      value: [{ source_id: 42, tier: "PRIMARY" }],
+      value: [
+        {
+          material_iri: "https://jawafdehi.org/material/ciaa/report-1",
+          additional_details: "key filing",
+        },
+      ],
     });
   });
 });

@@ -12,7 +12,6 @@ import {
 import {
   CASE_TYPES,
   RELATIONSHIP_TYPES,
-  EVIDENCE_TIERS,
   isValidSlug,
   isValidDateField,
   isValidCourtCaseRef,
@@ -26,7 +25,6 @@ import {
   type TimelineEventRow,
   type EvidenceRow,
   type RelationshipType,
-  type EvidenceTier,
 } from "@/lib/jawafdehi-forms";
 import { useCaseworkAuth } from "@/context/CaseworkAuthContext";
 import EntityRelationshipsEditor from "@/components/admin/case/EntityRelationshipsEditor";
@@ -102,13 +100,6 @@ function asRelType(v: unknown): RelationshipType {
     : "ACCUSED";
 }
 
-function asTier(v: unknown): EvidenceTier {
-  const s = str(v).toUpperCase();
-  return (EVIDENCE_TIERS as readonly string[]).includes(s)
-    ? (s as EvidenceTier)
-    : "PRIMARY";
-}
-
 // Parse a loaded case's entities array into editor rows. Tolerates the loose
 // read-plane shape (nes_id may live under different keys).
 function parseEntities(c: Record<string, unknown>): EntityRelationshipRow[] {
@@ -133,8 +124,11 @@ function parseTimeline(c: Record<string, unknown>): TimelineEventRow[] {
 function parseEvidence(c: Record<string, unknown>): EvidenceRow[] {
   const list = Array.isArray(c.evidence) ? (c.evidence as Record<string, unknown>[]) : [];
   return list
-    .map((e) => ({ source_id: Number(e.source_id ?? e.source ?? e.id), tier: asTier(e.tier) }))
-    .filter((e) => Number.isFinite(e.source_id) && e.source_id > 0);
+    .map((e) => ({
+      material_iri: str(e.material_iri ?? e.material ?? e["@id"]),
+      additional_details: str(e.additional_details ?? e.notes),
+    }))
+    .filter((e) => e.material_iri.trim());
 }
 
 // Parse a loaded case (loose read-plane shape) into the editor state.
