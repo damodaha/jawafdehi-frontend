@@ -51,6 +51,10 @@ import NgmCourtCases from "./pages/admin/ngm/NgmCourtCases";
 import NgmCourtCaseForm from "./pages/admin/ngm/NgmCourtCaseForm";
 import NgmMaterials from "./pages/admin/ngm/NgmMaterials";
 import NgmMaterialForm from "./pages/admin/ngm/NgmMaterialForm";
+import NgmCourts from "./pages/admin/ngm/NgmCourts";
+import NgmCourtForm from "./pages/admin/ngm/NgmCourtForm";
+import NgmFirms from "./pages/admin/ngm/NgmFirms";
+import NgmFirmForm from "./pages/admin/ngm/NgmFirmForm";
 import AdminCases from "./pages/admin/jawafdehi/AdminCases";
 import AdminCaseForm from "./pages/admin/jawafdehi/AdminCaseForm";
 import AdminSources from "./pages/admin/jawafdehi/AdminSources";
@@ -135,6 +139,15 @@ const App = () => (
                           element={<NgmCourtCaseForm />}
                         />
                         <Route path="ngm/courtcases" element={<NgmCourtCases />} />
+                        <Route path="ngm/courts/new" element={<NgmCourtForm />} />
+                        <Route
+                          path="ngm/courts/:identifier/edit"
+                          element={<NgmCourtForm />}
+                        />
+                        <Route path="ngm/courts" element={<NgmCourts />} />
+                        <Route path="ngm/firms/new" element={<NgmFirmForm />} />
+                        <Route path="ngm/firms/:id/edit" element={<NgmFirmForm />} />
+                        <Route path="ngm/firms" element={<NgmFirms />} />
                         <Route path="ngm/materials/new" element={<NgmMaterialForm />} />
                         <Route path="ngm/materials/edit/*" element={<NgmMaterialForm />} />
                         <Route path="ngm/materials" element={<NgmMaterials />} />

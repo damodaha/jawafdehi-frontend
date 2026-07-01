@@ -53,6 +53,8 @@ const NAV: NavGroup[] = [
     heading: "NGM — Governance",
     items: [
       { to: "/admin/ngm/courtcases", label: "Court cases", icon: Gavel },
+      { to: "/admin/ngm/courts", label: "Courts", icon: Building2 },
+      { to: "/admin/ngm/firms", label: "Blocklisted firms", icon: Building2 },
       { to: "/admin/ngm/materials", label: "Materials", icon: ScrollText },
     ],
   },

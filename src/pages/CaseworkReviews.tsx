@@ -5,13 +5,16 @@ import {
   listReviewsGrouped,
   submitReview,
   buildSubmitPayload,
+  regradeAll,
   apiErrorMessage,
 } from "@/services/casework-api";
 import type { GroupedCase, ReviewListItem, ReviewerInfo } from "@/types/casework";
+import { useCaseworkAuth } from "@/context/CaseworkAuthContext";
+import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { dispositionColor, statusColor, fmtDate, fmtDur, scoreBand } from "@/lib/casework-ui";
-import { Loader2, Plus, RefreshCw } from "lucide-react";
+import { Loader2, Plus, RefreshCw, Repeat } from "lucide-react";
 
 const PAGE_SIZE = 20;
 
@@ -50,7 +53,9 @@ function reviewerLabels(reviewers: ReviewerInfo[] | null): string[] {
 
 export default function CaseworkReviews() {
   const navigate = useNavigate();
+  const { isModerator } = useCaseworkAuth();
   const [groups, setGroups] = useState<GroupedCase[]>([]);
+  const [regrading, setRegrading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [count, setCount] = useState(0);
@@ -146,17 +151,55 @@ export default function CaseworkReviews() {
     if (!ok) setRerunningSlug(null);
   };
 
+  // F9 — regrade all reviewable cases against the current rules (admin/
+  // moderator). POSTs /api/casework/reviews/regrade-all/; refresh page 1 so the
+  // newly-queued runs appear.
+  const onRegradeAll = async () => {
+    setRegrading(true);
+    setErr("");
+    try {
+      const res = await regradeAll();
+      toast({
+        title: "Regrade queued",
+        description: `${res.regrading} case${res.regrading === 1 ? "" : "s"} queued for regrade.`,
+      });
+      await loadFirst(true);
+    } catch (e: unknown) {
+      setErr(apiErrorMessage(e, "Regrade-all failed."));
+    } finally {
+      setRegrading(false);
+    }
+  };
+
   const shownReviews = groups.reduce((n, g) => n + (g.executions?.length ?? 0), 0);
 
   return (
     <CaseworkLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-xl font-bold">Case reviews</h1>
-          <p className="text-sm text-muted-foreground">
-            Submit a case slug, court case number, or case URL to run a multi-dimensional
-            quality review.
-          </p>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h1 className="text-xl font-bold">Case reviews</h1>
+            <p className="text-sm text-muted-foreground">
+              Submit a case slug, court case number, or case URL to run a multi-dimensional
+              quality review.
+            </p>
+          </div>
+          {isModerator && (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={regrading}
+              title="Queue a fresh review for every reviewable case against the current rules"
+              onClick={onRegradeAll}
+            >
+              {regrading ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Repeat className="mr-1 h-4 w-4" />
+              )}
+              Regrade all
+            </Button>
+          )}
         </div>
 
         <form onSubmit={onSubmit} className="flex gap-2 items-start">

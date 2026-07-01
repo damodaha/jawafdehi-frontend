@@ -13,6 +13,7 @@ import {
   parseMaterialIri,
 } from "@/lib/ngm-forms";
 import DeleteButton from "@/components/admin/DeleteButton";
+import MaterialFileUpload from "@/components/admin/ngm/MaterialFileUpload";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -240,6 +241,30 @@ export default function NgmMaterialForm() {
           )}
         </div>
       </form>
+
+      {/* F8 — file upload. Only in edit mode (the material must exist so its
+          {source}/{ident} path is known). Prefer the components parsed from the
+          doc's @id (canonical location); fall back to the route ref. Refresh the
+          doc after upload so the new contentUrl/associatedMedia shows. */}
+      {editing &&
+        (() => {
+          const parts = iri ? parseMaterialIri(iri) : null;
+          const lastSlash = refPath.lastIndexOf("/");
+          const source = parts?.source ?? refPath.slice(0, lastSlash);
+          const ident = parts?.ident ?? refPath.slice(lastSlash + 1);
+          if (!source || !ident) return null;
+          return (
+            <MaterialFileUpload
+              source={source}
+              ident={ident}
+              onUploaded={(res) => {
+                if (res && typeof res === "object") {
+                  setJsonText(JSON.stringify(res, null, 2));
+                }
+              }}
+            />
+          );
+        })()}
     </div>
   );
 }
