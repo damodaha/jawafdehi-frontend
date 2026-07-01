@@ -38,11 +38,12 @@ export default function DatePairInput({
     if (bs) onBsChange(bs);
   };
 
-  // Pick BS → set BS, and set AD from the paired Gregorian date the picker
-  // already computed (no re-derivation needed).
+  // Pick BS → set BS, and mirror the paired Gregorian date the picker already
+  // computed. Propagate an empty adDate too (clearing BS clears AD) so the pair
+  // can't be left mismatched.
   const handleBs = ({ bsDate, adDate }: { bsDate: string; adDate: string }) => {
     onBsChange(bsDate);
-    if (adDate) onAdChange(adDate);
+    onAdChange(adDate || "");
   };
 
   return (

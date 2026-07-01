@@ -27,6 +27,10 @@ interface Props {
   onUploaded?: (result: unknown) => void;
 }
 
+// Backend upload cap (see test plan M9). Rejected client-side so an oversize
+// file isn't streamed only to 413/timeout at the gateway.
+const MAX_FILE_BYTES = 100 * 1024 * 1024;
+
 // F8 — material file upload control. Multipart POST to
 // /api/materials/{source}/{ident}/file with { file, role, material_type? }.
 export default function MaterialFileUpload({
@@ -43,6 +47,10 @@ export default function MaterialFileUpload({
 
   const upload = async () => {
     if (!file) return;
+    if (file.size > MAX_FILE_BYTES) {
+      setError("File exceeds the 100MB limit.");
+      return;
+    }
     setUploading(true);
     setError(null);
     try {

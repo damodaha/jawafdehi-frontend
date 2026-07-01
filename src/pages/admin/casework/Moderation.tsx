@@ -43,9 +43,18 @@ export default function Moderation() {
     }
   }, []);
 
+  // Only fetch the queue for moderators. The nav link is already role-scoped and
+  // the API re-checks on every transition, but a non-moderator who deep-links
+  // here shouldn't even see the queue — so we gate the page below and skip load.
   useEffect(() => {
-    load();
-  }, [load]);
+    if (isModerator) load();
+  }, [load, isModerator]);
+
+  if (!isModerator) {
+    return (
+      <FormError message="You don't have permission to access the moderation queue." />
+    );
+  }
 
   const act = async (slug: string, to: CaseState, verb: string) => {
     setBusySlug(slug);
