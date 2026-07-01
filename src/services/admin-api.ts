@@ -15,6 +15,16 @@
 import axios, { type AxiosInstance } from "axios";
 import { getAccessToken } from "./oidc";
 
+// DEV-ONLY: when the app is built/run with VITE_DEV_AUTH and the user logged in
+// with a username/password (Django session) instead of OIDC, requests carry no
+// bearer token. In that mode we let the browser send the session cookie
+// (withCredentials) and echo the CSRF token on unsafe methods. Read via the
+// live flag + a lazy localStorage lookup to avoid an import cycle with
+// dev-auth.ts (which imports ADMIN_API_BASE_URL from this module).
+const DEV_AUTH_ENABLED = import.meta.env.VITE_DEV_AUTH === "true";
+const CSRF_STORAGE_KEY = "jawafdehi.devAuth.csrf";
+const UNSAFE_METHODS = new Set(["post", "put", "patch", "delete"]);
+
 // The monolith host. Defaults to the same origin so a deploy behind one domain
 // "just works"; override for split local dev (e.g. http://localhost:48000).
 export const ADMIN_API_BASE_URL =
@@ -25,7 +35,18 @@ function makeClient(): AxiosInstance {
   const client = axios.create({ baseURL: ADMIN_API_BASE_URL });
   client.interceptors.request.use(async (config) => {
     const token = await getAccessToken();
-    if (token) config.headers.Authorization = `Bearer ${token}`;
+    if (token) {
+      // Normal path: OIDC bearer token.
+      config.headers.Authorization = `Bearer ${token}`;
+    } else if (DEV_AUTH_ENABLED && typeof window !== "undefined") {
+      // DEV_AUTH session path: no bearer, ride the session cookie + CSRF.
+      config.withCredentials = true;
+      const method = (config.method || "get").toLowerCase();
+      const csrf = window.localStorage.getItem(CSRF_STORAGE_KEY);
+      if (csrf && UNSAFE_METHODS.has(method)) {
+        config.headers["X-CSRFToken"] = csrf;
+      }
+    }
     return config;
   });
   return client;
