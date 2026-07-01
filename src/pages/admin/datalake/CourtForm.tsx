@@ -15,9 +15,9 @@ import { ArrowLeft, Loader2, Save } from "lucide-react";
 
 const str = (v: unknown): string => (v == null ? "" : String(v));
 
-// F7 — create + edit a NGM court. `identifier` is the natural key and is locked
+// F7 — create + edit a data-lake court. `identifier` is the natural key and is locked
 // in edit mode. Create POSTs; edit PUTs (replace).
-export default function NgmCourtForm() {
+export default function CourtForm() {
   const params = useParams();
   const navigate = useNavigate();
   const editing = Boolean(params.identifier);
@@ -79,7 +79,7 @@ export default function NgmCourtForm() {
         await createCourt(payload);
         toast({ title: "Court created" });
       }
-      navigate("/admin/ngm/courts");
+      navigate("/admin/datalake/courts");
     } catch (err) {
       setError(adminErrorMessage(err, "Failed to save court"));
     } finally {
@@ -102,7 +102,7 @@ export default function NgmCourtForm() {
           variant="ghost"
           size="sm"
           className="mb-2 -ml-2"
-          onClick={() => navigate("/admin/ngm/courts")}
+          onClick={() => navigate("/admin/datalake/courts")}
         >
           <ArrowLeft className="mr-1 h-4 w-4" /> Courts
         </Button>
@@ -169,7 +169,7 @@ export default function NgmCourtForm() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => navigate("/admin/ngm/courts")}
+            onClick={() => navigate("/admin/datalake/courts")}
           >
             Cancel
           </Button>

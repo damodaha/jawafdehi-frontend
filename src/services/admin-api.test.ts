@@ -31,10 +31,10 @@ vi.mock("axios", () => {
 });
 
 import {
-  listNesEntities,
-  getNesEntity,
-  deleteNesEntity,
-  reindexNes,
+  listEntities,
+  getEntity,
+  deleteEntity,
+  reindexEntities,
   searchEntities,
   listCourtCases,
   listCourts,
@@ -62,11 +62,11 @@ beforeEach(() => {
 // TASK A — the client must address the SINGLE unified /api root; the former
 // /api/nes and /api/ngm prefixes were hard-cut.
 describe("admin-api unified paths (no /api/nes or /api/ngm)", () => {
-  it("routes NES entities to /api/entities and reindex to /api/admin/reindex", async () => {
-    await listNesEntities();
-    await getNesEntity("person/ram-bahadur");
-    await deleteNesEntity("person/ram-bahadur");
-    await reindexNes();
+  it("routes entities to /api/entities and reindex to /api/admin/reindex", async () => {
+    await listEntities();
+    await getEntity("person/ram-bahadur");
+    await deleteEntity("person/ram-bahadur");
+    await reindexEntities();
     expect(calls.map((c) => `${c.method} ${c.url}`)).toEqual([
       "get /api/entities",
       "get /api/entities/person/ram-bahadur",

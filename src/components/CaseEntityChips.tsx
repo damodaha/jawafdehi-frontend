@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { Building2, MapPin, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { JawafEntity } from "@/types/jds";
-import type { Entity } from "@/types/nes";
-import { getPrimaryName } from "@/utils/nes-helpers";
+import type { Entity } from "@/types/entity";
+import { getPrimaryName } from "@/utils/entity-helpers";
 import { translateDynamicText } from "@/lib/translate-dynamic-content";
 import { cn } from "@/lib/utils";
 

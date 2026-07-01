@@ -1,6 +1,6 @@
 // Unified platform search contract (Think-Big unified search).
-// One ranked, typed, bilingual result set across NES entities, NGM materials,
-// NGM court cases, and PUBLISHED Jawafdehi cases. Served by GET /api/search/.
+// One ranked, typed, bilingual result set across entities, materials, court
+// cases, and PUBLISHED Jawafdehi cases. Served by GET /api/search/.
 
 // The four indexed result domains. "all" is a UI-only sentinel (sent as "no type
 // filter"); it is never a value the backend returns on a result.
@@ -65,6 +65,7 @@ export interface ArchiveSearchResult {
   type: ArchiveSearchResultType;
   // IRI for entity/material; synthesized id/slug-bearing IRI for courtcase/case.
   id: string;
+  // Backend-provided origin tag (part of the /api/search response contract).
   source_app: "nes" | "ngm" | "jawafdehi";
   title: BilingualText;
   snippet: BilingualText;

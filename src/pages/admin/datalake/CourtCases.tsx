@@ -20,25 +20,25 @@ const columns: Column<Row>[] = [
 
 const PAGE_SIZE = 25;
 
-export default function NgmCourtCases() {
+export default function CourtCases() {
   const navigate = useNavigate();
   return (
     <ResourceTable<Row>
-      title="NGM Court Cases"
+      title="Court Cases"
       description="Judicial cases in the governance data lake. Mostly scraped; you can also create/edit by hand."
       columns={columns}
       pageSize={PAGE_SIZE}
       rowKey={(r) => `${str(r.court_identifier)}/${str(r.case_number)}`}
       headerAction={
         <Button asChild size="sm">
-          <Link to="/admin/ngm/courtcases/new">
+          <Link to="/admin/datalake/courtcases/new">
             <Plus className="mr-1 h-4 w-4" /> New case
           </Link>
         </Button>
       }
       onRowClick={(r) =>
         navigate(
-          `/admin/ngm/courtcases/${encodeURIComponent(
+          `/admin/datalake/courtcases/${encodeURIComponent(
             str(r.court_identifier),
           )}/${encodeURIComponent(str(r.case_number))}/edit`,
         )

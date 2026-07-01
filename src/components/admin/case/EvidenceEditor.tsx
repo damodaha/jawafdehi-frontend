@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { listMaterials, adminErrorMessage } from "@/services/admin-api";
 import { type EvidenceRow } from "@/lib/jawafdehi-forms";
-import { isValidMaterialIri } from "@/lib/ngm-forms";
+import { isValidMaterialIri } from "@/lib/datalake-forms";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +20,7 @@ function materialTitle(m: Record<string, unknown>): string {
   return String(m.name ?? m.title ?? materialIri(m));
 }
 
-// F5 — evidence linker. Case evidence is a reference to an NGM material (the
+// F5 — evidence linker. Case evidence is a reference to a data-lake material (the
 // CaseMaterialReference join; ADR "cases own no documents"), NOT a document
 // source. Each row is { material_iri, additional_details }; the parent diffs
 // into a replace op on /evidence (§3). Includes a materials search
@@ -65,9 +65,9 @@ export default function EvidenceEditor({ rows, onChange }: Props) {
 
   return (
     <div className="space-y-3 rounded-md border bg-white p-4">
-      <Label className="text-sm font-semibold">Evidence (NGM materials)</Label>
+      <Label className="text-sm font-semibold">Evidence (materials)</Label>
       <p className="text-xs text-muted-foreground">
-        Link NGM materials by their canonical <code>@id</code> IRI. Add an
+        Link materials by their canonical <code>@id</code> IRI. Add an
         optional case-specific note per link.
       </p>
 

@@ -4,7 +4,7 @@ import {
   RELATIONSHIP_TYPES,
   type EntityRelationshipRow,
 } from "@/lib/jawafdehi-forms";
-import { isValidEntityIri } from "@/lib/ngm-forms";
+import { isValidEntityIri } from "@/lib/datalake-forms";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Loader2, Plus, Search, Trash2 } from "lucide-react";
 
-// Display the bilingual/plain name of a NES entity search hit.
+// Display the bilingual/plain name of an entity search hit.
 function entityName(e: Record<string, unknown>): string {
   const n = e.name;
   if (typeof n === "string") return n;
@@ -34,7 +34,7 @@ interface Props {
 }
 
 // F3 — entity-relationship editor. Rows of {nes_id, relationship_type, notes}.
-// The parent diffs these into a replace op on /entities (§3). Includes a NES
+// The parent diffs these into a replace op on /entities (§3). Includes an entity
 // entity picker hitting GET /api/entities?query=.
 export default function EntityRelationshipsEditor({ rows, onChange }: Props) {
   const [query, setQuery] = useState("");
@@ -89,7 +89,7 @@ export default function EntityRelationshipsEditor({ rows, onChange }: Props) {
                 runSearch();
               }
             }}
-            placeholder="Search NES entities to link…"
+            placeholder="Search entities to link…"
           />
           <Button type="button" variant="outline" onClick={runSearch} disabled={searching}>
             {searching ? (

@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Database, FileText, Gavel } from "lucide-react";
 
 import { getStatistics } from "@/services/jds-api";
-import type { MaterialsMetrics, NesMetrics, NgmMetrics } from "@/types/jds";
+import type { MaterialsMetrics, EntityMetrics, DataLakeMetrics } from "@/types/jds";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -97,8 +97,8 @@ const DataQuality = () => {
 
           {isLoading && !isError && <LoadingState />}
 
-          {nes && <NesSection nes={nes} t={t} />}
-          {ngm && <NgmSection ngm={ngm} t={t} />}
+          {nes && <EntitiesSection nes={nes} t={t} />}
+          {ngm && <DataLakeSection ngm={ngm} t={t} />}
           {materials && <MaterialsSection materials={materials} t={t} />}
         </div>
       </main>
@@ -108,7 +108,7 @@ const DataQuality = () => {
 
 type Translate = ReturnType<typeof useTranslation>["t"];
 
-function NesSection({ nes, t }: Readonly<{ nes: NesMetrics; t: Translate }>) {
+function EntitiesSection({ nes, t }: Readonly<{ nes: EntityMetrics; t: Translate }>) {
   const completeness: CompletenessItem[] = [
     {
       label: t("dataQuality.completeness.withIdentifier", "Have a stable identifier"),
@@ -133,7 +133,7 @@ function NesSection({ nes, t }: Readonly<{ nes: NesMetrics; t: Translate }>) {
   return (
     <SourceSection
       icon={<Database className="h-6 w-6 text-accent" />}
-      heading={t("dataQuality.nes.heading", "Entities (NES)")}
+      heading={t("dataQuality.nes.heading", "Entities")}
       description={t(
         "dataQuality.nes.description",
         "People, offices, organizations and locations tracked across the archive.",
@@ -152,7 +152,7 @@ function NesSection({ nes, t }: Readonly<{ nes: NesMetrics; t: Translate }>) {
   );
 }
 
-function NgmSection({ ngm, t }: Readonly<{ ngm: NgmMetrics; t: Translate }>) {
+function DataLakeSection({ ngm, t }: Readonly<{ ngm: DataLakeMetrics; t: Translate }>) {
   const completeness: CompletenessItem[] = [
     {
       label: t("dataQuality.completeness.nesResolved", "Resolved to a tracked entity"),
@@ -177,7 +177,7 @@ function NgmSection({ ngm, t }: Readonly<{ ngm: NgmMetrics; t: Translate }>) {
   return (
     <SourceSection
       icon={<Gavel className="h-6 w-6 text-accent" />}
-      heading={t("dataQuality.ngm.heading", "Judicial records (NGM)")}
+      heading={t("dataQuality.ngm.heading", "Judicial records")}
       description={t(
         "dataQuality.ngm.description",
         "Court cases, hearings and source documents collected from Nepal's judiciary.",

@@ -78,7 +78,7 @@ interface CourtCaseCardProps {
   courtCaseId: string;
   courtCase?: CourtCase;
   isLoading: boolean;
-  // When true, the header links to the NGM court-case detail page
+  // When true, the header links to the data-lake court-case detail page
   // (/courtcase/<court>/<case_number>). Off on the detail page itself.
   linkToDetail?: boolean;
 }

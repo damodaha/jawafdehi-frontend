@@ -9,7 +9,7 @@ import {
   adminErrorMessage,
   type CourtCaseWrite,
 } from "@/services/admin-api";
-import { isValidEntityIri } from "@/lib/ngm-forms";
+import { isValidEntityIri } from "@/lib/datalake-forms";
 import DeleteButton from "@/components/admin/DeleteButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,9 +33,9 @@ interface CourtOption {
 
 const str = (v: unknown): string => (v == null ? "" : String(v));
 
-// Create + edit a NGM court case. The natural key is (court, case_number); in
+// Create + edit a data-lake court case. The natural key is (court, case_number); in
 // edit mode both come from the route and are locked (they're the PK).
-export default function NgmCourtCaseForm() {
+export default function CourtCaseForm() {
   const params = useParams();
   const navigate = useNavigate();
   const editing = Boolean(params.court && params.caseNumber);
@@ -125,7 +125,7 @@ export default function NgmCourtCaseForm() {
         await createCourtCase(payload);
         toast({ title: "Case created" });
       }
-      navigate("/admin/ngm/courtcases");
+      navigate("/admin/datalake/courtcases");
     } catch (err) {
       setError(adminErrorMessage(err, "Failed to save case"));
     } finally {
@@ -148,7 +148,7 @@ export default function NgmCourtCaseForm() {
           variant="ghost"
           size="sm"
           className="mb-2 -ml-2"
-          onClick={() => navigate("/admin/ngm/courtcases")}
+          onClick={() => navigate("/admin/datalake/courtcases")}
         >
           <ArrowLeft className="mr-1 h-4 w-4" /> Court cases
         </Button>
@@ -256,7 +256,7 @@ export default function NgmCourtCaseForm() {
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="nes_id">NES entity IRI (optional)</Label>
+          <Label htmlFor="nes_id">Entity IRI (optional)</Label>
           <Input
             id="nes_id"
             value={str(form.nes_id)}
@@ -284,7 +284,7 @@ export default function NgmCourtCaseForm() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => navigate("/admin/ngm/courtcases")}
+            onClick={() => navigate("/admin/datalake/courtcases")}
           >
             Cancel
           </Button>
@@ -295,7 +295,7 @@ export default function NgmCourtCaseForm() {
                 onDelete={() =>
                   deleteCourtCase(params.court!, params.caseNumber!)
                 }
-                onDeleted={() => navigate("/admin/ngm/courtcases")}
+                onDeleted={() => navigate("/admin/datalake/courtcases")}
               />
             </div>
           )}

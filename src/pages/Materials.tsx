@@ -1,6 +1,6 @@
 import ArchiveSearch from "./ArchiveSearch";
 
-// NGM governance materials browse page — a single-type view of the unified
+// Data-lake governance materials browse page — a single-type view of the unified
 // archive search (faceted, sorted, bilingual), pinned to the `material` type.
 export default function Materials() {
   return (

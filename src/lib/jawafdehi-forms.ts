@@ -8,7 +8,7 @@ import type {
   DocumentSourceType,
 } from "@/types/jds";
 import type { PatchOp } from "@/services/admin-api";
-import { isValidEntityIri } from "@/lib/ngm-forms";
+import { isValidEntityIri } from "@/lib/datalake-forms";
 
 // Corruption-case type + workflow-state choices (see types/jds.ts).
 export const CASE_TYPES: readonly CaseType[] = [
@@ -56,7 +56,7 @@ export const SOURCE_LINK_ROLES = [
 ] as const;
 
 // URL-friendly slug: lowercase alnum, hyphen-separated (mirrors the case-slug
-// rule; reused from the NES slugify shape).
+// rule; reused from the entity slugify shape).
 export function slugify(input: string): string {
   return input
     .trim()
@@ -98,7 +98,7 @@ export interface TimelineEventRow {
   description: string;
 }
 
-// One evidence entry = a reference to an NGM material (the CaseMaterialReference
+// One evidence entry = a reference to a data-lake material (the CaseMaterialReference
 // join; ADR "cases own no documents"). material_iri is a canonical material @id
 // IRI; additional_details is an optional case-specific note.
 export interface EvidenceRow {
@@ -109,7 +109,7 @@ export interface EvidenceRow {
 // --- Validators --------------------------------------------------------------
 
 // Case slug rule mirrors Case.save()/validate(): lowercase alnum,
-// hyphen-separated (same shape as the NES slug).
+// hyphen-separated (same shape as the entity slug).
 export const CASE_SLUG_RE = /^[a-z0-9][a-z0-9-]*$/;
 
 export function isValidSlug(value: string): boolean {

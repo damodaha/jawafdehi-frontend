@@ -46,16 +46,16 @@ const NAV: NavGroup[] = [
     items: [{ to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true }],
   },
   {
-    heading: "NES — Entities",
-    items: [{ to: "/admin/nes/entities", label: "Entities", icon: Network }],
+    heading: "Entities",
+    items: [{ to: "/admin/entities", label: "Entities", icon: Network }],
   },
   {
-    heading: "NGM — Governance",
+    heading: "Data Lake",
     items: [
-      { to: "/admin/ngm/courtcases", label: "Court cases", icon: Gavel },
-      { to: "/admin/ngm/courts", label: "Courts", icon: Building2 },
-      { to: "/admin/ngm/firms", label: "Blocklisted firms", icon: Building2 },
-      { to: "/admin/ngm/materials", label: "Materials", icon: ScrollText },
+      { to: "/admin/datalake/courtcases", label: "Court cases", icon: Gavel },
+      { to: "/admin/datalake/courts", label: "Courts", icon: Building2 },
+      { to: "/admin/datalake/firms", label: "Blocklisted firms", icon: Building2 },
+      { to: "/admin/datalake/materials", label: "Materials", icon: ScrollText },
     ],
   },
   {

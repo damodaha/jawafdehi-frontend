@@ -58,7 +58,7 @@ const emptyFacets: ArchiveSearchFacets = {
   tags: [],
 };
 
-// When `lockedType` is set the page is a single-type browse view (e.g. the NGM
+// When `lockedType` is set the page is a single-type browse view (e.g. the data-lake
 // Materials / Court-cases landing pages reuse this component): the record-type is
 // pinned, the type selector is hidden, and the heading/SEO are overridden.
 export interface ArchiveSearchProps {

@@ -20,20 +20,20 @@ const columns: Column<Row>[] = [
   { header: "Type", cell: (r) => str(r.court_type) },
 ];
 
-export default function NgmCourts() {
+export default function Courts() {
   const navigate = useNavigate();
   return (
     <ResourceTable<Row>
       title="Courts"
-      description="NGM courts. Create and edit court records."
+      description="Courts. Create and edit court records."
       columns={columns}
       rowKey={(r) => str(r.identifier)}
       onRowClick={(r) => {
         const id = str(r.identifier);
-        if (id && id !== "—") navigate(`/admin/ngm/courts/${encodeURIComponent(id)}/edit`);
+        if (id && id !== "—") navigate(`/admin/datalake/courts/${encodeURIComponent(id)}/edit`);
       }}
       headerAction={
-        <Button size="sm" onClick={() => navigate("/admin/ngm/courts/new")}>
+        <Button size="sm" onClick={() => navigate("/admin/datalake/courts/new")}>
           <Plus className="mr-1 h-4 w-4" /> New Court
         </Button>
       }

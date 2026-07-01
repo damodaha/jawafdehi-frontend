@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { materialTail, parseCourtCaseRef } from "./ngm-api";
+import { materialTail, parseCourtCaseRef } from "./datalake-api";
 
 describe("materialTail", () => {
   it("strips a full material IRI to its <source>/<ident> tail", () => {

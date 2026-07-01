@@ -1,6 +1,6 @@
-// Helpers for authoring NES schema.org JSON-LD entities in the admin panel.
+// Helpers for authoring entity schema.org JSON-LD in the admin panel.
 //
-// Mirrors the backend write contract (services/nes/.../write_validation.py +
+// Mirrors the backend write contract (entity write_validation +
 // validation.py): the known @type vocabulary, the immutable patch paths, and an
 // RFC-6902 diff for the edit form (since no json-patch lib is bundled).
 import type { PatchOp } from "@/services/admin-api";

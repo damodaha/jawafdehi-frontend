@@ -6,7 +6,7 @@ import {
   getMaterialByIri,
   adminErrorMessage,
 } from "@/services/admin-api";
-import { parseMaterialIri } from "@/lib/ngm-forms";
+import { parseMaterialIri } from "@/lib/datalake-forms";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,7 +65,7 @@ const columns: Column<Row>[] = [
 // Materials browse page. The backend now exposes a paginated list
 // (GET /api/materials -> {results, next}), so this is a proper ResourceTable
 // with an IRI look-up kept alongside for jumping straight to one material.
-export default function NgmMaterials() {
+export default function Materials() {
   const navigate = useNavigate();
   const [iri, setIri] = useState("");
   const [lookupLoading, setLookupLoading] = useState(false);
@@ -80,7 +80,7 @@ export default function NgmMaterials() {
     try {
       const doc = await getMaterialByIri<Record<string, unknown>>(iri.trim());
       const tail = editTail(doc["@id"]);
-      if (tail) navigate(`/admin/ngm/materials/edit/${tail}`);
+      if (tail) navigate(`/admin/datalake/materials/edit/${tail}`);
       else setLookupError("Resolved material has no usable @id.");
     } catch (err) {
       setLookupError(adminErrorMessage(err, "Material not found"));
@@ -114,7 +114,7 @@ export default function NgmMaterials() {
       )}
 
       <ResourceTable<Row>
-        title="NGM Materials"
+        title="Materials"
         description="Governance documents (JSON-LD keyed by @id). Mostly bulk-ingested; you can create, edit, and delete by hand."
         columns={columns}
         pageSize={PAGE_SIZE}
@@ -125,14 +125,14 @@ export default function NgmMaterials() {
         }
         headerAction={
           <Button asChild size="sm">
-            <Link to="/admin/ngm/materials/new">
+            <Link to="/admin/datalake/materials/new">
               <Plus className="mr-1 h-4 w-4" /> New material
             </Link>
           </Button>
         }
         onRowClick={(r) => {
           const tail = editTail(r["@id"]);
-          if (tail) navigate(`/admin/ngm/materials/edit/${tail}`);
+          if (tail) navigate(`/admin/datalake/materials/edit/${tail}`);
         }}
         fetchPage={(page) =>
           listMaterials<Row>({

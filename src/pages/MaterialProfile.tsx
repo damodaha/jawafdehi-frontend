@@ -7,10 +7,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { humanizeEntityType } from "@/utils/nes-helpers";
-import { getMaterial, type Material, type MaterialBilingual } from "@/services/ngm-api";
+import { humanizeEntityType } from "@/utils/entity-helpers";
+import { getMaterial, type Material, type MaterialBilingual } from "@/services/datalake-api";
 
-// ─── value helpers (a material is schema.org JSON-LD, same family as NES entities) ──
+// ─── value helpers (a material is schema.org JSON-LD, same family as entities) ──
 
 function bilingual(v: MaterialBilingual | string | undefined): { en: string; ne: string } {
   if (!v) return { en: "", ne: "" };
@@ -75,7 +75,7 @@ const HANDLED_KEYS = new Set([
   "description", "text", "url", "sameAs", "identifier", "associatedMedia",
 ]);
 
-// A roled source link (mirrors the NGM index DocumentSource link roles).
+// A roled source link (mirrors the data-lake DocumentSource link roles).
 const ROLE_LABELS: Record<string, string> = {
   RAW: "Download document",
   ALTERNATE: "Alternate format",
@@ -112,7 +112,7 @@ export default function MaterialProfile() {
   const params = useParams();
   const tail = params["*"] || "";
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["ngm-material", tail],
+    queryKey: ["datalake-material", tail],
     queryFn: () => getMaterial(tail),
     enabled: tail.length > 0,
     retry: false,
@@ -150,7 +150,7 @@ export default function MaterialProfile() {
         isAccessibleForFree: true,
         ...(descText ? { description: descText } : {}),
         ...(data.datePublished ? { datePublished: String(data.datePublished) } : {}),
-        publisher: { "@type": "Organization", name: "Jawafdehi NGM" },
+        publisher: { "@type": "Organization", name: "Jawafdehi" },
       })
     : null;
 
@@ -254,7 +254,7 @@ export default function MaterialProfile() {
             {/* Provenance. */}
             <div className="rounded-xl border bg-muted/30 p-4 text-xs text-muted-foreground">
               <p>
-                <strong>Source:</strong> Jawafdehi governance archive (NGM) — public-domain
+                <strong>Source:</strong> Jawafdehi governance archive — public-domain
                 government documents and records on Nepal&apos;s governance and judiciary.
               </p>
             </div>

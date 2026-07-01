@@ -92,14 +92,14 @@ async function prefetch(url: string, queryClient: QueryClient): Promise<void> {
     return;
   }
 
-  // NGM material profile (/material/<source>/<ident>). The query key mirrors
-  // MaterialProfile's useQuery (['ngm-material', tail]) so the client hydrates
+  // Data-lake material profile (/material/<source>/<ident>). The query key mirrors
+  // MaterialProfile's useQuery (['datalake-material', tail]) so the client hydrates
   // from the dehydrated cache instead of refetching.
   const materialMatch = url.match(/^\/material\/(.+?)(?:[?#]|$)/);
   if (materialMatch) {
     const tail = decodeURIComponent(materialMatch[1]);
     await queryClient.prefetchQuery({
-      queryKey: ['ngm-material', tail],
+      queryKey: ['datalake-material', tail],
       queryFn: async () => {
         const res = await http.get(`/api/materials/${tail}`);
         return res.data;
@@ -108,16 +108,16 @@ async function prefetch(url: string, queryClient: QueryClient): Promise<void> {
     return;
   }
 
-  // NGM court case profile (/courtcase/<court>/<case_number>). Assembles the
+  // Data-lake court case profile (/courtcase/<court>/<case_number>). Assembles the
   // composite-key core + hearings + entities into one CourtCase, keyed to match
-  // CourtCaseProfile's useQuery (['ngm-courtcase', court, caseNumber]).
+  // CourtCaseProfile's useQuery (['datalake-courtcase', court, caseNumber]).
   const courtcaseMatch = url.match(/^\/courtcase\/([^/]+)\/(.+?)\/?(?:[?#]|$)/);
   if (courtcaseMatch) {
     const court = decodeURIComponent(courtcaseMatch[1]);
     const caseNumber = decodeURIComponent(courtcaseMatch[2]);
     const base = `/api/courtcases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}`;
     await queryClient.prefetchQuery({
-      queryKey: ['ngm-courtcase', court, caseNumber],
+      queryKey: ['datalake-courtcase', court, caseNumber],
       queryFn: async () => {
         // Core must load; hearings/entities degrade to [] (mirrors
         // getCourtCaseFull so SSR and client agree on cache shape).

@@ -9,9 +9,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { humanizeEntityType } from "@/utils/nes-helpers";
+import { humanizeEntityType } from "@/utils/entity-helpers";
 
-// NES records are schema.org JSON-LD with a jawafdehi: extension namespace. We type
+// Entity records are schema.org JSON-LD with a jawafdehi: extension namespace. We type
 // the spine we read explicitly and keep an index signature for the long tail of
 // type-specific fields (rendered generically).
 interface JsonLdRef {
@@ -28,7 +28,7 @@ interface VersionInfo {
   change_description?: string;
 }
 type Bilingual = { en?: string | null; ne?: string | null };
-interface NesEntity {
+interface EntityRecord {
   "@id": string;
   "@type"?: string | string[];
   additionalType?: string;
@@ -68,7 +68,7 @@ function bilingual(v: Bilingual | string | undefined): { en: string; ne: string 
   return { en: v.en || "", ne: v.ne || "" };
 }
 
-function typeToken(t: NesEntity["@type"], additional?: string): string | undefined {
+function typeToken(t: EntityRecord["@type"], additional?: string): string | undefined {
   const parts: string[] = [];
   if (Array.isArray(t)) parts.push(...t);
   else if (t) parts.push(t);
@@ -162,13 +162,13 @@ function RelationLink({ label, refObj }: { label: string; refObj?: JsonLdRef }) 
   );
 }
 
-export default function NesEntityProfile() {
+export default function EntityRecordProfile() {
   const params = useParams();
   const tail = params["*"] || "";
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["nes-entity", tail],
+    queryKey: ["entity-record", tail],
     queryFn: async () => {
-      const res = await http.get<NesEntity>(`/api/entities/${tail}`);
+      const res = await http.get<EntityRecord>(`/api/entities/${tail}`);
       return res.data;
     },
     enabled: tail.length > 0,
@@ -203,10 +203,10 @@ export default function NesEntityProfile() {
   return (
     <main id="main-content" className="min-h-screen bg-background py-8 md:py-12">
       <Helmet>
-        <title>{displayName} | Nepal Entity Service</title>
+        <title>{displayName} | Jawafdehi Entity Registry</title>
         <meta
           name="description"
-          content={`${displayName} — ${typeLabel} in the Nepal Entity Service (NES) public registry.`}
+          content={`${displayName} — ${typeLabel} in the Jawafdehi public entity registry.`}
         />
       </Helmet>
 
@@ -222,7 +222,7 @@ export default function NesEntityProfile() {
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              This entity could not be found in the Nepal Entity Service.
+              This entity could not be found in the registry.
             </AlertDescription>
           </Alert>
         ) : isLoading ? (
@@ -318,7 +318,7 @@ export default function NesEntityProfile() {
             {/* Provenance. */}
             <div className="rounded-xl border bg-muted/30 p-4 text-xs text-muted-foreground">
               <p>
-                <strong>Source:</strong> Nepal Entity Service (NES) — a public registry of Nepal&apos;s
+                <strong>Source:</strong> Jawafdehi entity registry — a public registry of Nepal&apos;s
                 people, organizations, and places.
               </p>
               {version?.change_description ? (

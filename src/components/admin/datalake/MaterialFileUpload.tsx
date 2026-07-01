@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { uploadMaterialFile, adminErrorMessage } from "@/services/admin-api";
-import { MATERIAL_TYPES } from "@/lib/ngm-forms";
+import { MATERIAL_TYPES } from "@/lib/datalake-forms";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {

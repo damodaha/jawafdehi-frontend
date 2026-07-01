@@ -5,9 +5,9 @@
 // ONE host under a SINGLE unified `/api` root — the former per-service prefixes
 // (`/api/nes`, `/api/ngm`) were hard-cut. Each resource lives at its own path:
 //
-//     /api/entities...     NES entities (JSON-LD read/write + reindex)
-//     /api/courtcases...   NGM court cases (composite-key read/write)
-//     /api/courts, /api/firms, /api/materials   NGM governance data
+//     /api/entities...     entities (JSON-LD read/write + reindex)
+//     /api/courtcases...   court cases (composite-key read/write)
+//     /api/courts, /api/firms, /api/materials   data-lake records
 //     /api/cases, /api/sources   Jawafdehi cases / document sources
 //
 // Auth is OIDC/Zitadel only (DRF token auth was dropped in the monolith): every
@@ -21,20 +21,20 @@ export const ADMIN_API_BASE_URL = API_BASE_URL;
 export const adminErrorMessage = extractErrorMessage;
 
 // ---------------------------------------------------------------------------
-// NES — entities (JSON-LD documents keyed by @id IRI)
+// Entities (JSON-LD documents keyed by @id IRI)
 // ---------------------------------------------------------------------------
 
-// A stored NES entity is a raw schema.org JSON-LD document; we only type the
+// A stored entity is a raw schema.org JSON-LD document; we only type the
 // keys the admin list/detail views read. Everything else rides along in [k].
-export interface NesEntity {
+export interface EntityRecord {
   "@id": string;
   "@type"?: string | string[];
   name?: string | { ne?: string; en?: string };
   [k: string]: unknown;
 }
 
-export interface NesEntityListResponse {
-  entities: NesEntity[];
+export interface EntityListResponse {
+  entities: EntityRecord[];
   total: number;
   limit: number;
   offset: number;
@@ -49,23 +49,23 @@ export interface ListEntitiesParams {
   offset?: number;
 }
 
-export async function listNesEntities(
+export async function listEntities(
   params: ListEntitiesParams = {},
-): Promise<NesEntityListResponse> {
-  const { data } = await client.get<NesEntityListResponse>("/api/entities", {
+): Promise<EntityListResponse> {
+  const { data } = await client.get<EntityListResponse>("/api/entities", {
     params,
   });
   return data;
 }
 
-// Entity picker for the case relationship editor (F3): searches NES entities
+// Entity picker for the case relationship editor (F3): searches entities
 // and returns the raw hits (each has an @id + name). Reuses the flat
-// /api/entities list endpoint (no /api/nes prefix — hard-cut).
+// /api/entities list endpoint (flat, unprefixed).
 export async function searchEntities(
   query: string,
   limit = 20,
-): Promise<NesEntity[]> {
-  const { data } = await client.get<NesEntityListResponse>("/api/entities", {
+): Promise<EntityRecord[]> {
+  const { data } = await client.get<EntityListResponse>("/api/entities", {
     params: { query, limit },
   });
   return data.entities ?? [];
@@ -81,8 +81,8 @@ function encodeRef(ref: string): string {
 }
 
 // Detail by ref: a bare `<prefix>/<slug>` path or a url-encoded @id IRI.
-export async function getNesEntity(ref: string): Promise<NesEntity> {
-  const { data } = await client.get<NesEntity>(
+export async function getEntity(ref: string): Promise<EntityRecord> {
+  const { data } = await client.get<EntityRecord>(
     `/api/entities/${encodeRef(ref)}`,
   );
   return data;
@@ -102,10 +102,10 @@ export interface CreateEntityPayload {
   [k: string]: unknown;
 }
 
-export async function createNesEntity(
+export async function createEntity(
   payload: CreateEntityPayload,
-): Promise<NesEntity> {
-  const { data } = await client.post<NesEntity>("/api/entities", payload);
+): Promise<EntityRecord> {
+  const { data } = await client.post<EntityRecord>("/api/entities", payload);
   return data;
 }
 
@@ -119,19 +119,19 @@ export interface PatchOp {
 }
 
 // EDIT is an RFC-6902 patch: PATCH /api/entities/{ref} with { patch_ops }.
-export async function patchNesEntity(
+export async function patchEntity(
   ref: string,
   patchOps: PatchOp[],
   changeDescription?: string,
-): Promise<NesEntity> {
-  const { data } = await client.patch<NesEntity>(
+): Promise<EntityRecord> {
+  const { data } = await client.patch<EntityRecord>(
     `/api/entities/${encodeRef(ref)}`,
     { patch_ops: patchOps, change_description: changeDescription },
   );
   return data;
 }
 
-export async function getNesEntityVersions(ref: string): Promise<{
+export async function getEntityVersions(ref: string): Promise<{
   versions: unknown[];
   total: number;
 }> {
@@ -141,24 +141,24 @@ export async function getNesEntityVersions(ref: string): Promise<{
   return data;
 }
 
-export async function listNesEntityPrefixes(): Promise<{ prefixes: string[] }> {
+export async function listEntityPrefixes(): Promise<{ prefixes: string[] }> {
   const { data } = await client.get("/api/entity_prefixes");
   return data;
 }
 
 // Trigger an OpenSearch reindex (admin only). Returns whatever the job emits.
-export async function reindexNes(): Promise<unknown> {
+export async function reindexEntities(): Promise<unknown> {
   const { data } = await client.post("/api/admin/reindex", {});
   return data;
 }
 
 // Soft-delete an entity (backend flips it to removed; returns 204 No Content).
-export async function deleteNesEntity(ref: string): Promise<void> {
+export async function deleteEntity(ref: string): Promise<void> {
   await client.delete(`/api/entities/${encodeRef(ref)}`);
 }
 
 // ---------------------------------------------------------------------------
-// NGM — courts + materials (read-mostly; ingestion is bulk)
+// Data Lake — courts + materials (read-mostly; ingestion is bulk)
 // ---------------------------------------------------------------------------
 
 export interface Paginated<T> {
@@ -187,9 +187,9 @@ export async function listBlacklistedFirms<T = Record<string, unknown>>(): Promi
   return data;
 }
 
-// --- NGM court-case write surface (HasNgmRole) -----------------------------
+// --- Court-case write surface (data-lake role) --------------------------
 // Composite natural key is (court, case_number); create posts to the list root,
-// update uses the composite path. `nes_id`, when set, must be a canonical NES
+// update uses the composite path. `nes_id`, when set, must be a canonical
 // entity @id IRI (backend returns 400 otherwise).
 export interface CourtCaseWrite {
   case_number: string;
@@ -244,7 +244,7 @@ export async function deleteCourtCase(
   );
 }
 
-// List materials (paginated). The materials list is NGM/DRF-shaped {results,
+// List materials (paginated). The materials list is DRF-shaped {results,
 // next}; `count`/`previous` may be absent, so ResourceTable tolerates undefined.
 export async function listMaterials<T = Record<string, unknown>>(
   params: Record<string, unknown> = {},
@@ -278,7 +278,7 @@ export async function getMaterialByPath<T = Record<string, unknown>>(
   return data;
 }
 
-// --- NGM material write surface (HasNgmRole) -------------------------------
+// --- Material write surface (data-lake role) ------------------------------
 // A material is a schema.org JSON-LD doc keyed by its @id IRI. Create upserts by
 // @id; update replaces the doc at <source>/<ident> (the body @id must match).
 export async function createMaterial<T = Record<string, unknown>>(
@@ -315,7 +315,7 @@ export async function deleteMaterial(
 }
 
 // ---------------------------------------------------------------------------
-// Jawafdehi — corruption cases (DISTINCT from NGM court cases) + sources.
+// Jawafdehi — corruption cases (DISTINCT from data-lake court cases) + sources.
 // Full CRUD: cases are keyed by slug, updated via RFC-6902 PATCH; sources are
 // keyed by numeric id and created via multipart (optional file upload).
 // ---------------------------------------------------------------------------
@@ -356,7 +356,7 @@ export async function createCase<T = Record<string, unknown>>(
   return data;
 }
 
-// UPDATE is an RFC-6902 patch (mirrors the NES entity contract): the body is a
+// UPDATE is an RFC-6902 patch (mirrors the entity contract): the body is a
 // bare array of patch ops.
 export async function patchCase<T = Record<string, unknown>>(
   slug: string,
@@ -452,8 +452,8 @@ export async function deleteSource(id: number | string): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// NGM — courts + blocklisted firms write surface (HasNgmRole). Flat /api/
-// paths (no /api/ngm prefix — hard-cut). Courts are keyed by `identifier`
+// Data Lake — courts + blocklisted firms write surface (data-lake role). Flat /api/
+// paths (flat, unprefixed). Courts are keyed by `identifier`
 // (their PK); firms by numeric `id`.
 // ---------------------------------------------------------------------------
 
@@ -534,9 +534,9 @@ export async function updateFirm<T = Record<string, unknown>>(
   return data;
 }
 
-// --- NGM material file upload (HasNgmRole). Multipart: file, role, and, when
+// --- Material file upload (data-lake role). Multipart: file, role, and, when
 // creating, material_type. Endpoint: POST /api/materials/{source}/{ident}/file
-// (flat — no /api/ngm prefix). `source` may be multi-segment, so it is not
+// (flat, unprefixed). `source` may be multi-segment, so it is not
 // url-encoded (mirrors getMaterialByPath).
 export async function uploadMaterialFile<T = Record<string, unknown>>(
   source: string,

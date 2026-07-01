@@ -13,7 +13,7 @@ import { Loader2, RefreshCw } from "lucide-react";
 
 export interface Column<T> {
   header: string;
-  // Cell renderer for a row. Kept liberal — most NGM/Jawafdehi rows are loosely
+  // Cell renderer for a row. Kept liberal — most data-lake/Jawafdehi rows are loosely
   // typed Record<string, unknown> off the read plane.
   cell: (row: T) => React.ReactNode;
   className?: string;
@@ -33,7 +33,7 @@ interface ResourceTableProps<T> {
   onRowClick?: (row: T) => void;
 }
 
-// A generic paginated table over a DRF list endpoint. Used by the NGM +
+// A generic paginated table over a DRF list endpoint. Used by the data-lake +
 // Jawafdehi admin pages. Supports an optional header action and row-click.
 export default function ResourceTable<T>({
   title,

@@ -1,9 +1,9 @@
 /**
- * Nepal Entity Service (NES) API Client
+ * Entity API Client
  *
- * This module provides typed API functions to interact with the NES backend.
+ * This module provides typed API functions to interact with the entity backend.
  *
- * NES entities now live on the consolidated monolith under the unified `/api`
+ * Entities live on the consolidated monolith under the unified `/api`
  * root (`/api/entities`, `/api/relationships`). Auth, base-URL resolution, and
  * error extraction are handled by the shared `http` client (./http).
  */
@@ -17,7 +17,7 @@ import type {
   Entity,
   Relationship,
   VersionSummary
-} from '@/types/nes';
+} from '@/types/entity';
 
 // ============================================================================
 // Response Types
@@ -64,7 +64,7 @@ export interface RelationshipSearchParams {
 }
 
 // ============================================================================
-// PAP-Specific Types (Not part of NES core)
+// PAP-Specific Types (Not part of the entity core)
 // ============================================================================
 
 export interface Allegation {
@@ -99,7 +99,7 @@ export interface TimelineEvent {
 // Error Handling
 // ============================================================================
 
-export class NESApiError extends Error {
+export class EntityApiError extends Error {
   constructor(
     message: string,
     public statusCode?: number,
@@ -107,7 +107,7 @@ export class NESApiError extends Error {
     public originalError?: Error
   ) {
     super(message);
-    this.name = 'NESApiError';
+    this.name = 'EntityApiError';
   }
 }
 
@@ -115,7 +115,7 @@ function handleApiError(error: unknown, endpoint: string): never {
   const statusCode = (error as { response?: { status?: number } })?.response?.status;
   const message = extractErrorMessage(error, 'Unknown error occurred');
 
-  throw new NESApiError(
+  throw new EntityApiError(
     `API request failed: ${message}`,
     statusCode,
     endpoint,
@@ -209,7 +209,7 @@ export async function searchEntities(
  *
  * @example
  * ```typescript
- * // Using NES entity ID format
+ * // Using entity ID format
  * const entity = await getEntityById('entity:person/prabin-shahi');
  * // Using simple slug
  * const entity2 = await getEntityById('pushpa-kamal-dahal-prachanda');
@@ -217,7 +217,7 @@ export async function searchEntities(
  */
 export async function getEntityById(idOrSlug: string): Promise<Entity> {
   try {
-    // URL-encode the entity ID to handle NES format (entity:type/slug)
+    // URL-encode the entity ID to handle the entity:type/slug format
     const encodedId = encodeURIComponent(idOrSlug);
     const response = await http.get<Entity>(`/api/entities/${encodedId}`, {
       timeout: 30000,
@@ -254,7 +254,7 @@ export async function getEntityBySlug(slug: string): Promise<Entity> {
  */
 export async function getEntityVersions(idOrSlug: string): Promise<VersionListResponse> {
   try {
-    // URL-encode the entity ID to handle NES format (entity:type/slug)
+    // URL-encode the entity ID to handle the entity:type/slug format
     const encodedId = encodeURIComponent(idOrSlug);
     const response = await http.get<VersionListResponse>(
       `/api/entities/${encodedId}/versions`,
@@ -306,7 +306,7 @@ export async function getRelationships(
 // ============================================================================
 // Allegation & Case API Functions
 // ============================================================================
-// Note: NES API provides entity data only. Allegations and cases will be
+// Note: the entity API provides entity data only. Allegations and cases will be
 // handled by a separate API (Jawafdehi) to be integrated later.
 //
 // These functions are currently not implemented and return empty arrays.
@@ -436,4 +436,4 @@ export type {
   Entity,
   Relationship,
   VersionSummary
-} from '@/types/nes';
+} from '@/types/entity';

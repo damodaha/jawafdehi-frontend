@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import { getCaseById } from "@/services/jds-api";
 import { toggleArchiveSearchParam } from "@/utils/archive-search-params";
 import { getSubjectEntities } from "@/utils/case-entities";
-import { humanizeEntityType } from "@/utils/nes-helpers";
+import { humanizeEntityType } from "@/utils/entity-helpers";
 
 // Auto-language: prefer English, fall back to Nepali (no toggle). Strips the HTML
 // <em> highlight tags that snippets carry so we render plain text.

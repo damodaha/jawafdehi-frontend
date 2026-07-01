@@ -19,7 +19,7 @@ const str = (v: unknown): string => (v == null ? "" : String(v));
 // F7 — create + edit a blocklisted firm. The record is keyed by its numeric
 // `id` (the PK; firm names are not unique). Fields mirror BlacklistedFirmSerializer.
 // Create POSTs; edit PATCHes.
-export default function NgmFirmForm() {
+export default function FirmForm() {
   const params = useParams();
   const navigate = useNavigate();
   const editing = Boolean(params.id);
@@ -103,7 +103,7 @@ export default function NgmFirmForm() {
         await createFirm(payload);
         toast({ title: "Firm created" });
       }
-      navigate("/admin/ngm/firms");
+      navigate("/admin/datalake/firms");
     } catch (err) {
       setError(adminErrorMessage(err, "Failed to save firm"));
     } finally {
@@ -126,7 +126,7 @@ export default function NgmFirmForm() {
           variant="ghost"
           size="sm"
           className="mb-2 -ml-2"
-          onClick={() => navigate("/admin/ngm/firms")}
+          onClick={() => navigate("/admin/datalake/firms")}
         >
           <ArrowLeft className="mr-1 h-4 w-4" /> Firms
         </Button>
@@ -242,7 +242,7 @@ export default function NgmFirmForm() {
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="nes_id">NES entity @id (optional)</Label>
+            <Label htmlFor="nes_id">Entity @id (optional)</Label>
             <Input
               id="nes_id"
               value={str(form.nes_id)}
@@ -265,7 +265,7 @@ export default function NgmFirmForm() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => navigate("/admin/ngm/firms")}
+            onClick={() => navigate("/admin/datalake/firms")}
           >
             Cancel
           </Button>

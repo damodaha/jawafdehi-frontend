@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  getNesEntity,
-  patchNesEntity,
-  getNesEntityVersions,
-  deleteNesEntity,
+  getEntity,
+  patchEntity,
+  getEntityVersions,
+  deleteEntity,
   adminErrorMessage,
-  type NesEntity,
+  type EntityRecord,
 } from "@/services/admin-api";
-import { diffToPatchOps } from "@/lib/nes-jsonld";
+import { diffToPatchOps } from "@/lib/entity-jsonld";
 import DeleteButton from "@/components/admin/DeleteButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,20 +23,20 @@ import { ArrowLeft, Loader2, Save } from "lucide-react";
 // "extra properties" JSON.
 const READONLY_KEYS = new Set(["@id", "@type", "@context", "jawafdehi:version"]);
 
-function nameField(name: NesEntity["name"], lang: "en" | "ne"): string {
+function nameField(name: EntityRecord["name"], lang: "en" | "ne"): string {
   if (!name) return "";
   if (typeof name === "string") return lang === "en" ? name : "";
   return name[lang] ?? "";
 }
 
-export default function NesEntityEdit() {
+export default function EntityEdit() {
   // The ref is the IRI tail (prefix/slug), possibly multi-segment, captured by a
   // splat route. useParams gives us the "*" param.
   const params = useParams();
   const ref = params["*"] ?? "";
   const navigate = useNavigate();
 
-  const [doc, setDoc] = useState<NesEntity | null>(null);
+  const [doc, setDoc] = useState<EntityRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,7 +51,7 @@ export default function NesEntityEdit() {
   // Split a loaded doc into the edited fields. `name` is lifted into the two
   // inputs; everything except the read-only identity keys and name becomes the
   // editable extra-properties JSON.
-  const hydrate = useCallback((d: NesEntity) => {
+  const hydrate = useCallback((d: EntityRecord) => {
     setNameEn(nameField(d.name, "en"));
     setNameNe(nameField(d.name, "ne"));
     const extra: Record<string, unknown> = {};
@@ -66,7 +66,7 @@ export default function NesEntityEdit() {
     let alive = true;
     setLoading(true);
     setError(null);
-    getNesEntity(ref)
+    getEntity(ref)
       .then((d) => {
         if (!alive) return;
         setDoc(d);
@@ -76,7 +76,7 @@ export default function NesEntityEdit() {
         if (alive) setError(adminErrorMessage(err, "Failed to load entity"));
       })
       .finally(() => alive && setLoading(false));
-    getNesEntityVersions(ref)
+    getEntityVersions(ref)
       .then((v) => alive && setVersionCount(v.total))
       .catch(() => {});
     return () => {
@@ -136,7 +136,7 @@ export default function NesEntityEdit() {
     setSaving(true);
     setError(null);
     try {
-      const updated = await patchNesEntity(
+      const updated = await patchEntity(
         ref,
         patchOps,
         changeDescription.trim() || "Updated via admin panel",
@@ -145,7 +145,7 @@ export default function NesEntityEdit() {
       hydrate(updated);
       setChangeDescription("");
       toast({ title: "Entity updated", description: updated["@id"] });
-      getNesEntityVersions(ref)
+      getEntityVersions(ref)
         .then((v) => setVersionCount(v.total))
         .catch(() => {});
     } catch (err) {
@@ -166,7 +166,7 @@ export default function NesEntityEdit() {
   if (error && !doc) {
     return (
       <div className="max-w-2xl space-y-4">
-        <Button variant="ghost" size="sm" onClick={() => navigate("/admin/nes/entities")}>
+        <Button variant="ghost" size="sm" onClick={() => navigate("/admin/entities")}>
           <ArrowLeft className="mr-1 h-4 w-4" /> Entities
         </Button>
         <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
@@ -183,11 +183,11 @@ export default function NesEntityEdit() {
           variant="ghost"
           size="sm"
           className="mb-2 -ml-2"
-          onClick={() => navigate("/admin/nes/entities")}
+          onClick={() => navigate("/admin/entities")}
         >
           <ArrowLeft className="mr-1 h-4 w-4" /> Entities
         </Button>
-        <h1 className="text-2xl font-bold tracking-tight">Edit NES Entity</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Edit entity</h1>
         <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
           <Badge variant="secondary">
             {Array.isArray(doc?.["@type"])
@@ -264,8 +264,8 @@ export default function NesEntityEdit() {
           <div className="ml-auto">
             <DeleteButton
               resourceLabel="entity"
-              onDelete={() => deleteNesEntity(ref)}
-              onDeleted={() => navigate("/admin/nes/entities")}
+              onDelete={() => deleteEntity(ref)}
+              onDeleted={() => navigate("/admin/entities")}
             />
           </div>
         </div>

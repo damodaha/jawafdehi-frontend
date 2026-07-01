@@ -11,9 +11,9 @@ import {
   MATERIAL_TYPES,
   isValidMaterialIri,
   parseMaterialIri,
-} from "@/lib/ngm-forms";
+} from "@/lib/datalake-forms";
 import DeleteButton from "@/components/admin/DeleteButton";
-import MaterialFileUpload from "@/components/admin/ngm/MaterialFileUpload";
+import MaterialFileUpload from "@/components/admin/datalake/MaterialFileUpload";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -36,11 +36,11 @@ const TEMPLATE = `{
   "name": {"en": "Example report", "ne": "उदाहरण प्रतिवेदन"}
 }`;
 
-// Create or edit a NGM material (a schema.org JSON-LD document). In create mode
+// Create or edit a data-lake material (a schema.org JSON-LD document). In create mode
 // the backend upserts by @id and derives the schema.org @type from
 // material_type. In edit mode (routed on the IRI's <source>/<ident> via a splat)
 // the existing doc is loaded and PUT-replaced; @id is locked.
-export default function NgmMaterialForm() {
+export default function MaterialForm() {
   const navigate = useNavigate();
   // The "*" splat param is the material IRI tail (source/ident) in edit mode.
   const params = useParams();
@@ -118,7 +118,7 @@ export default function NgmMaterialForm() {
           description: (created as Record<string, unknown>)["@id"] as string,
         });
       }
-      navigate("/admin/ngm/materials");
+      navigate("/admin/datalake/materials");
     } catch (err) {
       setError(adminErrorMessage(err, "Failed to save material"));
     } finally {
@@ -141,7 +141,7 @@ export default function NgmMaterialForm() {
           variant="ghost"
           size="sm"
           className="mb-2 -ml-2"
-          onClick={() => navigate("/admin/ngm/materials")}
+          onClick={() => navigate("/admin/datalake/materials")}
         >
           <ArrowLeft className="mr-1 h-4 w-4" /> Materials
         </Button>
@@ -218,7 +218,7 @@ export default function NgmMaterialForm() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => navigate("/admin/ngm/materials")}
+            onClick={() => navigate("/admin/datalake/materials")}
           >
             Cancel
           </Button>
@@ -235,7 +235,7 @@ export default function NgmMaterialForm() {
                     refPath.slice(lastSlash + 1),
                   );
                 }}
-                onDeleted={() => navigate("/admin/ngm/materials")}
+                onDeleted={() => navigate("/admin/datalake/materials")}
               />
             </div>
           )}

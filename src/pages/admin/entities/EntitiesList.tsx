@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  listNesEntities,
+  listEntities,
   adminErrorMessage,
-  type NesEntity,
+  type EntityRecord,
 } from "@/services/admin-api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,15 +21,15 @@ import { Loader2, RefreshCw, Search } from "lucide-react";
 
 const PAGE_SIZE = 50;
 
-// Bilingual name -> display string. NES names are either a plain string or a
+// Bilingual name -> display string. Entity names are either a plain string or a
 // language map {ne, en}; prefer English, fall back to Nepali.
-function displayName(name: NesEntity["name"]): string {
+function displayName(name: EntityRecord["name"]): string {
   if (!name) return "—";
   if (typeof name === "string") return name;
   return name.en || name.ne || "—";
 }
 
-function typeLabel(t: NesEntity["@type"]): string {
+function typeLabel(t: EntityRecord["@type"]): string {
   if (!t) return "—";
   return Array.isArray(t) ? t.join(", ") : t;
 }
@@ -41,9 +41,9 @@ function entityRef(id: string): string {
   return m ? m[1] : id;
 }
 
-export default function NesEntities() {
+export default function EntitiesList() {
   const navigate = useNavigate();
-  const [entities, setEntities] = useState<NesEntity[]>([]);
+  const [entities, setEntities] = useState<EntityRecord[]>([]);
   const [total, setTotal] = useState(0);
   const [offset, setOffset] = useState(0);
   const [query, setQuery] = useState("");
@@ -55,7 +55,7 @@ export default function NesEntities() {
     setLoading(true);
     setError(null);
     try {
-      const res = await listNesEntities({
+      const res = await listEntities({
         query: q || undefined,
         limit: PAGE_SIZE,
         offset: off,
@@ -87,7 +87,7 @@ export default function NesEntities() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">NES Entities</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Entities</h1>
           <p className="text-sm text-muted-foreground">
             {total.toLocaleString()} entities
           </p>
@@ -103,7 +103,7 @@ export default function NesEntities() {
             Refresh
           </Button>
           <Button asChild size="sm">
-            <Link to="/admin/nes/entities/new">
+            <Link to="/admin/entities/new">
               <Plus className="mr-1 h-4 w-4" /> New entity
             </Link>
           </Button>
@@ -157,7 +157,7 @@ export default function NesEntities() {
                   <TableRow
                     key={ent["@id"]}
                     className="cursor-pointer"
-                    onClick={() => navigate(`/admin/nes/entities/edit/${ref}`)}
+                    onClick={() => navigate(`/admin/entities/edit/${ref}`)}
                   >
                     <TableCell className="font-medium">
                       {displayName(ent.name)}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  createNesEntity,
+  createEntity,
   adminErrorMessage,
   type CreateEntityPayload,
 } from "@/services/admin-api";
@@ -10,7 +10,7 @@ import {
   PREFIX_RE,
   SLUG_RE,
   slugify,
-} from "@/lib/nes-jsonld";
+} from "@/lib/entity-jsonld";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,10 +25,10 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { ArrowLeft, Loader2 } from "lucide-react";
 
-// Create a NES entity using the backend "authoring shape": prefix + slug +
+// Create an entity using the backend "authoring shape": prefix + slug +
 // @type + bilingual name, plus optional free-form schema.org properties
 // (description, sameAs, …) entered as JSON and merged in verbatim.
-export default function NesEntityCreate() {
+export default function EntityCreate() {
   const navigate = useNavigate();
   const [prefix, setPrefix] = useState("");
   const [slug, setSlug] = useState("");
@@ -117,10 +117,10 @@ export default function NesEntityCreate() {
     };
 
     try {
-      const created = await createNesEntity(payload);
+      const created = await createEntity(payload);
       toast({ title: "Entity created", description: created["@id"] });
       // Route to the edit view of the new entity (ref = prefix/slug).
-      navigate(`/admin/nes/entities/edit/${prefix.trim()}/${slug.trim()}`);
+      navigate(`/admin/entities/edit/${prefix.trim()}/${slug.trim()}`);
     } catch (err) {
       setError(adminErrorMessage(err, "Failed to create entity"));
     } finally {
@@ -135,11 +135,11 @@ export default function NesEntityCreate() {
           variant="ghost"
           size="sm"
           className="mb-2 -ml-2"
-          onClick={() => navigate("/admin/nes/entities")}
+          onClick={() => navigate("/admin/entities")}
         >
           <ArrowLeft className="mr-1 h-4 w-4" /> Entities
         </Button>
-        <h1 className="text-2xl font-bold tracking-tight">New NES Entity</h1>
+        <h1 className="text-2xl font-bold tracking-tight">New entity</h1>
         <p className="text-sm text-muted-foreground">
           Identity (prefix + slug + type) and bilingual name. The{" "}
           <code>@id</code> IRI is built from prefix/slug.
@@ -260,7 +260,7 @@ export default function NesEntityCreate() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => navigate("/admin/nes/entities")}
+            onClick={() => navigate("/admin/entities")}
           >
             Cancel
           </Button>

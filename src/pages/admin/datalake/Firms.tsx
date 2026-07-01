@@ -18,20 +18,20 @@ const columns: Column<Row>[] = [
 
 // F7 — blocklisted firms list. Firms are keyed by their numeric `id` (the model
 // PK); firm names are not unique, so the row/route key is the id.
-export default function NgmFirms() {
+export default function Firms() {
   const navigate = useNavigate();
   return (
     <ResourceTable<Row>
       title="Blocklisted firms"
-      description="Firms flagged in NGM. Create and edit firm records."
+      description="Blocklisted firms. Create and edit firm records."
       columns={columns}
       rowKey={(r) => str(r.id)}
       onRowClick={(r) => {
         const id = str(r.id);
-        if (id && id !== "—") navigate(`/admin/ngm/firms/${encodeURIComponent(id)}/edit`);
+        if (id && id !== "—") navigate(`/admin/datalake/firms/${encodeURIComponent(id)}/edit`);
       }}
       headerAction={
-        <Button size="sm" onClick={() => navigate("/admin/ngm/firms/new")}>
+        <Button size="sm" onClick={() => navigate("/admin/datalake/firms/new")}>
           <Plus className="mr-1 h-4 w-4" /> New Firm
         </Button>
       }
