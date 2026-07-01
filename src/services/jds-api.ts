@@ -1,15 +1,18 @@
 /**
  * Jawafdehi API (JDS) Client
- * 
+ *
  * API client for the Jawafdehi accountability platform.
  * Provides read-only access to published cases of accused corruption
  * and misconduct by public entities in Nepal.
- * 
+ *
  * Reference: Jawafdehi_Public_Accountability_API.yaml
- * Base URL: https://portal.jawafdehi.org/api
+ *
+ * Talks to the consolidated monolith via the shared `http` client (auth,
+ * base-URL resolution, and error extraction all live in ./http). Cases,
+ * sources, statistics, and feedback live under the unified `/api` root.
  */
 
-import axios, { AxiosError, AxiosInstance } from 'axios';
+import { http, extractErrorMessage } from './http';
 import { courtRefCandidates } from '@/utils/courtCaseRef';
 import type {
   Case,
@@ -69,20 +72,6 @@ export interface ApiErrorResponse {
 }
 
 // ============================================================================
-// Configuration
-// ============================================================================
-
-const JDS_API_BASE_URL = import.meta.env.VITE_JDS_API_BASE_URL || 'https://portal.jawafdehi.org/api';
-
-const apiClient: AxiosInstance = axios.create({
-  baseURL: JDS_API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  timeout: 10000,
-});
-
-// ============================================================================
 // Error Handling
 // ============================================================================
 
@@ -112,31 +101,20 @@ export class JDSApiError extends Error {
 }
 
 function handleApiError(error: unknown, endpoint: string): never {
-  if (axios.isAxiosError(error)) {
-    const axiosError = error as AxiosError<ApiErrorResponse>;
-    const statusCode = axiosError.response?.status;
-    const responseData = axiosError.response?.data;
-
-    // Extract error details
-    const message = responseData?.error || responseData?.detail || axiosError.message;
-    const validationErrors = responseData?.details;
-    const retryAfter = responseData?.retryAfter;
-
-    throw new JDSApiError(
-      `API Error: ${message}`,
-      statusCode,
-      endpoint,
-      error,
-      validationErrors,
-      retryAfter
-    );
-  }
+  const response = (error as { response?: { status?: number; data?: ApiErrorResponse } })
+    ?.response;
+  const message = extractErrorMessage(
+    error,
+    error instanceof Error ? error.message : String(error),
+  );
 
   throw new JDSApiError(
-    `Unexpected error: ${error instanceof Error ? error.message : String(error)}`,
-    undefined,
+    `API Error: ${message}`,
+    response?.status,
     endpoint,
-    error
+    error,
+    response?.data?.details,
+    response?.data?.retryAfter,
   );
 }
 
@@ -151,8 +129,9 @@ function handleApiError(error: unknown, endpoint: string): never {
  */
 export async function getCases(params?: CaseSearchParams): Promise<PaginatedCaseList> {
   try {
-    const response = await apiClient.get<PaginatedCaseList>('/cases/', {
+    const response = await http.get<PaginatedCaseList>('/api/cases/', {
       params,
+      timeout: 10000,
     });
     return response.data;
   } catch (error) {
@@ -166,7 +145,10 @@ export async function getCases(params?: CaseSearchParams): Promise<PaginatedCase
  */
 export async function getCaseById(id: string | number): Promise<CaseDetail> {
   try {
-    const response = await apiClient.get<CaseDetail>(`/cases/${encodeURIComponent(String(id))}/`);
+    const response = await http.get<CaseDetail>(
+      `/api/cases/${encodeURIComponent(String(id))}/`,
+      { timeout: 10000 },
+    );
     return response.data;
   } catch (error) {
     handleApiError(error, `/cases/${id}/`);
@@ -199,10 +181,11 @@ export async function getCaseByCourtRef(ref: string): Promise<CaseDetail> {
  */
 export async function getCasesByEntity(entityId: string, params?: CaseSearchParams): Promise<Case[]> {
   try {
-    const response = await apiClient.get<PaginatedCaseList>('/cases/', {
+    const response = await http.get<PaginatedCaseList>('/api/cases/', {
       params,
+      timeout: 10000,
     });
-    
+
     // Filter cases that include the entity in the unified entities array
     const filteredCases = response.data.results.filter(caseItem => 
       caseItem.entities?.some(e => e.nes_id === entityId)
@@ -220,8 +203,10 @@ export async function getCasesByEntity(entityId: string, params?: CaseSearchPara
  */
 export async function getJawafEntityById(entityId: number): Promise<import('@/types/jds').JawafEntity | null> {
   try {
-    const response = await apiClient.get<PaginatedCaseList>('/cases/');
-    
+    const response = await http.get<PaginatedCaseList>('/api/cases/', {
+      timeout: 10000,
+    });
+
     // Search through all cases to find the entity in the unified entities array
     for (const caseItem of response.data.results) {
       const entity = caseItem.entities?.find(e => e.id === entityId);
@@ -244,8 +229,9 @@ export async function getJawafEntityById(entityId: number): Promise<import('@/ty
  */
 export async function getDocumentSources(params?: DocumentSourceSearchParams): Promise<PaginatedDocumentSourceList> {
   try {
-    const response = await apiClient.get<PaginatedDocumentSourceList>('/sources/', {
+    const response = await http.get<PaginatedDocumentSourceList>('/api/sources/', {
       params,
+      timeout: 10000,
     });
     return response.data;
   } catch (error) {
@@ -258,7 +244,9 @@ export async function getDocumentSources(params?: DocumentSourceSearchParams): P
  */
 export async function getDocumentSourceById(id: number): Promise<DocumentSource> {
   try {
-    const response = await apiClient.get<DocumentSource>(`/sources/${id}/`);
+    const response = await http.get<DocumentSource>(`/api/sources/${id}/`, {
+      timeout: 10000,
+    });
     return response.data;
   } catch (error) {
     handleApiError(error, `/sources/${id}/`);
@@ -276,7 +264,9 @@ export async function getDocumentSourceById(id: number): Promise<DocumentSource>
  */
 export async function getStatistics(): Promise<CaseStatistics> {
   try {
-    const response = await apiClient.get<CaseStatistics>('/statistics/');
+    const response = await http.get<CaseStatistics>('/api/statistics/', {
+      timeout: 10000,
+    });
     return response.data;
   } catch (error) {
     handleApiError(error, '/statistics/');
@@ -326,12 +316,15 @@ export async function submitFeedback(feedback: FeedbackSubmission): Promise<Feed
       if (feedback.relatedPage) formData.append('relatedPage', feedback.relatedPage);
       if (feedback.contactInfo) formData.append('contactInfo', JSON.stringify(feedback.contactInfo));
       formData.append('attachment', feedback.attachment);
-      const response = await apiClient.post<FeedbackResponse>('/feedback/', formData, {
+      const response = await http.post<FeedbackResponse>('/api/feedback/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 10000,
       });
       return response.data;
     }
-    const response = await apiClient.post<FeedbackResponse>('/feedback/', feedback);
+    const response = await http.post<FeedbackResponse>('/api/feedback/', feedback, {
+      timeout: 10000,
+    });
     return response.data;
   } catch (error) {
     handleApiError(error, '/feedback/');

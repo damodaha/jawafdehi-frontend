@@ -8,19 +8,17 @@ This directory contains the API client and adapters for the Nepal Entity Service
 - **`nes-adapters.ts`** - Data transformation utilities (e.g., merging evidence and sources)
 - **`README.md`** - This file
 
-## Environment Variables
+## Base URL
 
-Set the backend API URL in your `.env` file:
+`api.ts` no longer owns a base URL or axios instance. It shares the unified
+`http` client (`src/services/http.ts`), which resolves the monolith origin from
+`VITE_JAWAFDEHI_API_BASE_URL` (or falls back to same-origin) and handles auth
+and error extraction. NES entities are served under the unified `/api` root
+(`/api/entities`, `/api/relationships`).
 
+For local development, set the override in your `.env`:
 ```env
-VITE_NES_API_BASE_URL=https://nes.jawafdehi.org/api
-```
-
-**Default:** `https://nes.jawafdehi.org/api`
-
-For local development:
-```env
-VITE_NES_API_BASE_URL=http://localhost:8000/api
+VITE_JAWAFDEHI_API_BASE_URL=http://127.0.0.1:48010
 ```
 
 ## API Reference

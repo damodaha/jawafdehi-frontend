@@ -3,16 +3,12 @@
  *
  * This module provides typed API functions to interact with the NES backend.
  *
- * References:
- * - Backend types: https://github.com/Jawafdehi/NepalEntityService-Tundikhel/blob/main/src/common/nes-types.ts
- * - Live reference: https://tundikhel.nes.jawafdehi.org
- * - Core NES: https://github.com/Jawafdehi/NepalEntityService
- *
- * Environment Variables:
- * - VITE_NES_API_BASE_URL: Base URL for the NES API (default: https://nes.jawafdehi.org/api)
+ * NES entities now live on the consolidated monolith under the unified `/api`
+ * root (`/api/entities`, `/api/relationships`). Auth, base-URL resolution, and
+ * error extraction are handled by the shared `http` client (./http).
  */
 
-import axios, { AxiosInstance, AxiosError } from 'axios';
+import { http, extractErrorMessage } from './http';
 import { getCasesByEntity } from '@/services/jds-api';
 import type {
   Person,
@@ -22,20 +18,6 @@ import type {
   Relationship,
   VersionSummary
 } from '@/types/nes';
-
-// ============================================================================
-// API Configuration
-// ============================================================================
-
-const API_BASE_URL = import.meta.env.VITE_NES_API_BASE_URL || 'https://nes.jawafdehi.org/api';
-
-const api: AxiosInstance = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  timeout: 30000,
-});
 
 // ============================================================================
 // Response Types
@@ -130,25 +112,14 @@ export class NESApiError extends Error {
 }
 
 function handleApiError(error: unknown, endpoint: string): never {
-  if (axios.isAxiosError(error)) {
-    const axiosError = error as AxiosError;
-    const statusCode = axiosError.response?.status;
-    const responseData = axiosError.response?.data as Record<string, unknown> | undefined;
-    const message = (responseData?.detail as string) || axiosError.message;
-
-    throw new NESApiError(
-      `API request failed: ${message}`,
-      statusCode,
-      endpoint,
-      error
-    );
-  }
+  const statusCode = (error as { response?: { status?: number } })?.response?.status;
+  const message = extractErrorMessage(error, 'Unknown error occurred');
 
   throw new NESApiError(
-    'Unknown error occurred',
-    undefined,
+    `API request failed: ${message}`,
+    statusCode,
     endpoint,
-    error instanceof Error ? error : undefined
+    error instanceof Error ? error : undefined,
   );
 }
 
@@ -195,8 +166,9 @@ export async function getEntities(params?: EntitySearchParams): Promise<EntityLi
       queryParams['entity-id'] = params.entity_ids.join(',');
     }
 
-    const response = await api.get<EntityListResponse>('/entities', {
-      params: queryParams
+    const response = await http.get<EntityListResponse>('/api/entities', {
+      params: queryParams,
+      timeout: 30000,
     });
     return response.data;
   } catch (error) {
@@ -247,7 +219,9 @@ export async function getEntityById(idOrSlug: string): Promise<Entity> {
   try {
     // URL-encode the entity ID to handle NES format (entity:type/slug)
     const encodedId = encodeURIComponent(idOrSlug);
-    const response = await api.get<Entity>(`/entities/${encodedId}`);
+    const response = await http.get<Entity>(`/api/entities/${encodedId}`, {
+      timeout: 30000,
+    });
     return response.data;
   } catch (error) {
     const encodedId = encodeURIComponent(idOrSlug);
@@ -282,7 +256,10 @@ export async function getEntityVersions(idOrSlug: string): Promise<VersionListRe
   try {
     // URL-encode the entity ID to handle NES format (entity:type/slug)
     const encodedId = encodeURIComponent(idOrSlug);
-    const response = await api.get<VersionListResponse>(`/entities/${encodedId}/versions`);
+    const response = await http.get<VersionListResponse>(
+      `/api/entities/${encodedId}/versions`,
+      { timeout: 30000 },
+    );
     return response.data;
   } catch (error) {
     console.warn(`Version history not available for entity ${idOrSlug}`);
@@ -315,7 +292,10 @@ export async function getRelationships(
   params?: RelationshipSearchParams
 ): Promise<RelationshipListResponse> {
   try {
-    const response = await api.get<RelationshipListResponse>('/relationships', { params });
+    const response = await http.get<RelationshipListResponse>('/api/relationships', {
+      params,
+      timeout: 30000,
+    });
     return response.data;
   } catch (error) {
     console.warn('Relationships endpoint returned error, returning empty list');
@@ -437,7 +417,7 @@ export async function getEntityIdsWithCases(): Promise<string[]> {
  */
 export async function healthCheck(): Promise<{ status: string }> {
   try {
-    const response = await api.get('/health');
+    const response = await http.get('/api/health', { timeout: 30000 });
     return response.data;
   } catch (error) {
     handleApiError(error, '/health');
@@ -447,8 +427,6 @@ export async function healthCheck(): Promise<{ status: string }> {
 // ============================================================================
 // Exports
 // ============================================================================
-
-export default api;
 
 // Re-export types for convenience
 export type {

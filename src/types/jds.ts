@@ -2,9 +2,9 @@
  * Jawafdehi API (JDS) Types
  * 
  * Type definitions for the accountability and cases API.
- * 
+ *
  * Reference: Jawafdehi_Public_Accountability_API.yaml
- * Base URL: https://portal.jawafdehi.org/api
+ * Served by the unified monolith under `/api` (see services/jds-api.ts).
  */
 
 // ============================================================================

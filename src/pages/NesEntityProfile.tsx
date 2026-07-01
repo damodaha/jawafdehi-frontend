@@ -1,8 +1,9 @@
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { AlertCircle, AlertTriangle, ArrowLeft, ExternalLink } from "lucide-react";
+
+import { http } from "@/services/http";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -46,10 +47,6 @@ interface NesEntity {
   "jawafdehi:version"?: VersionInfo;
   [key: string]: unknown;
 }
-
-const NES_API_BASE_URL =
-  (typeof import.meta !== "undefined" && import.meta.env?.VITE_NES_API_BASE_URL) ||
-  "https://nes.jawafdehi.org/api";
 
 // Entity IRI -> relative SPA path the /entity/* route resolves.
 const ENTITY_MARKER = "/entity/";
@@ -171,7 +168,7 @@ export default function NesEntityProfile() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["nes-entity", tail],
     queryFn: async () => {
-      const res = await axios.get<NesEntity>(`${NES_API_BASE_URL}/entities/${tail}`);
+      const res = await http.get<NesEntity>(`/api/entities/${tail}`);
       return res.data;
     },
     enabled: tail.length > 0,

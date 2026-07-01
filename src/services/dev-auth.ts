@@ -10,8 +10,7 @@
 // SessionAuthentication under DEV_AUTH. We keep a small snapshot of the signed-in
 // user (and the CSRF token) in localStorage so a page reload stays logged in
 // without a token, and so admin-api.ts can attach X-CSRFToken to writes.
-import axios from "axios";
-import { ADMIN_API_BASE_URL } from "./admin-api";
+import { http, API_BASE_URL } from "./http";
 import type { CaseworkUser } from "@/types/casework";
 
 export const DEV_AUTH_ENABLED = import.meta.env.VITE_DEV_AUTH === "true";
@@ -19,13 +18,12 @@ export const DEV_AUTH_ENABLED = import.meta.env.VITE_DEV_AUTH === "true";
 const STORAGE_KEY = "jawafdehi.devAuth.user";
 const CSRF_KEY = "jawafdehi.devAuth.csrf";
 
-// A dedicated axios instance that sends the session cookie. `withCredentials`
-// makes the browser include the sessionid cookie on cross-origin XHR (the FE
-// dev server and the API may be on different ports); same-origin it's a no-op.
-const devClient = axios.create({
-  baseURL: ADMIN_API_BASE_URL,
-  withCredentials: true,
-});
+// Dev-login runs the unified client with `withCredentials` forced per-call, so
+// the browser includes the sessionid cookie even before any token exists
+// (the FE dev server and API may be on different ports; same-origin it's a
+// no-op). baseURL is the shared monolith origin.
+void API_BASE_URL;
+const devClient = http;
 
 export interface DevAuthUser extends CaseworkUser {
   csrftoken?: string;
@@ -64,6 +62,7 @@ export async function devLogin(
   const { data } = await devClient.post<DevAuthUser>(
     "/api/casework/auth/dev-login/",
     { username, password },
+    { withCredentials: true },
   );
   const { csrftoken, ...user } = data;
   store(user, csrftoken);
@@ -73,6 +72,7 @@ export async function devLogin(
 export async function devLogout(): Promise<void> {
   try {
     await devClient.post("/api/casework/auth/dev-logout/", null, {
+      withCredentials: true,
       headers: getStoredCsrf() ? { "X-CSRFToken": getStoredCsrf()! } : {},
     });
   } finally {

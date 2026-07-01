@@ -1,7 +1,7 @@
 // Admin panel API client.
 //
-// Unlike the legacy clients (api.ts -> nes.jawafdehi.org, jds-api.ts ->
-// portal.jawafdehi.org), the admin panel talks to the CONSOLIDATED monolith on
+// Every client (this one plus api.ts, jds-api.ts, cms-api.ts, search-api.ts)
+// now shares ONE axios instance (./http) pointed at the CONSOLIDATED monolith on
 // ONE host under a SINGLE unified `/api` root — the former per-service prefixes
 // (`/api/nes`, `/api/ngm`) were hard-cut. Each resource lives at its own path:
 //
@@ -12,66 +12,13 @@
 //
 // Auth is OIDC/Zitadel only (DRF token auth was dropped in the monolith): every
 // request carries `Authorization: Bearer <access>` from the shared oidc.ts.
-import axios, { type AxiosInstance } from "axios";
-import { getAccessToken } from "./oidc";
+import { http as client, API_BASE_URL, extractErrorMessage } from "./http";
 
-// DEV-ONLY: when the app is built/run with VITE_DEV_AUTH and the user logged in
-// with a username/password (Django session) instead of OIDC, requests carry no
-// bearer token. In that mode we let the browser send the session cookie
-// (withCredentials) and echo the CSRF token on unsafe methods. Read via the
-// live flag + a lazy localStorage lookup to avoid an import cycle with
-// dev-auth.ts (which imports ADMIN_API_BASE_URL from this module).
-const DEV_AUTH_ENABLED = import.meta.env.VITE_DEV_AUTH === "true";
-const CSRF_STORAGE_KEY = "jawafdehi.devAuth.csrf";
-const UNSAFE_METHODS = new Set(["post", "put", "patch", "delete"]);
-
-// The monolith host. Defaults to the same origin so a deploy behind one domain
-// "just works"; override for split local dev (e.g. http://localhost:48000).
-export const ADMIN_API_BASE_URL =
-  import.meta.env.VITE_ADMIN_API_BASE_URL ||
-  (typeof window !== "undefined" ? window.location.origin : "");
-
-function makeClient(): AxiosInstance {
-  const client = axios.create({ baseURL: ADMIN_API_BASE_URL });
-  client.interceptors.request.use(async (config) => {
-    const token = await getAccessToken();
-    if (token) {
-      // Normal path: OIDC bearer token.
-      config.headers.Authorization = `Bearer ${token}`;
-    } else if (DEV_AUTH_ENABLED && typeof window !== "undefined") {
-      // DEV_AUTH session path: no bearer, ride the session cookie + CSRF.
-      config.withCredentials = true;
-      const method = (config.method || "get").toLowerCase();
-      const csrf = window.localStorage.getItem(CSRF_STORAGE_KEY);
-      if (csrf && UNSAFE_METHODS.has(method)) {
-        config.headers["X-CSRFToken"] = csrf;
-      }
-    }
-    return config;
-  });
-  return client;
-}
-
-const client = makeClient();
-
-// Best-effort human message from an axios error: mirrors casework-api's helper
-// (plain-string body, DRF { detail }, the monolith's { error: { message } },
-// and field-error objects).
-export function adminErrorMessage(err: unknown, fallback: string): string {
-  const data = (err as { response?: { data?: unknown } })?.response?.data;
-  if (typeof data === "string" && data.trim()) return data;
-  if (data && typeof data === "object") {
-    const d = data as Record<string, unknown>;
-    if (typeof d.detail === "string") return d.detail;
-    const errObj = d.error as { message?: string } | undefined;
-    if (errObj && typeof errObj.message === "string") return errObj.message;
-    for (const v of Object.values(d)) {
-      if (typeof v === "string" && v.trim()) return v;
-      if (Array.isArray(v) && typeof v[0] === "string") return v[0];
-    }
-  }
-  return fallback;
-}
+// Back-compat re-exports: callers (and dev-auth.ts) import these names. The
+// client, base-URL resolution, and error extraction now live in http.ts (one
+// unified client for the whole app).
+export const ADMIN_API_BASE_URL = API_BASE_URL;
+export const adminErrorMessage = extractErrorMessage;
 
 // ---------------------------------------------------------------------------
 // NES — entities (JSON-LD documents keyed by @id IRI)
