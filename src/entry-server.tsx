@@ -14,8 +14,10 @@ import type { JawafEntity } from './types/jds';
 const JDS_API_BASE_URL = process.env.VITE_JDS_API_BASE_URL || 'https://portal.jawafdehi.org/api';
 // NGM read plane. SSR runs in Node, so a relative base won't resolve — fall back to
 // the production host when no absolute override is set. Post-consolidation NGM
-// lives on the same monolith as JDS under /api/ngm (not a separate ngm host).
-const NGM_API_BASE_URL = process.env.VITE_NGM_API_BASE_URL || 'https://portal.jawafdehi.org/api/ngm';
+// lives on the same monolith as JDS under the SINGLE unified /api root (the former
+// /api/ngm prefix was hard-cut): materials at /api/materials, court cases at
+// /api/courtcases.
+const NGM_API_BASE_URL = process.env.VITE_NGM_API_BASE_URL || 'https://portal.jawafdehi.org/api';
 
 export interface RenderResult {
   html: string;
@@ -102,6 +104,7 @@ async function prefetch(url: string, queryClient: QueryClient): Promise<void> {
       queryKey: ['ngm-material', tail],
       queryFn: async () => {
         const res = await axios.get(`${NGM_API_BASE_URL}/materials/${tail}`);
+        // (materials path unchanged under the unified /api root)
         return res.data;
       },
     });
@@ -115,7 +118,7 @@ async function prefetch(url: string, queryClient: QueryClient): Promise<void> {
   if (courtcaseMatch) {
     const court = decodeURIComponent(courtcaseMatch[1]);
     const caseNumber = decodeURIComponent(courtcaseMatch[2]);
-    const base = `${NGM_API_BASE_URL}/cases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}`;
+    const base = `${NGM_API_BASE_URL}/courtcases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}`;
     await queryClient.prefetchQuery({
       queryKey: ['ngm-courtcase', court, caseNumber],
       queryFn: async () => {

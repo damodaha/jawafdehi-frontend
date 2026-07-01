@@ -1,16 +1,15 @@
 /**
  * NGM API Client (governance / judicial materials + court cases)
  *
- * NGM data lives on the Think-Big monolith under the host-root `/api/ngm/` prefix
- * (distinct from the Jawafdehi `/api/` tree and the NES `/api/nes/` tree). Reads are
- * public — materials and court cases are derived from public-domain government
- * documents.
+ * NGM data lives on the Think-Big monolith under the SINGLE unified `/api` root
+ * (the former per-service `/api/ngm` prefix was hard-cut). Reads are public —
+ * materials and court cases are derived from public-domain government documents.
  *
- *   GET /api/ngm/materials/<source>/<ident>      -> material JSON-LD (schema.org)
- *   GET /api/ngm/cases/<court>/<case_number>/    -> court case (composite key)
- *   GET /api/ngm/cases/<court>/<case_number>/{hearings,entities,documents}
+ *   GET /api/materials/<source>/<ident>          -> material JSON-LD (schema.org)
+ *   GET /api/courtcases/<court>/<case_number>/   -> court case (composite key)
+ *   GET /api/courtcases/<court>/<case_number>/{hearings,entities,documents}
  *
- * Base URL defaults to the SAME-ORIGIN relative `/api/ngm` so the Vite dev proxy /
+ * Base URL defaults to the SAME-ORIGIN relative `/api` so the Vite dev proxy /
  * monolith ingress resolves it. An absolute override (VITE_NGM_API_BASE_URL) is
  * supported for split-host deployments. NOTE: keep the default RELATIVE — an
  * absolute prod default would make a containerized frontend bypass the proxy and
@@ -23,7 +22,7 @@ import type { CourtCase, CourtCaseHearing, CourtCaseEntity } from '@/types/jds';
 
 const NGM_API_BASE_URL =
   (typeof import.meta !== 'undefined' && import.meta.env?.VITE_NGM_API_BASE_URL) ||
-  '/api/ngm';
+  '/api';
 
 // A material @id IRI path component (`<source>/<ident>`) or a full IRI. The detail
 // route is a splat, so the tail may already be the `<source>/<ident>` form.
@@ -98,10 +97,10 @@ export async function getCourtCase(courtOrRef: string, caseNumber?: string): Pro
     caseNumber === undefined
       ? parseCourtCaseRef(courtOrRef)
       : { court: courtOrRef, caseNumber };
-  // Composite-key detail route is /cases/<court>/<case_number>/ (mounted at
-  // /api/ngm/), NOT nested under /courts/. Case numbers contain hyphens but no
+  // Composite-key detail route is /courtcases/<court>/<case_number>/ (mounted at
+  // /api/), NOT nested under /courts/. Case numbers contain hyphens but no
   // slashes; encode each segment.
-  const endpoint = `/cases/${encodeURIComponent(court)}/${encodeURIComponent(number)}/`;
+  const endpoint = `/courtcases/${encodeURIComponent(court)}/${encodeURIComponent(number)}/`;
   try {
     const response = await axios.get<CourtCase>(`${NGM_API_BASE_URL}${endpoint}`);
     return response.data;
@@ -123,7 +122,7 @@ async function getCaseSubResource<T>(
   caseNumber: string,
   sub: 'hearings' | 'entities' | 'documents',
 ): Promise<T[]> {
-  const endpoint = `/cases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}/${sub}`;
+  const endpoint = `/courtcases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}/${sub}`;
   try {
     const response = await axios.get<Paginated<T> | T[]>(`${NGM_API_BASE_URL}${endpoint}`);
     const data = response.data;

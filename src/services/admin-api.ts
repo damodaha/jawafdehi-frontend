@@ -2,11 +2,13 @@
 //
 // Unlike the legacy clients (api.ts -> nes.jawafdehi.org, jds-api.ts ->
 // portal.jawafdehi.org), the admin panel talks to the CONSOLIDATED monolith on
-// ONE host, addressing each former service by its URL path prefix:
+// ONE host under a SINGLE unified `/api` root — the former per-service prefixes
+// (`/api/nes`, `/api/ngm`) were hard-cut. Each resource lives at its own path:
 //
-//     /api/nes/...   NES entities (JSON-LD read/write + reindex)
-//     /api/ngm/...   NGM courts + materials (read plane + ingestion)
-//     /api/...       Jawafdehi cases / sources / casework
+//     /api/entities...     NES entities (JSON-LD read/write + reindex)
+//     /api/courtcases...   NGM court cases (composite-key read/write)
+//     /api/courts, /api/firms, /api/materials   NGM governance data
+//     /api/cases, /api/sources   Jawafdehi cases / document sources
 //
 // Auth is OIDC/Zitadel only (DRF token auth was dropped in the monolith): every
 // request carries `Authorization: Bearer <access>` from the shared oidc.ts.
@@ -82,7 +84,7 @@ export interface ListEntitiesParams {
 export async function listNesEntities(
   params: ListEntitiesParams = {},
 ): Promise<NesEntityListResponse> {
-  const { data } = await client.get<NesEntityListResponse>("/api/nes/entities", {
+  const { data } = await client.get<NesEntityListResponse>("/api/entities", {
     params,
   });
   return data;
@@ -100,7 +102,7 @@ function encodeRef(ref: string): string {
 // Detail by ref: a bare `<prefix>/<slug>` path or a url-encoded @id IRI.
 export async function getNesEntity(ref: string): Promise<NesEntity> {
   const { data } = await client.get<NesEntity>(
-    `/api/nes/entities/${encodeRef(ref)}`,
+    `/api/entities/${encodeRef(ref)}`,
   );
   return data;
 }
@@ -122,7 +124,7 @@ export interface CreateEntityPayload {
 export async function createNesEntity(
   payload: CreateEntityPayload,
 ): Promise<NesEntity> {
-  const { data } = await client.post<NesEntity>("/api/nes/entities", payload);
+  const { data } = await client.post<NesEntity>("/api/entities", payload);
   return data;
 }
 
@@ -135,14 +137,14 @@ export interface PatchOp {
   from?: string;
 }
 
-// EDIT is an RFC-6902 patch: PATCH /api/nes/entities/{ref} with { patch_ops }.
+// EDIT is an RFC-6902 patch: PATCH /api/entities/{ref} with { patch_ops }.
 export async function patchNesEntity(
   ref: string,
   patchOps: PatchOp[],
   changeDescription?: string,
 ): Promise<NesEntity> {
   const { data } = await client.patch<NesEntity>(
-    `/api/nes/entities/${encodeRef(ref)}`,
+    `/api/entities/${encodeRef(ref)}`,
     { patch_ops: patchOps, change_description: changeDescription },
   );
   return data;
@@ -153,20 +155,25 @@ export async function getNesEntityVersions(ref: string): Promise<{
   total: number;
 }> {
   const { data } = await client.get(
-    `/api/nes/entities/${encodeRef(ref)}/versions`,
+    `/api/entities/${encodeRef(ref)}/versions`,
   );
   return data;
 }
 
 export async function listNesEntityPrefixes(): Promise<{ prefixes: string[] }> {
-  const { data } = await client.get("/api/nes/entity_prefixes");
+  const { data } = await client.get("/api/entity_prefixes");
   return data;
 }
 
 // Trigger an OpenSearch reindex (admin only). Returns whatever the job emits.
 export async function reindexNes(): Promise<unknown> {
-  const { data } = await client.post("/api/nes/admin/reindex", {});
+  const { data } = await client.post("/api/admin/reindex", {});
   return data;
+}
+
+// Soft-delete an entity (backend flips it to removed; returns 204 No Content).
+export async function deleteNesEntity(ref: string): Promise<void> {
+  await client.delete(`/api/entities/${encodeRef(ref)}`);
 }
 
 // ---------------------------------------------------------------------------
@@ -183,19 +190,19 @@ export interface Paginated<T> {
 export async function listCourtCases<T = Record<string, unknown>>(
   params: Record<string, unknown> = {},
 ): Promise<Paginated<T>> {
-  const { data } = await client.get<Paginated<T>>("/api/ngm/cases/", { params });
+  const { data } = await client.get<Paginated<T>>("/api/courtcases/", { params });
   return data;
 }
 
 export async function listCourts<T = Record<string, unknown>>(): Promise<Paginated<T>> {
-  const { data } = await client.get<Paginated<T>>("/api/ngm/courts/");
+  const { data } = await client.get<Paginated<T>>("/api/courts/");
   return data;
 }
 
 export async function listBlacklistedFirms<T = Record<string, unknown>>(): Promise<
   Paginated<T>
 > {
-  const { data } = await client.get<Paginated<T>>("/api/ngm/firms/");
+  const { data } = await client.get<Paginated<T>>("/api/firms/");
   return data;
 }
 
@@ -222,7 +229,7 @@ export async function getCourtCase<T = Record<string, unknown>>(
   caseNumber: string,
 ): Promise<T> {
   const { data } = await client.get<T>(
-    `/api/ngm/cases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}`,
+    `/api/courtcases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}`,
   );
   return data;
 }
@@ -230,7 +237,7 @@ export async function getCourtCase<T = Record<string, unknown>>(
 export async function createCourtCase<T = Record<string, unknown>>(
   payload: CourtCaseWrite,
 ): Promise<T> {
-  const { data } = await client.post<T>("/api/ngm/cases/", payload);
+  const { data } = await client.post<T>("/api/courtcases/", payload);
   return data;
 }
 
@@ -240,9 +247,30 @@ export async function updateCourtCase<T = Record<string, unknown>>(
   payload: Partial<CourtCaseWrite>,
 ): Promise<T> {
   const { data } = await client.patch<T>(
-    `/api/ngm/cases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}`,
+    `/api/courtcases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}`,
     payload,
   );
+  return data;
+}
+
+// Soft-delete a court case by its composite key (backend returns 204).
+export async function deleteCourtCase(
+  court: string,
+  caseNumber: string,
+): Promise<void> {
+  await client.delete(
+    `/api/courtcases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}`,
+  );
+}
+
+// List materials (paginated). The materials list is NGM/DRF-shaped {results,
+// next}; `count`/`previous` may be absent, so ResourceTable tolerates undefined.
+export async function listMaterials<T = Record<string, unknown>>(
+  params: Record<string, unknown> = {},
+): Promise<Paginated<T>> {
+  // Trailing slash required: the backend list endpoint is GET /api/materials/
+  // (no ?iri= param). Without the slash the route 404s.
+  const { data } = await client.get<Paginated<T>>("/api/materials/", { params });
   return data;
 }
 
@@ -250,7 +278,7 @@ export async function updateCourtCase<T = Record<string, unknown>>(
 export async function getMaterialByIri<T = Record<string, unknown>>(
   iri: string,
 ): Promise<T> {
-  const { data } = await client.get<T>("/api/ngm/materials/", {
+  const { data } = await client.get<T>("/api/materials/", {
     params: { iri },
   });
   return data;
@@ -264,7 +292,7 @@ export async function getMaterialByPath<T = Record<string, unknown>>(
   ident: string,
 ): Promise<T> {
   const { data } = await client.get<T>(
-    `/api/ngm/materials/${source}/${encodeURIComponent(ident)}`,
+    `/api/materials/${source}/${encodeURIComponent(ident)}`,
   );
   return data;
 }
@@ -279,7 +307,7 @@ export async function createMaterial<T = Record<string, unknown>>(
   const body = materialType
     ? { material: jsonld, material_type: materialType }
     : jsonld;
-  const { data } = await client.post<T>("/api/ngm/materials/", body);
+  const { data } = await client.post<T>("/api/materials/", body);
   return data;
 }
 
@@ -289,14 +317,26 @@ export async function replaceMaterial<T = Record<string, unknown>>(
   jsonld: Record<string, unknown>,
 ): Promise<T> {
   const { data } = await client.put<T>(
-    `/api/ngm/materials/${encodeURIComponent(source)}/${encodeURIComponent(ident)}`,
+    `/api/materials/${encodeURIComponent(source)}/${encodeURIComponent(ident)}`,
     jsonld,
   );
   return data;
 }
 
+// Soft-delete a material by its <source>/<ident> path components (204).
+export async function deleteMaterial(
+  source: string,
+  ident: string,
+): Promise<void> {
+  await client.delete(
+    `/api/materials/${encodeURIComponent(source)}/${encodeURIComponent(ident)}`,
+  );
+}
+
 // ---------------------------------------------------------------------------
-// Jawafdehi — cases + sources (full CRUD lives here)
+// Jawafdehi — corruption cases (DISTINCT from NGM court cases) + sources.
+// Full CRUD: cases are keyed by slug, updated via RFC-6902 PATCH; sources are
+// keyed by numeric id and created via multipart (optional file upload).
 // ---------------------------------------------------------------------------
 
 export async function listCases<T = Record<string, unknown>>(
@@ -306,11 +346,116 @@ export async function listCases<T = Record<string, unknown>>(
   return data;
 }
 
+export async function getCase<T = Record<string, unknown>>(
+  slug: string,
+): Promise<T> {
+  const { data } = await client.get<T>(`/api/cases/${encodeURIComponent(slug)}/`);
+  return data;
+}
+
+// CREATE a corruption case. The backend accepts the case authoring fields
+// (title, case_type, state, …); we keep it loosely typed so the form owns the
+// exact shape while callers still get a typed result back.
+export async function createCase<T = Record<string, unknown>>(
+  payload: Record<string, unknown>,
+): Promise<T> {
+  const { data } = await client.post<T>("/api/cases/", payload);
+  return data;
+}
+
+// UPDATE is an RFC-6902 patch (mirrors the NES entity contract): the body is a
+// bare array of patch ops.
+export async function patchCase<T = Record<string, unknown>>(
+  slug: string,
+  patchOps: PatchOp[],
+): Promise<T> {
+  const { data } = await client.patch<T>(
+    `/api/cases/${encodeURIComponent(slug)}/`,
+    patchOps,
+  );
+  return data;
+}
+
+// Soft-delete a case (backend flips state -> CLOSED, returns 204).
+export async function deleteCase(slug: string): Promise<void> {
+  await client.delete(`/api/cases/${encodeURIComponent(slug)}/`);
+}
+
 export async function listSources<T = Record<string, unknown>>(
   params: Record<string, unknown> = {},
 ): Promise<Paginated<T>> {
   const { data } = await client.get<Paginated<T>>("/api/sources/", { params });
   return data;
+}
+
+export async function getSource<T = Record<string, unknown>>(
+  id: number | string,
+): Promise<T> {
+  const { data } = await client.get<T>(`/api/sources/${id}/`);
+  return data;
+}
+
+// Build the multipart body for a source create/update. Scalar fields ride as
+// form fields; `urls` (link-role dicts) is JSON-encoded; an optional File is
+// attached under `file`. Kept a standalone helper so it's unit-testable without
+// the network (the FormData shape is the load-bearing contract).
+export interface SourceWriteFields {
+  title: string;
+  description?: string;
+  source_type?: string | null;
+  urls?: { link: string; role: string }[] | null;
+  [k: string]: unknown;
+}
+
+export function buildSourceFormData(
+  fields: SourceWriteFields,
+  file?: File | null,
+): FormData {
+  const fd = new FormData();
+  for (const [k, v] of Object.entries(fields)) {
+    if (v == null || v === "") continue;
+    if (k === "urls") {
+      fd.append("urls", JSON.stringify(v));
+    } else if (Array.isArray(v) || typeof v === "object") {
+      fd.append(k, JSON.stringify(v));
+    } else {
+      fd.append(k, String(v));
+    }
+  }
+  if (file) fd.append("file", file);
+  return fd;
+}
+
+// CREATE a document source. Multipart so an optional file can be uploaded
+// alongside the metadata. axios sets the multipart boundary from the FormData.
+export async function createSource<T = Record<string, unknown>>(
+  fields: SourceWriteFields,
+  file?: File | null,
+): Promise<T> {
+  const { data } = await client.post<T>(
+    "/api/sources/",
+    buildSourceFormData(fields, file),
+  );
+  return data;
+}
+
+// UPDATE a source. Also multipart (a replacement file may be attached). Uses
+// PATCH so partial field updates don't wipe unspecified fields.
+export async function updateSource<T = Record<string, unknown>>(
+  id: number | string,
+  fields: SourceWriteFields,
+  file?: File | null,
+): Promise<T> {
+  const { data } = await client.patch<T>(
+    `/api/sources/${id}/`,
+    buildSourceFormData(fields, file),
+  );
+  return data;
+}
+
+// Soft-delete a source (204).
+export async function deleteSource(id: number | string): Promise<void> {
+  await client.delete(`/api/sources/${id}/`);
 }
 
 export { client as adminClient };

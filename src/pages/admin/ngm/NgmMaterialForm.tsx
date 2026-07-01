@@ -4,6 +4,7 @@ import {
   createMaterial,
   replaceMaterial,
   getMaterialByPath,
+  deleteMaterial,
   adminErrorMessage,
 } from "@/services/admin-api";
 import {
@@ -11,6 +12,7 @@ import {
   isValidMaterialIri,
   parseMaterialIri,
 } from "@/lib/ngm-forms";
+import DeleteButton from "@/components/admin/DeleteButton";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -219,6 +221,23 @@ export default function NgmMaterialForm() {
           >
             Cancel
           </Button>
+          {editing && (
+            <div className="ml-auto">
+              <DeleteButton
+                resourceLabel="material"
+                onDelete={() => {
+                  // Delete keys on the route ref (source/ident) that loaded the
+                  // doc — the same components the PUT/DELETE routes expect.
+                  const lastSlash = refPath.lastIndexOf("/");
+                  return deleteMaterial(
+                    refPath.slice(0, lastSlash),
+                    refPath.slice(lastSlash + 1),
+                  );
+                }}
+                onDeleted={() => navigate("/admin/ngm/materials")}
+              />
+            </div>
+          )}
         </div>
       </form>
     </div>

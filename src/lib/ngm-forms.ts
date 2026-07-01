@@ -22,7 +22,7 @@ export function isValidMaterialIri(value: string): boolean {
 }
 
 // Split a material @id IRI into its {source, ident} path components — the keys
-// the PUT /api/ngm/materials/<source>/<ident> route expects. `source` may be
+// the PUT /api/materials/<source>/<ident> route expects. `source` may be
 // multi-segment (e.g. "court"); `ident` is the final segment. Returns null for
 // a non-material IRI.
 export function parseMaterialIri(

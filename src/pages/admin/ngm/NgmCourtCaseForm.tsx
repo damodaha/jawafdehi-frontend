@@ -4,11 +4,13 @@ import {
   createCourtCase,
   updateCourtCase,
   getCourtCase,
+  deleteCourtCase,
   listCourts,
   adminErrorMessage,
   type CourtCaseWrite,
 } from "@/services/admin-api";
 import { isValidEntityIri } from "@/lib/ngm-forms";
+import DeleteButton from "@/components/admin/DeleteButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -286,6 +288,17 @@ export default function NgmCourtCaseForm() {
           >
             Cancel
           </Button>
+          {editing && (
+            <div className="ml-auto">
+              <DeleteButton
+                resourceLabel="court case"
+                onDelete={() =>
+                  deleteCourtCase(params.court!, params.caseNumber!)
+                }
+                onDeleted={() => navigate("/admin/ngm/courtcases")}
+              />
+            </div>
+          )}
         </div>
       </form>
     </div>
