@@ -1,19 +1,42 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import MDEditor from "@uiw/react-md-editor";
 import {
-  createCase,
   getCase,
+  createCase,
   patchCase,
-  deleteCase,
   adminErrorMessage,
+  type CreateCasePayload,
+  type PatchOp,
 } from "@/services/admin-api";
-import { diffToPatchOps } from "@/lib/nes-jsonld";
-import { CASE_TYPES, CASE_STATES, slugify } from "@/lib/jawafdehi-forms";
-import DeleteButton from "@/components/admin/DeleteButton";
+import {
+  CASE_TYPES,
+  RELATIONSHIP_TYPES,
+  EVIDENCE_TIERS,
+  isValidSlug,
+  isValidDateField,
+  isValidCourtCaseRef,
+  slugify,
+  replaceOp,
+  buildStringListPatch,
+  buildEntitiesPatch,
+  buildTimelinePatch,
+  buildEvidencePatch,
+  type EntityRelationshipRow,
+  type TimelineEventRow,
+  type EvidenceRow,
+  type RelationshipType,
+  type EvidenceTier,
+} from "@/lib/jawafdehi-forms";
+import { useCaseworkAuth } from "@/context/CaseworkAuthContext";
+import EntityRelationshipsEditor from "@/components/admin/case/EntityRelationshipsEditor";
+import TimelineEditor from "@/components/admin/case/TimelineEditor";
+import EvidenceEditor from "@/components/admin/case/EvidenceEditor";
+import ChipListEditor from "@/components/admin/case/ChipListEditor";
+import CaseStateControl from "@/components/admin/case/CaseStateControl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -24,130 +47,244 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { ArrowLeft, Loader2, Save } from "lucide-react";
 
-// Keys the dedicated inputs own — the extra-properties JSON must not set these
-// (it would silently shadow a field). Also the immutable/server keys.
-const MANAGED_KEYS = new Set([
-  "id",
-  "case_id",
-  "slug",
-  "title",
-  "case_type",
-  "state",
-  "short_description",
-  "created_at",
-  "updated_at",
-]);
-
 const str = (v: unknown): string => (v == null ? "" : String(v));
 
-// Create + edit a Jawafdehi corruption case (DISTINCT from an NGM court case).
-// Create POSTs the full object; edit sends an RFC-6902 patch (diff of the
-// loaded doc vs the edited one), mirroring the NES entity editor.
+// The mutable editor state. Sub-resource lists (entities/timeline/evidence) are
+// edited by the F3/F4/F5 child editors; F6 field editors extend this shape.
+interface CaseFormState {
+  title: string;
+  slug: string;
+  case_type: string;
+  description: string;
+  notes: string;
+  key_allegations: string[];
+  entities: EntityRelationshipRow[];
+  timeline: TimelineEventRow[];
+  evidence: EvidenceRow[];
+  // F6 first-class field editors.
+  bigo: string; // kept as string in the input; sent as number|null
+  thumbnail_url: string;
+  banner_url: string;
+  tags: string[];
+  court_cases: string[];
+  case_start_date: string; // AD
+  case_start_date_bs: string; // BS
+  case_end_date: string; // AD
+  case_end_date_bs: string; // BS
+}
+
+const EMPTY: CaseFormState = {
+  title: "",
+  slug: "",
+  case_type: "CORRUPTION",
+  description: "",
+  notes: "",
+  key_allegations: [],
+  entities: [],
+  timeline: [],
+  evidence: [],
+  bigo: "",
+  thumbnail_url: "",
+  banner_url: "",
+  tags: [],
+  court_cases: [],
+  case_start_date: "",
+  case_start_date_bs: "",
+  case_end_date: "",
+  case_end_date_bs: "",
+};
+
+// Coerce a loaded relationship_type into the known enum (default ACCUSED).
+function asRelType(v: unknown): RelationshipType {
+  const s = str(v).toUpperCase();
+  return (RELATIONSHIP_TYPES as readonly string[]).includes(s)
+    ? (s as RelationshipType)
+    : "ACCUSED";
+}
+
+function asTier(v: unknown): EvidenceTier {
+  const s = str(v).toUpperCase();
+  return (EVIDENCE_TIERS as readonly string[]).includes(s)
+    ? (s as EvidenceTier)
+    : "PRIMARY";
+}
+
+// Parse a loaded case's entities array into editor rows. Tolerates the loose
+// read-plane shape (nes_id may live under different keys).
+function parseEntities(c: Record<string, unknown>): EntityRelationshipRow[] {
+  const list = Array.isArray(c.entities) ? (c.entities as Record<string, unknown>[]) : [];
+  return list.map((e) => ({
+    nes_id: str(e.nes_id ?? e.entity ?? e["@id"]),
+    relationship_type: asRelType(e.relationship_type ?? e.role),
+    notes: str(e.notes),
+  }));
+}
+
+function parseTimeline(c: Record<string, unknown>): TimelineEventRow[] {
+  const list = Array.isArray(c.timeline) ? (c.timeline as Record<string, unknown>[]) : [];
+  return list.map((t) => ({
+    date: str(t.date),
+    date_bs: str(t.date_bs),
+    title: str(t.title),
+    description: str(t.description),
+  }));
+}
+
+function parseEvidence(c: Record<string, unknown>): EvidenceRow[] {
+  const list = Array.isArray(c.evidence) ? (c.evidence as Record<string, unknown>[]) : [];
+  return list
+    .map((e) => ({ source_id: Number(e.source_id ?? e.source ?? e.id), tier: asTier(e.tier) }))
+    .filter((e) => Number.isFinite(e.source_id) && e.source_id > 0);
+}
+
+// Parse a loaded case (loose read-plane shape) into the editor state.
+function fromCase(c: Record<string, unknown>): CaseFormState {
+  const allegations = Array.isArray(c.key_allegations)
+    ? (c.key_allegations as unknown[]).map(str)
+    : [];
+  const strList = (v: unknown): string[] =>
+    Array.isArray(v) ? (v as unknown[]).map(str) : [];
+  return {
+    title: str(c.title),
+    slug: str(c.slug),
+    case_type: str(c.case_type) || "CORRUPTION",
+    description: str(c.description),
+    notes: str(c.notes),
+    key_allegations: allegations,
+    entities: parseEntities(c),
+    timeline: parseTimeline(c),
+    evidence: parseEvidence(c),
+    bigo: c.bigo == null ? "" : str(c.bigo),
+    thumbnail_url: str(c.thumbnail_url),
+    banner_url: str(c.banner_url),
+    tags: strList(c.tags),
+    court_cases: strList(c.court_cases),
+    case_start_date: str(c.case_start_date),
+    case_start_date_bs: str(c.case_start_date_bs),
+    case_end_date: str(c.case_end_date),
+    case_end_date_bs: str(c.case_end_date_bs),
+  };
+}
+
+// Create + edit a Jawafdehi case. Create posts the authoring shape (backend
+// forces state=DRAFT, A1); edit diffs the touched scalar/list fields into an
+// RFC-6902 patch array (§3). description/notes are Markdown (A4).
 export default function AdminCaseForm() {
   const params = useParams();
   const navigate = useNavigate();
-  const slug = params.slug ?? "";
-  const editing = slug !== "";
+  const { isModerator } = useCaseworkAuth();
+  const slug = params.slug;
+  const editing = Boolean(slug);
 
-  const [loaded, setLoaded] = useState<Record<string, unknown> | null>(null);
+  const [form, setForm] = useState<CaseFormState>(EMPTY);
+  const [original, setOriginal] = useState<CaseFormState>(EMPTY);
+  const [caseState, setCaseState] = useState<string>("DRAFT");
+  // Raw multiline text for key allegations (one per line) — parsed to a list.
+  const [allegationsText, setAllegationsText] = useState("");
   const [loading, setLoading] = useState(editing);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // In create mode, track whether the user hand-edited the slug so we stop
+  // auto-deriving it from the title.
+  const [slugDirty, setSlugDirty] = useState(false);
 
-  const [title, setTitle] = useState("");
-  const [slugField, setSlugField] = useState("");
-  const [slugTouched, setSlugTouched] = useState(false);
-  const [caseType, setCaseType] = useState<string>(CASE_TYPES[0]);
-  const [state, setState] = useState<string>(CASE_STATES[0]);
-  const [shortDescription, setShortDescription] = useState("");
-  const [extraJson, setExtraJson] = useState("");
+  const set = <K extends keyof CaseFormState>(k: K, v: CaseFormState[K]) =>
+    setForm((f) => ({ ...f, [k]: v }));
 
-  const hydrate = useCallback((c: Record<string, unknown>) => {
-    setTitle(str(c.title));
-    setSlugField(str(c.slug));
-    if (typeof c.case_type === "string") setCaseType(c.case_type);
-    if (typeof c.state === "string") setState(c.state);
-    setShortDescription(str(c.short_description));
-    const extra: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(c)) {
-      if (MANAGED_KEYS.has(k)) continue;
-      extra[k] = v;
+  const loadCase = useCallback(async () => {
+    if (!editing || !slug) return;
+    setLoading(true);
+    try {
+      const c = await getCase<Record<string, unknown>>(slug);
+      const parsed = fromCase(c);
+      setForm(parsed);
+      setOriginal(parsed);
+      setCaseState(str(c.state ?? c.status) || "DRAFT");
+      setAllegationsText(parsed.key_allegations.join("\n"));
+    } catch (err) {
+      setError(adminErrorMessage(err, "Failed to load case"));
+    } finally {
+      setLoading(false);
     }
-    setExtraJson(Object.keys(extra).length ? JSON.stringify(extra, null, 2) : "");
-  }, []);
+  }, [editing, slug]);
 
   useEffect(() => {
-    if (!editing) return;
-    let alive = true;
-    setLoading(true);
-    getCase<Record<string, unknown>>(slug)
-      .then((c) => {
-        if (!alive) return;
-        setLoaded(c);
-        hydrate(c);
-      })
-      .catch((err) => alive && setError(adminErrorMessage(err, "Failed to load case")))
-      .finally(() => alive && setLoading(false));
-    return () => {
-      alive = false;
-    };
-  }, [editing, slug, hydrate]);
+    loadCase();
+  }, [loadCase]);
 
-  const onTitle = (v: string) => {
-    setTitle(v);
-    if (!editing && !slugTouched) setSlugField(slugify(v));
-  };
+  // Keep the parsed allegations list in sync with the textarea.
+  useEffect(() => {
+    const list = allegationsText
+      .split("\n")
+      .map((s) => s.trim())
+      .filter((s) => s !== "");
+    setForm((f) => ({ ...f, key_allegations: list }));
+  }, [allegationsText]);
 
-  // Parse the extra-properties JSON box (the free-form long tail of the case).
-  const { parsedExtra, extraError } = useMemo(() => {
-    if (!extraJson.trim()) return { parsedExtra: {}, extraError: null as string | null };
-    try {
-      const parsed = JSON.parse(extraJson);
-      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-        return { parsedExtra: {}, extraError: "Extra properties must be a JSON object." };
-      }
-      const clash = Object.keys(parsed).find((k) => MANAGED_KEYS.has(k));
-      if (clash) {
-        return {
-          parsedExtra: {},
-          extraError: `"${clash}" is set by the fields above — remove it from extra properties.`,
-        };
-      }
-      return { parsedExtra: parsed as Record<string, unknown>, extraError: null };
-    } catch {
-      return { parsedExtra: {}, extraError: "Extra properties must be valid JSON." };
-    }
-  }, [extraJson]);
+  const effectiveSlug = editing
+    ? form.slug
+    : slugDirty
+      ? form.slug
+      : slugify(form.title);
 
-  // The "after" object the form describes (used for both create and the edit diff).
-  const after = useMemo((): Record<string, unknown> => {
-    const obj: Record<string, unknown> = {
-      title: title.trim(),
-      case_type: caseType,
-      state,
-    };
-    if (slugField.trim()) obj.slug = slugField.trim();
-    if (shortDescription.trim()) obj.short_description = shortDescription.trim();
-    Object.assign(obj, parsedExtra);
-    return obj;
-  }, [title, caseType, state, slugField, shortDescription, parsedExtra]);
-
-  // In edit mode, the patch is the diff of the managed+extra keys vs the loaded
-  // doc. We diff only the keys the form manages so untouched server fields (id,
-  // timestamps, …) are never emitted as ops.
-  const patchOps = useMemo(() => {
-    if (!editing || !loaded || extraError) return [];
-    const before: Record<string, unknown> = {};
-    const keys = new Set([...Object.keys(after), "short_description", "slug"]);
-    for (const k of keys) if (k in loaded) before[k] = loaded[k];
-    return diffToPatchOps(before, after);
-  }, [editing, loaded, after, extraError]);
-
+  const slugValid = effectiveSlug === "" || isValidSlug(effectiveSlug);
+  const bigoValid = form.bigo.trim() === "" || Number.isFinite(Number(form.bigo));
+  const datesValid =
+    isValidDateField(form.case_start_date_bs) &&
+    isValidDateField(form.case_end_date_bs);
   const canSave =
     !saving &&
-    !extraError &&
-    title.trim() !== "" &&
-    (editing ? patchOps.length > 0 : true);
+    form.title.trim() !== "" &&
+    form.case_type.trim() !== "" &&
+    slugValid &&
+    bigoValid &&
+    datesValid;
+
+  // Build the RFC-6902 patch, emitting an op only for fields that changed.
+  // Scalars use replace; sub-resources (entities/timeline/evidence) use a
+  // whole-list replace (§3). slug only differs when DRAFT — we send it and let
+  // the API be the authority (it 422s a slug change once the case leaves DRAFT).
+  const changed = (a: unknown, b: unknown) => JSON.stringify(a) !== JSON.stringify(b);
+  const buildPatch = (): PatchOp[] => {
+    const ops: PatchOp[] = [];
+    if (form.title !== original.title) ops.push(replaceOp("/title", form.title));
+    if (form.slug !== original.slug) ops.push(replaceOp("/slug", form.slug));
+    if (form.case_type !== original.case_type)
+      ops.push(replaceOp("/case_type", form.case_type));
+    if (form.description !== original.description)
+      ops.push(replaceOp("/description", form.description));
+    if (form.notes !== original.notes) ops.push(replaceOp("/notes", form.notes));
+    if (changed(form.key_allegations, original.key_allegations))
+      ops.push(buildStringListPatch("/key_allegations", form.key_allegations));
+    if (changed(form.entities, original.entities))
+      ops.push(buildEntitiesPatch(form.entities));
+    if (changed(form.timeline, original.timeline))
+      ops.push(buildTimelinePatch(form.timeline));
+    if (changed(form.evidence, original.evidence))
+      ops.push(buildEvidencePatch(form.evidence));
+    // F6 fields.
+    if (form.bigo !== original.bigo) {
+      const n = form.bigo.trim() === "" ? null : Number(form.bigo);
+      ops.push(replaceOp("/bigo", n));
+    }
+    if (form.thumbnail_url !== original.thumbnail_url)
+      ops.push(replaceOp("/thumbnail_url", form.thumbnail_url || null));
+    if (form.banner_url !== original.banner_url)
+      ops.push(replaceOp("/banner_url", form.banner_url || null));
+    if (changed(form.tags, original.tags))
+      ops.push(buildStringListPatch("/tags", form.tags));
+    if (changed(form.court_cases, original.court_cases))
+      ops.push(buildStringListPatch("/court_cases", form.court_cases));
+    if (form.case_start_date !== original.case_start_date)
+      ops.push(replaceOp("/case_start_date", form.case_start_date || null));
+    if (form.case_start_date_bs !== original.case_start_date_bs)
+      ops.push(replaceOp("/case_start_date_bs", form.case_start_date_bs || null));
+    if (form.case_end_date !== original.case_end_date)
+      ops.push(replaceOp("/case_end_date", form.case_end_date || null));
+    if (form.case_end_date_bs !== original.case_end_date_bs)
+      ops.push(replaceOp("/case_end_date_bs", form.case_end_date_bs || null));
+    return ops;
+  };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,15 +292,35 @@ export default function AdminCaseForm() {
     setSaving(true);
     setError(null);
     try {
-      if (editing) {
-        const updated = await patchCase<Record<string, unknown>>(slug, patchOps);
-        setLoaded(updated);
-        hydrate(updated);
+      if (editing && slug) {
+        const ops = buildPatch();
+        if (ops.length === 0) {
+          toast({ title: "No changes to save" });
+          setSaving(false);
+          return;
+        }
+        const updated = await patchCase<Record<string, unknown>>(slug, ops);
+        const parsed = fromCase(updated);
+        setForm(parsed);
+        setOriginal(parsed);
+        setCaseState(str(updated.state ?? updated.status) || caseState);
         toast({ title: "Case updated" });
       } else {
-        const created = await createCase<Record<string, unknown>>(after);
-        toast({ title: "Case created" });
-        const newSlug = str(created.slug) || slugField.trim();
+        const payload: CreateCasePayload = {
+          title: form.title.trim(),
+          case_type: form.case_type,
+          description: form.description || undefined,
+          notes: form.notes || undefined,
+          key_allegations: form.key_allegations.length
+            ? form.key_allegations
+            : undefined,
+        };
+        if (effectiveSlug) payload.slug = effectiveSlug;
+        const created = await createCase<Record<string, unknown>>(payload);
+        toast({ title: "Case created (DRAFT)", description: str(created.slug) });
+        // Land the user on the new case's edit page so they can add
+        // entities/timeline/evidence and submit for review.
+        const newSlug = str(created.slug) || effectiveSlug;
         navigate(newSlug ? `/admin/jawafdehi/cases/${newSlug}/edit` : "/admin/jawafdehi/cases");
       }
     } catch (err) {
@@ -172,6 +329,9 @@ export default function AdminCaseForm() {
       setSaving(false);
     }
   };
+
+  // MDEditor renders per data-color-mode; the admin panel is a light surface.
+  const mdColorMode = useMemo(() => "light" as const, []);
 
   if (loading) {
     return (
@@ -182,7 +342,7 @@ export default function AdminCaseForm() {
   }
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="max-w-3xl space-y-6" data-color-mode={mdColorMode}>
       <div>
         <Button
           variant="ghost"
@@ -195,6 +355,12 @@ export default function AdminCaseForm() {
         <h1 className="text-2xl font-bold tracking-tight">
           {editing ? "Edit Case" : "New Case"}
         </h1>
+        {editing && (
+          <p className="text-sm text-muted-foreground">
+            Editing <span className="font-mono">{form.slug}</span>. New cases are
+            created as DRAFT.
+          </p>
+        )}
       </div>
 
       {error && (
@@ -203,41 +369,59 @@ export default function AdminCaseForm() {
         </p>
       )}
 
+      {/* F2 — state transitions. Edit mode only (a persisted case has a state).
+          Privileged targets are gated to admin/moderator in the UI; the API is
+          the authority. Transitioning reloads the case to reflect the new state. */}
+      {editing && slug && (
+        <CaseStateControl
+          slug={slug}
+          state={caseState}
+          isModerator={isModerator}
+          onTransitioned={() => loadCase()}
+        />
+      )}
+
       <form onSubmit={onSubmit} className="space-y-5">
         <div className="space-y-1">
           <Label htmlFor="title">Title</Label>
           <Input
             id="title"
-            value={title}
-            onChange={(e) => onTitle(e.target.value)}
-            placeholder="Oxygen plant procurement scandal"
+            value={form.title}
+            onChange={(e) => set("title", e.target.value)}
+            placeholder="Descriptive case title"
           />
-        </div>
-
-        <div className="space-y-1">
-          <Label htmlFor="slug">Slug</Label>
-          <Input
-            id="slug"
-            value={slugField}
-            onChange={(e) => {
-              setSlugTouched(true);
-              setSlugField(e.target.value);
-            }}
-            disabled={editing}
-            placeholder="oxygen-plant-procurement"
-            className="font-mono text-xs"
-          />
-          {editing && (
-            <p className="text-xs text-muted-foreground">
-              The slug is the case key and can&apos;t be changed here.
-            </p>
-          )}
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1">
+            <Label htmlFor="slug">Slug</Label>
+            <Input
+              id="slug"
+              value={effectiveSlug}
+              onChange={(e) => {
+                setSlugDirty(true);
+                set("slug", e.target.value);
+              }}
+              className="font-mono text-xs"
+              placeholder="auto-derived from title"
+            />
+            {!slugValid && (
+              <p className="text-xs text-red-600">
+                Lowercase alphanumeric, hyphen-separated.
+              </p>
+            )}
+            {editing && (
+              <p className="text-xs text-muted-foreground">
+                Slug is immutable once the case leaves DRAFT (API enforces).
+              </p>
+            )}
+          </div>
+          <div className="space-y-1">
             <Label>Case type</Label>
-            <Select value={caseType} onValueChange={setCaseType}>
+            <Select
+              value={form.case_type}
+              onValueChange={(v) => set("case_type", v)}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -250,50 +434,164 @@ export default function AdminCaseForm() {
               </SelectContent>
             </Select>
           </div>
+        </div>
+
+        <div className="space-y-1">
+          <Label>Description</Label>
+          <p className="text-xs text-muted-foreground">
+            Markdown. Publicly rendered on the case page.
+          </p>
+          <MDEditor
+            value={form.description}
+            onChange={(v) => set("description", v ?? "")}
+            height={280}
+            preview="edit"
+            textareaProps={{ placeholder: "## Summary\n\nWhat happened…" }}
+          />
+        </div>
+
+        <div className="space-y-1">
+          <Label>Notes (internal)</Label>
+          <p className="text-xs text-muted-foreground">
+            Markdown. Internal casework notes (not shown publicly).
+          </p>
+          <MDEditor
+            value={form.notes}
+            onChange={(v) => set("notes", v ?? "")}
+            height={200}
+            preview="edit"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <Label htmlFor="allegations">Key allegations (one per line)</Label>
+          <textarea
+            id="allegations"
+            value={allegationsText}
+            onChange={(e) => setAllegationsText(e.target.value)}
+            rows={4}
+            className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            placeholder={"Misappropriation of public funds\nFalsification of records"}
+          />
+        </div>
+
+        {/* F6 — first-class field editors (replacing raw-JSON entry). */}
+        <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1">
-            <Label>State</Label>
-            <Select value={state} onValueChange={setState}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {CASE_STATES.map((s) => (
-                  <SelectItem key={s} value={s}>
-                    {s}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label htmlFor="bigo">Bigo (embezzlement amount)</Label>
+            <Input
+              id="bigo"
+              type="number"
+              value={form.bigo}
+              onChange={(e) => set("bigo", e.target.value)}
+              placeholder="e.g. 1250000"
+            />
+            {!bigoValid && (
+              <p className="text-xs text-red-600">Must be a number.</p>
+            )}
+          </div>
+          <ChipListEditor
+            label="Tags"
+            items={form.tags}
+            onChange={(items) => set("tags", items)}
+            placeholder="Add a tag and press Enter"
+            normalize={(v) => v.trim().toLowerCase()}
+          />
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1">
+            <Label htmlFor="thumbnail_url">Thumbnail URL</Label>
+            <Input
+              id="thumbnail_url"
+              value={form.thumbnail_url}
+              onChange={(e) => set("thumbnail_url", e.target.value)}
+              className="text-xs"
+              placeholder="https://…"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="banner_url">Banner URL</Label>
+            <Input
+              id="banner_url"
+              value={form.banner_url}
+              onChange={(e) => set("banner_url", e.target.value)}
+              className="text-xs"
+              placeholder="https://…"
+            />
           </div>
         </div>
 
-        <div className="space-y-1">
-          <Label htmlFor="short_description">Short description</Label>
-          <Textarea
-            id="short_description"
-            value={shortDescription}
-            onChange={(e) => setShortDescription(e.target.value)}
-            rows={2}
-          />
-        </div>
+        <ChipListEditor
+          label="Court-case references"
+          items={form.court_cases}
+          onChange={(items) => set("court_cases", items)}
+          placeholder="court:case_number (e.g. special:081-CR-0136)"
+          help="Link related court cases as <court>:<case_number>."
+          validate={isValidCourtCaseRef}
+          invalidHint="Use the form <court>:<case_number>."
+        />
 
-        <div className="space-y-1">
-          <Label htmlFor="extra">
-            Extra properties (JSON, optional) — description, tags,
-            key_allegations, dates…
-          </Label>
-          <Textarea
-            id="extra"
-            value={extraJson}
-            onChange={(e) => setExtraJson(e.target.value)}
-            rows={10}
-            className="font-mono text-xs"
-            placeholder={'{\n  "tags": ["procurement"],\n  "key_allegations": ["…"]\n}'}
-          />
-          {extraError && <p className="text-xs text-red-600">{extraError}</p>}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1">
+            <Label className="text-xs">Case start (AD)</Label>
+            <Input
+              type="date"
+              value={form.case_start_date}
+              onChange={(e) => set("case_start_date", e.target.value)}
+            />
+            <Label className="text-xs">Case start (BS)</Label>
+            <Input
+              value={form.case_start_date_bs}
+              onChange={(e) => set("case_start_date_bs", e.target.value)}
+              placeholder="2080-09-18"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Case end (AD)</Label>
+            <Input
+              type="date"
+              value={form.case_end_date}
+              onChange={(e) => set("case_end_date", e.target.value)}
+            />
+            <Label className="text-xs">Case end (BS)</Label>
+            <Input
+              value={form.case_end_date_bs}
+              onChange={(e) => set("case_end_date_bs", e.target.value)}
+              placeholder="2081-03-05"
+            />
+          </div>
         </div>
+        {!datesValid && (
+          <p className="text-xs text-red-600">BS dates must be YYYY-MM-DD.</p>
+        )}
 
-        <div className="flex items-center gap-2">
+        {/* Sub-resource editors (F3/F4/F5). Shown only in edit mode: a case
+            must exist (have a slug) before entities/evidence can be linked. On
+            create, the user saves the DRAFT first, then lands on this edit page. */}
+        {editing ? (
+          <div className="space-y-4">
+            <EntityRelationshipsEditor
+              rows={form.entities}
+              onChange={(rows) => set("entities", rows)}
+            />
+            <TimelineEditor
+              rows={form.timeline}
+              onChange={(rows) => set("timeline", rows)}
+            />
+            <EvidenceEditor
+              rows={form.evidence}
+              onChange={(rows) => set("evidence", rows)}
+            />
+          </div>
+        ) : (
+          <p className="rounded-md border border-dashed bg-slate-50 px-3 py-2 text-sm text-muted-foreground">
+            Entities, timeline, and evidence can be added after the DRAFT is
+            created.
+          </p>
+        )}
+
+        <div className="flex gap-2">
           <Button type="submit" disabled={!canSave}>
             {saving ? (
               <Loader2 className="mr-1 h-4 w-4 animate-spin" />
@@ -309,15 +607,6 @@ export default function AdminCaseForm() {
           >
             Cancel
           </Button>
-          {editing && (
-            <div className="ml-auto">
-              <DeleteButton
-                resourceLabel="case"
-                onDelete={() => deleteCase(slug)}
-                onDeleted={() => navigate("/admin/jawafdehi/cases")}
-              />
-            </div>
-          )}
         </div>
       </form>
     </div>

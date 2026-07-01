@@ -90,6 +90,19 @@ export async function listNesEntities(
   return data;
 }
 
+// Entity picker for the case relationship editor (F3): searches NES entities
+// and returns the raw hits (each has an @id + name). Reuses the flat
+// /api/entities list endpoint (no /api/nes prefix — hard-cut).
+export async function searchEntities(
+  query: string,
+  limit = 20,
+): Promise<NesEntity[]> {
+  const { data } = await client.get<NesEntityListResponse>("/api/entities", {
+    params: { query, limit },
+  });
+  return data.entities ?? [];
+}
+
 // Encode a `<prefix>/<slug>` ref for the detail routes. The backend's _REF
 // route matches a path WITH literal slashes (it splits prefix/slug on the final
 // "/"), so we must NOT percent-encode the separators — encode each segment but
@@ -353,11 +366,23 @@ export async function getCase<T = Record<string, unknown>>(
   return data;
 }
 
+// The authoring shape POST /api/cases/ accepts. The backend forces state=DRAFT
+// on create (A1); everything else rides along verbatim (the [k] escape hatch
+// keeps the form free to send extra authoring fields).
+export interface CreateCasePayload {
+  title: string;
+  slug?: string;
+  case_type: string;
+  description?: string;
+  notes?: string;
+  key_allegations?: string[];
+  [k: string]: unknown;
+}
+
 // CREATE a corruption case. The backend accepts the case authoring fields
-// (title, case_type, state, …); we keep it loosely typed so the form owns the
-// exact shape while callers still get a typed result back.
+// (title, case_type, …) and forces state=DRAFT.
 export async function createCase<T = Record<string, unknown>>(
-  payload: Record<string, unknown>,
+  payload: CreateCasePayload,
 ): Promise<T> {
   const { data } = await client.post<T>("/api/cases/", payload);
   return data;
@@ -456,6 +481,111 @@ export async function updateSource<T = Record<string, unknown>>(
 // Soft-delete a source (204).
 export async function deleteSource(id: number | string): Promise<void> {
   await client.delete(`/api/sources/${id}/`);
+}
+
+// ---------------------------------------------------------------------------
+// NGM — courts + blocklisted firms write surface (HasNgmRole). Flat /api/
+// paths (no /api/ngm prefix — hard-cut). Courts are keyed by `identifier`
+// (their PK); firms by numeric `id`.
+// ---------------------------------------------------------------------------
+
+// CourtSerializer write fields (courts/serializers.py). `identifier` is the PK.
+export interface CourtWrite {
+  identifier: string;
+  court_type?: string | null;
+  full_name_english?: string | null;
+  full_name_nepali?: string | null;
+  [k: string]: unknown;
+}
+
+export async function getCourt<T = Record<string, unknown>>(
+  identifier: string,
+): Promise<T> {
+  const { data } = await client.get<T>(
+    `/api/courts/${encodeURIComponent(identifier)}/`,
+  );
+  return data;
+}
+
+export async function createCourt<T = Record<string, unknown>>(
+  payload: CourtWrite,
+): Promise<T> {
+  const { data } = await client.post<T>("/api/courts/", payload);
+  return data;
+}
+
+// Update replaces the court at its identifier (PUT); identifier is the PK and
+// is locked in edit mode.
+export async function updateCourt<T = Record<string, unknown>>(
+  identifier: string,
+  payload: CourtWrite,
+): Promise<T> {
+  const { data } = await client.put<T>(
+    `/api/courts/${encodeURIComponent(identifier)}/`,
+    payload,
+  );
+  return data;
+}
+
+// BlacklistedFirmSerializer write fields (courts/serializers.py). Keyed by the
+// numeric `id`; `firm_name` is the display/business name.
+export interface FirmWrite {
+  firm_name: string;
+  proprietor_name?: string | null;
+  address?: string | null;
+  blacklist_date_bs?: string | null;
+  blacklist_date_ad?: string | null;
+  effective_until_bs?: string | null;
+  effective_until_ad?: string | null;
+  duration?: string | null;
+  reason?: string | null;
+  recommending_office?: string | null;
+  nes_id?: string | null;
+  [k: string]: unknown;
+}
+
+export async function getFirm<T = Record<string, unknown>>(
+  id: number | string,
+): Promise<T> {
+  const { data } = await client.get<T>(`/api/firms/${id}/`);
+  return data;
+}
+
+export async function createFirm<T = Record<string, unknown>>(
+  payload: FirmWrite,
+): Promise<T> {
+  const { data } = await client.post<T>("/api/firms/", payload);
+  return data;
+}
+
+export async function updateFirm<T = Record<string, unknown>>(
+  id: number | string,
+  payload: FirmWrite,
+): Promise<T> {
+  const { data } = await client.patch<T>(`/api/firms/${id}/`, payload);
+  return data;
+}
+
+// --- NGM material file upload (HasNgmRole). Multipart: file, role, and, when
+// creating, material_type. Endpoint: POST /api/materials/{source}/{ident}/file
+// (flat — no /api/ngm prefix). `source` may be multi-segment, so it is not
+// url-encoded (mirrors getMaterialByPath).
+export async function uploadMaterialFile<T = Record<string, unknown>>(
+  source: string,
+  ident: string,
+  file: File,
+  role: string,
+  materialType?: string,
+): Promise<T> {
+  const form = new FormData();
+  form.append("file", file);
+  form.append("role", role);
+  if (materialType) form.append("material_type", materialType);
+  const { data } = await client.post<T>(
+    `/api/materials/${source}/${encodeURIComponent(ident)}/file`,
+    form,
+  );
+  return data;
 }
 
 export { client as adminClient };

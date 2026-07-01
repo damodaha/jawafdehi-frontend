@@ -10,6 +10,10 @@ interface AuthContextValue {
   login: () => void;
   logout: () => void;
   isAdmin: boolean;
+  // True when the user holds admin OR moderator — the UI gate for privileged
+  // actions (state transitions, moderation queue, regrade-all). The API is the
+  // authorization authority; this only decides which controls the UI offers.
+  isModerator: boolean;
 }
 
 const CaseworkAuthContext = createContext<AuthContextValue | null>(null);
@@ -61,6 +65,11 @@ export function CaseworkAuthProvider({ children }: { children: React.ReactNode }
         login,
         logout,
         isAdmin: !!user?.is_admin,
+        isModerator:
+          !!user &&
+          user.roles.some(
+            (r) => r.toLowerCase() === "admin" || r.toLowerCase() === "moderator",
+          ),
       }}
     >
       {children}
