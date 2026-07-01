@@ -15,6 +15,8 @@ import {
   isValidSlug,
   isValidDateField,
   isValidCourtCaseRef,
+  isValidTimelineRow,
+  isValidEntityRow,
   slugify,
   replaceOp,
   buildStringListPatch,
@@ -226,13 +228,27 @@ export default function AdminCaseForm() {
   const datesValid =
     isValidDateField(form.case_start_date_bs) &&
     isValidDateField(form.case_end_date_bs);
+  // A partially-filled timeline/entity row would serialize into the /timeline or
+  // /entities replace and 422 the whole PATCH (title-less timeline row, IRI-less
+  // entity row). Block save until every *populated* row is complete, so the user
+  // fixes it here instead of losing the whole batch to a server rejection. A
+  // fully-blank trailing add-row is fine — it's dropped by the patch builder.
+  const timelineRowsValid = form.timeline.every(
+    (r) =>
+      (r.title.trim() === "" && r.date.trim() === "") || isValidTimelineRow(r),
+  );
+  const entityRowsValid = form.entities.every(
+    (r) => r.nes_id.trim() === "" || isValidEntityRow(r),
+  );
   const canSave =
     !saving &&
     form.title.trim() !== "" &&
     form.case_type.trim() !== "" &&
     slugValid &&
     bigoValid &&
-    datesValid;
+    datesValid &&
+    timelineRowsValid &&
+    entityRowsValid;
 
   // Build the RFC-6902 patch, emitting an op only for fields that changed.
   // Scalars use replace; sub-resources (entities/timeline/evidence) use a
@@ -582,6 +598,17 @@ export default function AdminCaseForm() {
           <p className="rounded-md border border-dashed bg-slate-50 px-3 py-2 text-sm text-muted-foreground">
             Entities, timeline, and evidence can be added after the DRAFT is
             created.
+          </p>
+        )}
+
+        {editing && !timelineRowsValid && (
+          <p className="text-xs text-red-600">
+            Every timeline event needs a title and a valid date (YYYY-MM-DD).
+          </p>
+        )}
+        {editing && !entityRowsValid && (
+          <p className="text-xs text-red-600">
+            Every entity row needs a valid entity IRI and a relationship type.
           </p>
         )}
 
