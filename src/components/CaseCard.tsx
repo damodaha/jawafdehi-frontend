@@ -21,8 +21,8 @@ interface CaseCardProps {
   tags?: string[];
   description: string;
   allegations?: string[]; // Key allegations array
-  entityIds?: string[]; // NES entity @id IRIs (used to link to /entity/:id)
-  locationIds?: string[]; // NES entity @id IRIs
+  entityIds?: string[]; // NES entity @id IRIs (used to link to /entity/*)
+  locationIds?: string[]; // NES entity @id IRIs (used to link to /entity/*)
   thumbnailUrl?: string; //Thumbnail image
   viewMode?: "grid" | "list";
   hideDescription?: boolean;

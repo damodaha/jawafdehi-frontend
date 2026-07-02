@@ -1174,10 +1174,12 @@ export async function askGuestCaseQuestion(params: {
         ).includes(normalize(term))
       )
     );
+    const chargeSheetName = chargeSheet?.source?.display_name
+      || (chargeSheet ? (language === "ne" ? `स्रोत ${chargeSheet.sourceId}` : `Source ${chargeSheet.sourceId}`) : "");
     answer = chargeSheet?.source
       ? language === "ne"
-        ? `${chargeSheet.source.display_name} यो सार्वजनिक मुद्दासँग सम्बन्धित आरोपपत्रको सबैभन्दा प्रत्यक्ष स्रोत हो।`
-        : `${chargeSheet.source.display_name} is the source most directly related to the charge sheet for this public case.`
+        ? `${chargeSheetName} यो सार्वजनिक मुद्दासँग सम्बन्धित आरोपपत्रको सबैभन्दा प्रत्यक्ष स्रोत हो।`
+        : `${chargeSheetName} is the source most directly related to the charge sheet for this public case.`
       : language === "ne"
       ? "यो मुद्दा पृष्ठमा आरोपपत्रलाई स्पष्ट रूपमा उल्लेख गर्ने सार्वजनिक स्रोत मैले भेटिनँ।"
       : "I could not identify a public source on this case page that explicitly mentions a charge sheet.";
