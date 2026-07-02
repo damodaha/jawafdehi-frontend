@@ -104,7 +104,7 @@ function Sidebar({ roles }: { roles: string[] }) {
     <nav className="flex flex-col gap-5 p-4">
       {NAV.map((group) => {
         const visible = group.items.filter((it) => {
-          if (it.roles && !it.roles.some((r) => lower.includes(r))) return false;
+          if (it.roles && !it.roles.some((r) => lower.includes(r.toLowerCase()))) return false;
           if (it.canAccess && !it.canAccess(roles)) return false;
           return true;
         });

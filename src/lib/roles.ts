@@ -70,9 +70,8 @@ function normalize(roles: readonly string[] | undefined): string[] {
 }
 
 function hasAny(roles: readonly string[] | undefined, allowed: readonly string[]): boolean {
-  const lower = normalize(roles);
-  const allowedLower = allowed.map((r) => r.toLowerCase());
-  return allowedLower.some((r) => lower.includes(r));
+  const lower = new Set(normalize(roles));
+  return allowed.some((r) => lower.has(r.toLowerCase()));
 }
 
 // May the user open the admin panel at all?
