@@ -7,6 +7,7 @@ import type { Entity } from "@/types/entity";
 import { getPrimaryName } from "@/utils/entity-helpers";
 import { translateDynamicText } from "@/lib/translate-dynamic-content";
 import { cn } from "@/lib/utils";
+import { entityPath } from "@/lib/entity-links";
 
 interface CaseEntityChipsProps {
   entities: JawafEntity[];
@@ -90,7 +91,7 @@ export function CaseEntityChips({
           // Case entities are keyed on their NES @id IRI (the backend no longer
           // returns a numeric id). Fall back to display_name/index for id-less binds.
           const key = jawafEntity.nes_id ?? `${jawafEntity.display_name ?? 'entity'}-${index}`;
-          const to = jawafEntity.nes_id ? `/entity/${encodeURIComponent(jawafEntity.nes_id)}` : undefined;
+          const to = entityPath(jawafEntity.nes_id) ?? undefined;
 
           const inner = (
             <>

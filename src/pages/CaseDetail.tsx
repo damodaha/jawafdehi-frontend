@@ -42,6 +42,7 @@ import { JAWAFDEHI_WHATSAPP_NUMBER, JAWAFDEHI_EMAIL } from "@/config/constants";
 import { translateDynamicText } from "@/lib/translate-dynamic-content";
 import { trackEvent } from "@/utils/analytics";
 import { cn } from "@/lib/utils";
+import { entityPath } from "@/lib/entity-links";
 import { formatBigo } from "@/utils/number";
 import { resolveLegacyCaseSlug } from "@/utils/legacyCaseMap";
 import { isCourtCaseRef } from "@/utils/courtCaseRef";
@@ -400,10 +401,11 @@ const CaseDetail = () => {
                     let displayName = entity?.names?.[0]?.en?.full || entity?.names?.[0]?.ne?.full || e.display_name || e.nes_id || t('common.notAvailable');
                     displayName = translateDynamicText(displayName, currentLang);
                     const key = e.nes_id ?? `${e.display_name ?? 'entity'}-${index}`;
+                    const to = entityPath(e.nes_id);
                     return (
                       <span key={key}>
-                        {e.nes_id ? (
-                          <Link to={`/entity/${encodeURIComponent(e.nes_id)}`} className="text-primary hover:underline">{displayName}</Link>
+                        {to ? (
+                          <Link to={to} className="text-primary hover:underline">{displayName}</Link>
                         ) : (
                           <span className="text-foreground">{displayName}</span>
                         )}
@@ -428,10 +430,11 @@ const CaseDetail = () => {
                       let displayName = entity?.names?.[0]?.en?.full || entity?.names?.[0]?.ne?.full || e.display_name || e.nes_id || t('common.notAvailable');
                       displayName = translateDynamicText(displayName, currentLang);
                       const key = e.nes_id ?? `${e.display_name ?? 'location'}-${index}`;
+                      const to = entityPath(e.nes_id);
                       return (
                         <span key={key}>
-                          {e.nes_id ? (
-                            <Link to={`/entity/${encodeURIComponent(e.nes_id)}`} className="text-primary hover:underline">{displayName}</Link>
+                          {to ? (
+                            <Link to={to} className="text-primary hover:underline">{displayName}</Link>
                           ) : (
                             <span className="text-foreground">{displayName}</span>
                           )}

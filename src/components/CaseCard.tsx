@@ -6,6 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, User } from "lucide-react";
+import { entityPath } from "@/lib/entity-links";
 
 const nepaliDigits = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 
@@ -198,12 +199,13 @@ function CaseCardTags({ tags }: Readonly<{ tags: string[] }>) {
 }
 
 function EntityRow({ icon: Icon, label, title, ids }: Readonly<{ icon: typeof User; label: string; title?: string; ids?: string[] }>) {
+  const to = ids && ids.length > 0 ? entityPath(ids[0]) : null;
   return (
     <div className="flex min-w-0 items-center">
       <Icon className="mr-2 h-4 w-4 flex-shrink-0" aria-hidden="true" />
-      {ids && ids.length > 0 ? (
+      {to ? (
         <Link
-          to={`/entity/${encodeURIComponent(ids[0])}`}
+          to={to}
           className="block min-w-0 truncate rounded-sm transition-colors hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           title={title}
           onClick={(e) => e.stopPropagation()}
