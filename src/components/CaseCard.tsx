@@ -20,8 +20,8 @@ interface CaseCardProps {
   tags?: string[];
   description: string;
   allegations?: string[]; // Key allegations array
-  entityIds?: number[]; // Jawaf entity IDs
-  locationIds?: number[]; // Jawaf entity IDs
+  entityIds?: string[]; // NES entity @id IRIs (used to link to /entity/:id)
+  locationIds?: string[]; // NES entity @id IRIs
   thumbnailUrl?: string; //Thumbnail image
   viewMode?: "grid" | "list";
   hideDescription?: boolean;
@@ -197,13 +197,13 @@ function CaseCardTags({ tags }: Readonly<{ tags: string[] }>) {
   );
 }
 
-function EntityRow({ icon: Icon, label, title, ids }: Readonly<{ icon: typeof User; label: string; title?: string; ids?: number[] }>) {
+function EntityRow({ icon: Icon, label, title, ids }: Readonly<{ icon: typeof User; label: string; title?: string; ids?: string[] }>) {
   return (
     <div className="flex min-w-0 items-center">
       <Icon className="mr-2 h-4 w-4 flex-shrink-0" aria-hidden="true" />
       {ids && ids.length > 0 ? (
         <Link
-          to={`/entity/${ids[0]}`}
+          to={`/entity/${encodeURIComponent(ids[0])}`}
           className="block min-w-0 truncate rounded-sm transition-colors hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           title={title}
           onClick={(e) => e.stopPropagation()}
