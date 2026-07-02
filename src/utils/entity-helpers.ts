@@ -1,13 +1,13 @@
-import type { Entity, Name, Contact, LangText, ContactType } from '@/types/nes';
+import type { Entity, Name, Contact, LangText, ContactType } from '@/types/entity';
 
 /**
- * Helper functions to work with NES entity data structures
+ * Helper functions to work with entity data structures
  */
 
 /**
  * Humanize a schema.org `@type` token into a readable label.
  *
- * NES entity types arrive as raw schema.org tokens, sometimes comma-joined and/or
+ * Entity types arrive as raw schema.org tokens, sometimes comma-joined and/or
  * namespaced — e.g. "AdministrativeArea,jawafdehi:RuralMunicipality",
  * "EducationalOrganization", "jawafdehi:District". We pick the MOST SPECIFIC type
  * (the last token — the namespaced/jawafdehi-specific one is more descriptive than

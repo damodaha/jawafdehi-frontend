@@ -2,9 +2,9 @@
  * Jawafdehi API (JDS) Types
  * 
  * Type definitions for the accountability and cases API.
- * 
+ *
  * Reference: Jawafdehi_Public_Accountability_API.yaml
- * Base URL: https://portal.jawafdehi.org/api
+ * Served by the unified monolith under `/api` (see services/jds-api.ts).
  */
 
 // ============================================================================
@@ -243,16 +243,17 @@ export interface CaseStatistics {
   entities_tracked: number;
   cases_under_investigation: number;
   cases_closed: number;
-  // Cross-source data-quality coverage (NES entities + NGM judicial records).
-  // Optional so older cached payloads / partial responses stay type-safe.
-  nes?: NesMetrics;
-  ngm?: NgmMetrics;
+  // Cross-source data-quality coverage (entities + judicial records). The
+  // `nes`/`ngm` keys are the backend response field names (part of the JSON
+  // contract). Optional so older cached payloads stay type-safe.
+  nes?: EntityMetrics;
+  ngm?: DataLakeMetrics;
   materials?: MaterialsMetrics;
   last_updated: string;
 }
 
-/** NES (entities) coverage metrics surfaced by the data quality dashboard. */
-export interface NesMetrics {
+/** Entity coverage metrics surfaced by the data quality dashboard. */
+export interface EntityMetrics {
   total: number;
   by_prefix: { prefix: string; count: number }[];
   by_type: { entity_type: string; count: number }[];
@@ -268,8 +269,8 @@ export interface NesMetrics {
   };
 }
 
-/** NGM (judicial) coverage metrics surfaced by the data quality dashboard. */
-export interface NgmMetrics {
+/** Judicial-record coverage metrics surfaced by the data quality dashboard. */
+export interface DataLakeMetrics {
   court_cases_total: number;
   courts_total: number;
   by_court_type: { court__court_type: string; count: number }[];
@@ -285,7 +286,7 @@ export interface NgmMetrics {
   };
 }
 
-/** Materials (NGM development-project / document dataset) coverage metrics. */
+/** Materials (development-project / document dataset) coverage metrics. */
 export interface MaterialsMetrics {
   total: number;
   by_type: { material_type: string; count: number }[];

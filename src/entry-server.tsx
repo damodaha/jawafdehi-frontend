@@ -8,16 +8,14 @@ import { ThemeProvider } from './components/ThemeProvider';
 import './i18n/config';
 import { getCaseById, getCases, getStatistics } from './services/jds-api';
 import { getArticleBySlug, getArticles } from './services/cms-api';
-import axios from 'axios';
+import { http } from './services/http';
 import type { JawafEntity } from './types/jds';
 
-const JDS_API_BASE_URL = process.env.VITE_JDS_API_BASE_URL || 'https://portal.jawafdehi.org/api';
-// NGM read plane. SSR runs in Node, so a relative base won't resolve — fall back to
-// the production host when no absolute override is set. Post-consolidation NGM
-// lives on the same monolith as JDS under the SINGLE unified /api root (the former
-// /api/ngm prefix was hard-cut): materials at /api/materials, court cases at
-// /api/courtcases.
-const NGM_API_BASE_URL = process.env.VITE_NGM_API_BASE_URL || 'https://portal.jawafdehi.org/api';
+// SSR/pre-render runs in Node, where the shared `http` client's same-origin
+// default won't resolve — set VITE_JAWAFDEHI_API_BASE_URL (the monolith origin)
+// for the SSR build so `http` carries an absolute baseURL. Every plane now lives
+// on the ONE monolith under the unified `/api` root: entities at /api/entities,
+// materials at /api/materials, court cases at /api/courtcases.
 
 export interface RenderResult {
   html: string;
@@ -87,47 +85,46 @@ async function prefetch(url: string, queryClient: QueryClient): Promise<void> {
     await queryClient.prefetchQuery({
       queryKey: ['jds-entity', entityId],
       queryFn: async () => {
-        const res = await axios.get<JawafEntity>(`${JDS_API_BASE_URL}/entities/${entityId}/`);
+        const res = await http.get<JawafEntity>(`/api/entities/${entityId}/`);
         return res.data;
       },
     });
     return;
   }
 
-  // NGM material profile (/material/<source>/<ident>). The query key mirrors
-  // MaterialProfile's useQuery (['ngm-material', tail]) so the client hydrates
+  // Data-lake material profile (/material/<source>/<ident>). The query key mirrors
+  // MaterialProfile's useQuery (['datalake-material', tail]) so the client hydrates
   // from the dehydrated cache instead of refetching.
   const materialMatch = url.match(/^\/material\/(.+?)(?:[?#]|$)/);
   if (materialMatch) {
     const tail = decodeURIComponent(materialMatch[1]);
     await queryClient.prefetchQuery({
-      queryKey: ['ngm-material', tail],
+      queryKey: ['datalake-material', tail],
       queryFn: async () => {
-        const res = await axios.get(`${NGM_API_BASE_URL}/materials/${tail}`);
-        // (materials path unchanged under the unified /api root)
+        const res = await http.get(`/api/materials/${tail}`);
         return res.data;
       },
     });
     return;
   }
 
-  // NGM court case profile (/courtcase/<court>/<case_number>). Assembles the
+  // Data-lake court case profile (/courtcase/<court>/<case_number>). Assembles the
   // composite-key core + hearings + entities into one CourtCase, keyed to match
-  // CourtCaseProfile's useQuery (['ngm-courtcase', court, caseNumber]).
+  // CourtCaseProfile's useQuery (['datalake-courtcase', court, caseNumber]).
   const courtcaseMatch = url.match(/^\/courtcase\/([^/]+)\/(.+?)\/?(?:[?#]|$)/);
   if (courtcaseMatch) {
     const court = decodeURIComponent(courtcaseMatch[1]);
     const caseNumber = decodeURIComponent(courtcaseMatch[2]);
-    const base = `${NGM_API_BASE_URL}/courtcases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}`;
+    const base = `/api/courtcases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}`;
     await queryClient.prefetchQuery({
-      queryKey: ['ngm-courtcase', court, caseNumber],
+      queryKey: ['datalake-courtcase', court, caseNumber],
       queryFn: async () => {
         // Core must load; hearings/entities degrade to [] (mirrors
         // getCourtCaseFull so SSR and client agree on cache shape).
-        const core = await axios.get(`${base}/`).then((r) => r.data);
+        const core = await http.get(`${base}/`).then((r) => r.data);
         const [hearings, entities] = await Promise.all([
-          axios.get(`${base}/hearings`).then((r) => r.data?.results ?? r.data ?? []).catch(() => []),
-          axios.get(`${base}/entities`).then((r) => r.data?.results ?? r.data ?? []).catch(() => []),
+          http.get(`${base}/hearings`).then((r) => r.data?.results ?? r.data ?? []).catch(() => []),
+          http.get(`${base}/entities`).then((r) => r.data?.results ?? r.data ?? []).catch(() => []),
         ]);
         return { ...core, hearings, entities };
       },

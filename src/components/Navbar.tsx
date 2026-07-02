@@ -87,7 +87,7 @@ export function Navbar() {
     [t],
   );
 
-  // Unified public archive: full search + the NGM single-type browse views.
+  // Unified public archive: full search + the data-lake single-type browse views.
   const archiveNavItems = useMemo<NavItem[]>(
     () => [
       { key: "search", label: t("nav.searchArchive", "Search archive"), to: "/search", exact: true },

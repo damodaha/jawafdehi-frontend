@@ -1,6 +1,6 @@
 import ArchiveSearch from "./ArchiveSearch";
 
-// NGM court cases browse page — a single-type view of the unified archive search
+// Data-lake court cases browse page — a single-type view of the unified archive search
 // pinned to the `courtcase` type (Supreme, Special, High, District court records).
 export default function CourtCases() {
   return (

@@ -1,14 +1,14 @@
 /**
- * NES Data Adapters
- * 
- * This module provides adapter functions to transform NES backend data
+ * Entity Data Adapters
+ *
+ * This module provides adapter functions to transform entity backend data
  * into UI-friendly formats, including merging evidence and sources.
- * 
+ *
  * References:
  * - Backend types: https://github.com/Jawafdehi/NepalEntityService-Tundikhel/blob/main/src/common/nes-types.ts
  */
 
-import type { Entity, Attribution } from '@/types/nes';
+import type { Entity, Attribution } from '@/types/entity';
 
 // ============================================================================
 // Evidence & Sources Types
@@ -51,7 +51,7 @@ export interface EvidenceAndSource {
  * 
  * Into a unified "Evidence & Sources" list for UI display.
  * 
- * @param entity - Entity object from NES backend
+ * @param entity - Entity object from the entity backend
  * @returns Array of merged evidence and source items
  * 
  * @example
@@ -68,7 +68,7 @@ export function mergeEvidenceAndSources(entity: Entity): EvidenceAndSource[] {
   const merged: EvidenceAndSource[] = [];
   
   // Process attributions (source references)
-  // Attribution in NES has: title (LangText1) and details (LangText | null)
+  // Attribution has: title (LangText1) and details (LangText | null)
   if (entity.attributions && entity.attributions.length > 0) {
     entity.attributions.forEach((attribution: Attribution, index: number) => {
       const source: EvidenceAndSource = {

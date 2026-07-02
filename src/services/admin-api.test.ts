@@ -31,13 +31,21 @@ vi.mock("axios", () => {
 });
 
 import {
-  listNesEntities,
-  getNesEntity,
-  deleteNesEntity,
-  reindexNes,
+  listEntities,
+  getEntity,
+  deleteEntity,
+  reindexEntities,
+  searchEntities,
   listCourtCases,
   listCourts,
   deleteCourtCase,
+  getCourt,
+  createCourt,
+  updateCourt,
+  getFirm,
+  createFirm,
+  updateFirm,
+  uploadMaterialFile,
   listMaterials,
   deleteMaterial,
   listCases,
@@ -54,11 +62,11 @@ beforeEach(() => {
 // TASK A — the client must address the SINGLE unified /api root; the former
 // /api/nes and /api/ngm prefixes were hard-cut.
 describe("admin-api unified paths (no /api/nes or /api/ngm)", () => {
-  it("routes NES entities to /api/entities and reindex to /api/admin/reindex", async () => {
-    await listNesEntities();
-    await getNesEntity("person/ram-bahadur");
-    await deleteNesEntity("person/ram-bahadur");
-    await reindexNes();
+  it("routes entities to /api/entities and reindex to /api/admin/reindex", async () => {
+    await listEntities();
+    await getEntity("person/ram-bahadur");
+    await deleteEntity("person/ram-bahadur");
+    await reindexEntities();
     expect(calls.map((c) => `${c.method} ${c.url}`)).toEqual([
       "get /api/entities",
       "get /api/entities/person/ram-bahadur",
@@ -108,6 +116,45 @@ describe("admin-api unified paths (no /api/nes or /api/ngm)", () => {
     expect(calls[0].method).toBe("post");
     expect(calls[0].url).toBe("/api/sources/");
     expect(calls[0].body).toBeInstanceOf(FormData);
+  });
+
+  it("routes the entity picker (searchEntities) to /api/entities (not /api/nes)", async () => {
+    await searchEntities("ram", 10);
+    expect(calls[0]).toMatchObject({ method: "get", url: "/api/entities" });
+  });
+
+  it("routes courts to /api/courts (create=POST list, update=PUT detail)", async () => {
+    await getCourt("special");
+    await createCourt({ identifier: "special" });
+    await updateCourt("special", { identifier: "special" });
+    expect(calls.map((c) => `${c.method} ${c.url}`)).toEqual([
+      "get /api/courts/special/",
+      "post /api/courts/",
+      "put /api/courts/special/",
+    ]);
+  });
+
+  it("routes firms to /api/firms keyed by numeric id (update=PATCH)", async () => {
+    await getFirm(7);
+    await createFirm({ firm_name: "ACME Builders" });
+    await updateFirm(7, { firm_name: "ACME Builders" });
+    expect(calls.map((c) => `${c.method} ${c.url}`)).toEqual([
+      "get /api/firms/7/",
+      "post /api/firms/",
+      "patch /api/firms/7/",
+    ]);
+  });
+
+  it("uploads a material file to /api/materials/{source}/{ident}/file", async () => {
+    const file = new File(["x"], "a.pdf", { type: "application/pdf" });
+    await uploadMaterialFile("ciaa", "press-2081-042", file, "RAW", "official_report");
+    expect(calls[0].method).toBe("post");
+    expect(calls[0].url).toBe("/api/materials/ciaa/press-2081-042/file");
+    expect(calls[0].body).toBeInstanceOf(FormData);
+    const fd = calls[0].body as FormData;
+    expect(fd.get("role")).toBe("RAW");
+    expect(fd.get("material_type")).toBe("official_report");
+    expect(fd.get("file")).toBeInstanceOf(File);
   });
 });
 

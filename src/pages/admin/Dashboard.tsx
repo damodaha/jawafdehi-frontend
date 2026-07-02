@@ -15,19 +15,19 @@ import {
 } from "lucide-react";
 
 // Landing page for the unified admin panel. Each card is a doorway into one of
-// the three former systems (NES / NGM / Jawafdehi) plus casework. Counts are
+// the data domains (Entities / Data Lake / Jawafdehi) plus casework. Counts are
 // intentionally not fetched here yet — the resource pages own their own data.
 const SECTIONS = [
   {
-    to: "/admin/nes/entities",
+    to: "/admin/entities",
     icon: Network,
-    title: "NES Entities",
+    title: "Entities",
     body: "Schema.org JSON-LD entities. Create, edit, view versions, and trigger an OpenSearch reindex.",
   },
   {
-    to: "/admin/ngm/courtcases",
+    to: "/admin/datalake/courtcases",
     icon: Gavel,
-    title: "NGM Governance",
+    title: "Data Lake",
     body: "Court cases, hearings, and materials sourced into the governance data lake (read + ingestion).",
   },
   {
@@ -56,7 +56,7 @@ export default function AdminDashboard() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Admin</h1>
         <p className="text-sm text-muted-foreground">
-          One panel for NES, NGM, Jawafdehi cases, and casework.
+          One panel for entities, the data lake, Jawafdehi cases, and casework.
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

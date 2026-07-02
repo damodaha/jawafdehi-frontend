@@ -1184,13 +1184,13 @@
     "showMore": "Show {{count}} more",
     "showLess": "Show less",
     "nes": {
-      "heading": "Entities (NES)",
+      "heading": "Entities",
       "description": "People, offices, organizations and locations tracked across the archive.",
       "total": "Entities tracked",
       "byType": "By type"
     },
     "ngm": {
-      "heading": "Judicial records (NGM)",
+      "heading": "Judicial records",
       "description": "Court cases, hearings and source documents collected from Nepal's judiciary.",
       "courtCases": "Court records",
       "courts": "Courts",

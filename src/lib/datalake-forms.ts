@@ -1,4 +1,4 @@
-// Client-side validators for NGM admin write forms. These mirror the backend
+// Client-side validators for data-lake admin write forms. These mirror the backend
 // contracts (shared/jawafdehi_shared/entities/ids.py) so the form can give
 // immediate feedback; the backend remains the authority and re-validates.
 
@@ -36,7 +36,7 @@ export function parseMaterialIri(
   return { source: path.slice(0, lastSlash), ident: path.slice(lastSlash + 1) };
 }
 
-// NGM material_type tokens (Material.material_type values; see jsonld.py
+// Material_type tokens (Material.material_type values; see jsonld.py
 // MaterialType). These pick the schema.org @type the backend derives — the
 // create form sends material_type, not the raw @type.
 export const MATERIAL_TYPES = [

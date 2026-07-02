@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { adminErrorMessage, type Paginated } from "@/services/admin-api";
+import { FormError } from "@/components/admin/FormError";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -13,7 +14,7 @@ import { Loader2, RefreshCw } from "lucide-react";
 
 export interface Column<T> {
   header: string;
-  // Cell renderer for a row. Kept liberal — most NGM/Jawafdehi rows are loosely
+  // Cell renderer for a row. Kept liberal — most data-lake/Jawafdehi rows are loosely
   // typed Record<string, unknown> off the read plane.
   cell: (row: T) => React.ReactNode;
   className?: string;
@@ -33,7 +34,7 @@ interface ResourceTableProps<T> {
   onRowClick?: (row: T) => void;
 }
 
-// A generic paginated table over a DRF list endpoint. Used by the NGM +
+// A generic paginated table over a DRF list endpoint. Used by the data-lake +
 // Jawafdehi admin pages. Supports an optional header action and row-click.
 export default function ResourceTable<T>({
   title,
@@ -105,11 +106,7 @@ export default function ResourceTable<T>({
         </div>
       </div>
 
-      {error && (
-        <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
-          {error}
-        </p>
-      )}
+      <FormError message={error} />
 
       <div className="rounded-md border bg-white">
         <Table>

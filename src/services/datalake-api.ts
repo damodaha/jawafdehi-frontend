@@ -1,28 +1,22 @@
 /**
- * NGM API Client (governance / judicial materials + court cases)
+ * Data Lake API Client (judicial materials + court cases)
  *
- * NGM data lives on the Think-Big monolith under the SINGLE unified `/api` root
- * (the former per-service `/api/ngm` prefix was hard-cut). Reads are public —
- * materials and court cases are derived from public-domain government documents.
+ * Data-lake records live on the Think-Big monolith under the SINGLE unified
+ * `/api` root. Reads are public — materials and court cases are derived from
+ * public-domain government documents.
  *
  *   GET /api/materials/<source>/<ident>          -> material JSON-LD (schema.org)
  *   GET /api/courtcases/<court>/<case_number>/   -> court case (composite key)
  *   GET /api/courtcases/<court>/<case_number>/{hearings,entities,documents}
  *
- * Base URL defaults to the SAME-ORIGIN relative `/api` so the Vite dev proxy /
- * monolith ingress resolves it. An absolute override (VITE_NGM_API_BASE_URL) is
- * supported for split-host deployments. NOTE: keep the default RELATIVE — an
- * absolute prod default would make a containerized frontend bypass the proxy and
- * hit prod (the bug that crashed the home page during the search migration).
+ * Auth, base-URL resolution, and error extraction are handled by the shared
+ * `http` client (./http) — the ONE axios instance every service layer shares.
+ * Call sites pass FULL `/api/...` paths.
  */
 
-import axios from 'axios';
+import { http, extractErrorMessage } from './http';
 import { JDSApiError } from './jds-api';
 import type { CourtCase, CourtCaseHearing, CourtCaseEntity } from '@/types/jds';
-
-const NGM_API_BASE_URL =
-  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_NGM_API_BASE_URL) ||
-  '/api';
 
 // A material @id IRI path component (`<source>/<ident>`) or a full IRI. The detail
 // route is a splat, so the tail may already be the `<source>/<ident>` form.
@@ -41,7 +35,7 @@ function encodeTail(tail: string): string {
 
 /**
  * A material is stored schema.org JSON-LD (bilingual language maps + a `jawafdehi:`
- * extension namespace), the same family as NES entities. We type only the spine and
+ * extension namespace), the same family as entities. We type only the spine and
  * keep an index signature for the type-specific long tail (rendered generically).
  */
 export type MaterialBilingual = { en?: string | null; ne?: string | null };
@@ -66,12 +60,12 @@ export interface Material {
  */
 export async function getMaterial(iriOrTail: string): Promise<Material> {
   const tail = encodeTail(materialTail(iriOrTail));
-  const endpoint = `/materials/${tail}`;
+  const endpoint = `/api/materials/${tail}`;
   try {
-    const response = await axios.get<Material>(`${NGM_API_BASE_URL}${endpoint}`);
+    const response = await http.get<Material>(endpoint);
     return response.data;
   } catch (error) {
-    handleNgmError(error, endpoint);
+    handleDataLakeError(error, endpoint);
   }
 }
 
@@ -87,7 +81,7 @@ export function parseCourtCaseRef(ref: string): { court: string; caseNumber: str
 }
 
 /**
- * Retrieve a court case by its composite key from the NGM read plane.
+ * Retrieve a court case by its composite key from the data-lake read plane.
  * Accepts either a `<court>:<number>` ref or explicit court + caseNumber.
  */
 export async function getCourtCase(ref: string): Promise<CourtCase>;
@@ -100,12 +94,12 @@ export async function getCourtCase(courtOrRef: string, caseNumber?: string): Pro
   // Composite-key detail route is /courtcases/<court>/<case_number>/ (mounted at
   // /api/), NOT nested under /courts/. Case numbers contain hyphens but no
   // slashes; encode each segment.
-  const endpoint = `/courtcases/${encodeURIComponent(court)}/${encodeURIComponent(number)}/`;
+  const endpoint = `/api/courtcases/${encodeURIComponent(court)}/${encodeURIComponent(number)}/`;
   try {
-    const response = await axios.get<CourtCase>(`${NGM_API_BASE_URL}${endpoint}`);
+    const response = await http.get<CourtCase>(endpoint);
     return response.data;
   } catch (error) {
-    handleNgmError(error, endpoint);
+    handleDataLakeError(error, endpoint);
   }
 }
 
@@ -122,13 +116,13 @@ async function getCaseSubResource<T>(
   caseNumber: string,
   sub: 'hearings' | 'entities' | 'documents',
 ): Promise<T[]> {
-  const endpoint = `/courtcases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}/${sub}`;
+  const endpoint = `/api/courtcases/${encodeURIComponent(court)}/${encodeURIComponent(caseNumber)}/${sub}`;
   try {
-    const response = await axios.get<Paginated<T> | T[]>(`${NGM_API_BASE_URL}${endpoint}`);
+    const response = await http.get<Paginated<T> | T[]>(endpoint);
     const data = response.data;
     return Array.isArray(data) ? data : (data.results ?? []);
   } catch (error) {
-    handleNgmError(error, endpoint);
+    handleDataLakeError(error, endpoint);
   }
 }
 
@@ -156,15 +150,13 @@ export async function getCourtCaseFull(courtOrRef: string, caseNumber?: string):
 }
 
 /** Normalize an axios/unknown error into a JDSApiError (shared error shape). */
-function handleNgmError(error: unknown, endpoint: string): never {
-  if (axios.isAxiosError(error)) {
-    const message = error.response?.data?.detail || error.response?.data?.error || error.message;
-    throw new JDSApiError(`NGM API Error: ${message}`, error.response?.status, endpoint, error);
-  }
+function handleDataLakeError(error: unknown, endpoint: string): never {
+  const message = extractErrorMessage(error, 'Unknown error occurred');
+  const statusCode = (error as { response?: { status?: number } })?.response?.status;
   throw new JDSApiError(
-    `Unexpected error: ${error instanceof Error ? error.message : String(error)}`,
-    undefined,
+    `Data Lake API Error: ${message}`,
+    statusCode,
     endpoint,
-    error,
+    error instanceof Error ? error : undefined,
   );
 }

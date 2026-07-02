@@ -7,6 +7,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { useCaseworkAuth } from "@/context/CaseworkAuthContext";
+import { hasAdminAccess } from "@/lib/roles";
 import { Button } from "@/components/ui/button";
 import {
   Building2,
@@ -22,9 +23,8 @@ import {
 
 // The unified admin panel mounts at /admin (folds in the old /portal casework
 // pages). Auth: OIDC + an internal role. The API is the authorization
-// authority; this gate just keeps role-less users out of a UI that would 403
-// on every call.
-const ADMIN_ROLES = ["admin", "moderator", "caseworker", "contributor", "readonly"];
+// authority; this gate (hasAdminAccess, see lib/roles) just keeps role-less
+// users out of a UI that would 403 on every call.
 
 // Sidebar groups. `roles` (when set) narrows a link to those roles; links
 // without it show for anyone who cleared the panel gate.
@@ -46,21 +46,22 @@ const NAV: NavGroup[] = [
     items: [{ to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true }],
   },
   {
-    heading: "NES — Entities",
-    items: [{ to: "/admin/nes/entities", label: "Entities", icon: Network }],
+    heading: "Entities",
+    items: [{ to: "/admin/entities", label: "Entities", icon: Network }],
   },
   {
-    heading: "NGM — Governance",
+    heading: "Data Lake",
     items: [
-      { to: "/admin/ngm/courtcases", label: "Court cases", icon: Gavel },
-      { to: "/admin/ngm/materials", label: "Materials", icon: ScrollText },
+      { to: "/admin/datalake/courtcases", label: "Court cases", icon: Gavel },
+      { to: "/admin/datalake/courts", label: "Courts", icon: Building2 },
+      { to: "/admin/datalake/firms", label: "Blocklisted firms", icon: Building2 },
+      { to: "/admin/datalake/materials", label: "Materials", icon: ScrollText },
     ],
   },
   {
     heading: "Jawafdehi — Cases",
     items: [
       { to: "/admin/jawafdehi/cases", label: "Cases", icon: FileText },
-      { to: "/admin/jawafdehi/sources", label: "Sources", icon: Building2 },
     ],
   },
   {
@@ -143,8 +144,7 @@ function AdminShell({ children }: { children: ReactNode }) {
 
   // Role gate.
   const roles = user.roles ?? [];
-  const hasAccess = roles.some((r) => ADMIN_ROLES.includes(r.toLowerCase()));
-  if (!hasAccess) {
+  if (!hasAdminAccess(roles)) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
         <div className="w-full max-w-md space-y-4 rounded-2xl bg-white p-8 text-center shadow-xl">

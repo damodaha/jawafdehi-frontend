@@ -88,7 +88,7 @@ const Cases = () => {
 
   const entityQueries = useQueries({
     queries: uniqueNesIds.map((nesId) => ({
-      queryKey: ['nes-entity', nesId],
+      queryKey: ['entity-record', nesId],
       queryFn: () => getEntityById(nesId),
       staleTime: 10 * 60 * 1000,
       retry: false,

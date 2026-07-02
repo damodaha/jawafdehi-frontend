@@ -12,7 +12,7 @@ import { getCases, getStatistics } from "@/services/jds-api";
 import { getEntityById } from "@/services/api";
 import { useEffect, useMemo, useState } from "react";
 
-import type { Entity } from "@/types/nes";
+import type { Entity } from "@/types/entity";
 import { translateDynamicText } from "@/lib/translate-dynamic-content";
 import { getSubjectEntities } from "@/utils/case-entities";
 import { useTranslation } from "react-i18next";
@@ -41,7 +41,7 @@ const Index = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Resolve location entities from NES
+  // Resolve location entities from the registry
   useEffect(() => {
     if (!casesData?.results) return;
 
@@ -100,7 +100,7 @@ const Index = () => {
       });
       const primaryEntity = entityNames[0] || "Unknown Entity";
 
-      // Translate location names using NES resolution
+      // Translate location names using entity resolution
       const locationNames = locationEntities.map(e => {
         if (e.nes_id && resolvedEntities[e.nes_id]) {
           const entity = resolvedEntities[e.nes_id];

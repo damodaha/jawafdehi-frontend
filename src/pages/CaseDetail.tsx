@@ -27,10 +27,11 @@ import {
 } from "@/components/ui/tooltip";
 import { Banknote, Calendar, FileText, AlertTriangle, ArrowLeft, ExternalLink, AlertCircle, Info, Mail, MapPin, MessageCircle, Scale, StickyNote, User, Share2 } from "lucide-react";
 import { getCaseById, getCaseByCourtRef, getDocumentSourceById } from "@/services/jds-api";
-import { getCourtCase } from "@/services/ngm-api";
+import { API_BASE_URL } from "@/services/http";
+import { getCourtCase } from "@/services/datalake-api";
 import { getEntityById } from "@/services/api";
 import type { CourtCase, DocumentSource, JawafEntity } from "@/types/jds";
-import type { Entity } from "@/types/nes";
+import type { Entity } from "@/types/entity";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { formatCaseDateRange } from "@/utils/date";
 import { stripMarkdown } from "@/utils/markdown";
@@ -203,7 +204,7 @@ const CaseDetail = () => {
 
   const entityQueries = useQueries({
     queries: uniqueNesIds.map((nesId) => ({
-      queryKey: ['nes-entity', nesId],
+      queryKey: ['entity-record', nesId],
       queryFn: () => getEntityById(nesId),
       staleTime: 10 * 60 * 1000,
       retry: false,
@@ -354,7 +355,7 @@ const CaseDetail = () => {
         <meta name="twitter:title" content={`${caseData.title} | Jawafdehi`} />
         <meta name="twitter:description" content={metaDescription} />
         <meta name="twitter:image" content="https://jawafdehi.org/og-favicon.png" />
-        <link rel="alternate" type="application/json" href={`https://portal.jawafdehi.org/api/cases/${id}/`} title="Case data (JSON API)" />
+        <link rel="alternate" type="application/json" href={`${API_BASE_URL}/api/cases/${id}/`} title="Case data (JSON API)" />
         <link rel="alternate" type="application/json+oembed" href={`https://jawafdehi.org/oembed?url=${encodeURIComponent(canonicalUrl)}&format=json`} title={`${caseData.title} oEmbed`} />
       </Helmet>
       <CaseDetailBanner
@@ -656,7 +657,7 @@ const CaseDetail = () => {
                 </div>
                 <Button variant="outline" size="lg" asChild className="shrink-0">
                   <a
-                    href={`https://portal.jawafdehi.org/admin/cases/case/${id}/change/`}
+                    href={`${API_BASE_URL}/admin/cases/case/${id}/change/`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2"

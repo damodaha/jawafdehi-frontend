@@ -21,7 +21,7 @@ import WeeklyMeetings from "./pages/WeeklyMeetings";
 import Information from "./pages/Information";
 import CaseDetail from "./pages/CaseDetail";
 import EntityProfile from "./pages/EntityProfile";
-import NesEntityProfile from "./pages/NesEntityProfile";
+import EntityRecordProfile from "./pages/EntityRecordProfile";
 import MaterialProfile from "./pages/MaterialProfile";
 import CourtCaseProfile from "./pages/CourtCaseProfile";
 import EntityResponse from "./pages/EntityResponse";
@@ -44,17 +44,21 @@ import { getUserManager, onSigninCallback } from "./services/oidc";
 import { CaseworkAuthProvider } from "./context/CaseworkAuthContext";
 import AdminLayout from "@/components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
-import NesEntities from "./pages/admin/nes/NesEntities";
-import NesEntityCreate from "./pages/admin/nes/NesEntityCreate";
-import NesEntityEdit from "./pages/admin/nes/NesEntityEdit";
-import NgmCourtCases from "./pages/admin/ngm/NgmCourtCases";
-import NgmCourtCaseForm from "./pages/admin/ngm/NgmCourtCaseForm";
-import NgmMaterials from "./pages/admin/ngm/NgmMaterials";
-import NgmMaterialForm from "./pages/admin/ngm/NgmMaterialForm";
+import EntitiesList from "./pages/admin/entities/EntitiesList";
+import EntityCreate from "./pages/admin/entities/EntityCreate";
+import EntityEdit from "./pages/admin/entities/EntityEdit";
+// Admin data-lake pages. Aliased where the default-export name collides with a
+// public browse page already imported above (Materials, CourtCases).
+import AdminCourtCases from "./pages/admin/datalake/CourtCases";
+import CourtCaseForm from "./pages/admin/datalake/CourtCaseForm";
+import AdminMaterials from "./pages/admin/datalake/Materials";
+import MaterialForm from "./pages/admin/datalake/MaterialForm";
+import Courts from "./pages/admin/datalake/Courts";
+import CourtForm from "./pages/admin/datalake/CourtForm";
+import Firms from "./pages/admin/datalake/Firms";
+import FirmForm from "./pages/admin/datalake/FirmForm";
 import AdminCases from "./pages/admin/jawafdehi/AdminCases";
 import AdminCaseForm from "./pages/admin/jawafdehi/AdminCaseForm";
-import AdminSources from "./pages/admin/jawafdehi/AdminSources";
-import AdminSourceForm from "./pages/admin/jawafdehi/AdminSourceForm";
 import Moderation from "./pages/admin/casework/Moderation";
 import CaseworkLogin from "./pages/CaseworkLogin";
 import CaseworkCallback from "./pages/CaseworkCallback";
@@ -123,21 +127,30 @@ const App = () => (
                       <Route path="callback" element={<CaseworkCallback />} />
                       <Route element={<AdminLayout />}>
                         <Route path="" element={<AdminDashboard />} />
-                        {/* NES — create/edit before the list so the literal
+                        {/* Entities — create/edit before the list so the literal
                             "new" and "edit" segments win over the splat. */}
-                        <Route path="nes/entities/new" element={<NesEntityCreate />} />
-                        <Route path="nes/entities/edit/*" element={<NesEntityEdit />} />
-                        <Route path="nes/entities" element={<NesEntities />} />
-                        {/* NGM */}
-                        <Route path="ngm/courtcases/new" element={<NgmCourtCaseForm />} />
+                        <Route path="entities/new" element={<EntityCreate />} />
+                        <Route path="entities/edit/*" element={<EntityEdit />} />
+                        <Route path="entities" element={<EntitiesList />} />
+                        {/* Data Lake */}
+                        <Route path="datalake/courtcases/new" element={<CourtCaseForm />} />
                         <Route
-                          path="ngm/courtcases/:court/:caseNumber/edit"
-                          element={<NgmCourtCaseForm />}
+                          path="datalake/courtcases/:court/:caseNumber/edit"
+                          element={<CourtCaseForm />}
                         />
-                        <Route path="ngm/courtcases" element={<NgmCourtCases />} />
-                        <Route path="ngm/materials/new" element={<NgmMaterialForm />} />
-                        <Route path="ngm/materials/edit/*" element={<NgmMaterialForm />} />
-                        <Route path="ngm/materials" element={<NgmMaterials />} />
+                        <Route path="datalake/courtcases" element={<AdminCourtCases />} />
+                        <Route path="datalake/courts/new" element={<CourtForm />} />
+                        <Route
+                          path="datalake/courts/:identifier/edit"
+                          element={<CourtForm />}
+                        />
+                        <Route path="datalake/courts" element={<Courts />} />
+                        <Route path="datalake/firms/new" element={<FirmForm />} />
+                        <Route path="datalake/firms/:id/edit" element={<FirmForm />} />
+                        <Route path="datalake/firms" element={<Firms />} />
+                        <Route path="datalake/materials/new" element={<MaterialForm />} />
+                        <Route path="datalake/materials/edit/*" element={<MaterialForm />} />
+                        <Route path="datalake/materials" element={<AdminMaterials />} />
                         {/* Jawafdehi — create/edit before the list so the
                             literal "new" segment wins over the :slug/:id param. */}
                         <Route path="jawafdehi/cases/new" element={<AdminCaseForm />} />
@@ -146,12 +159,11 @@ const App = () => (
                           element={<AdminCaseForm />}
                         />
                         <Route path="jawafdehi/cases" element={<AdminCases />} />
-                        <Route path="jawafdehi/sources/new" element={<AdminSourceForm />} />
-                        <Route
-                          path="jawafdehi/sources/:id/edit"
-                          element={<AdminSourceForm />}
-                        />
-                        <Route path="jawafdehi/sources" element={<AdminSources />} />
+                        {/* Document Sources removed: the "cases own no documents"
+                            ADR collapsed sources into Data Lake materials, so there
+                            is no /api/sources/ write endpoint. Evidence is linked as
+                            material IRIs on the case; manage docs under Data Lake →
+                            Materials. */}
                         {/* Casework (folded in from /portal) */}
                         <Route path="reviews" element={<CaseworkReviews />} />
                         <Route path="reviews/:id" element={<CaseworkReviewDetail />} />
@@ -175,18 +187,18 @@ const App = () => (
             <Route path="/case/:id" element={<CaseDetail />} />
             <Route path="/entities" element={<Entities />} />
             <Route path="/search" element={<ArchiveSearch />} />
-            {/* NGM single-type browse pages (unified-archive search, type-pinned). */}
+            {/* Data-lake single-type browse pages (unified-archive search, type-pinned). */}
             <Route path="/materials" element={<Materials />} />
             <Route path="/courtcases" element={<CourtCases />} />
             {/* Legacy Jawafdehi case-entity profile (numeric id, single segment). */}
             <Route path="/entity/:id" element={<EntityProfile />} />
-            {/* NES entity by IRI tail (multi-segment, e.g. organization/.../tu).
+            {/* Entity record by IRI tail (multi-segment, e.g. organization/.../tu).
                 React Router prefers the more specific :id route for single-segment
-                numeric ids, so this splat only catches the hierarchical NES IRIs. */}
-            <Route path="/entity/*" element={<NesEntityProfile />} />
-            {/* NGM governance material by IRI tail (/material/<source>/<ident>). */}
+                numeric ids, so this splat only catches the hierarchical entity IRIs. */}
+            <Route path="/entity/*" element={<EntityRecordProfile />} />
+            {/* Data-lake material by IRI tail (/material/<source>/<ident>). */}
             <Route path="/material/*" element={<MaterialProfile />} />
-            {/* NGM court case by IRI tail (/courtcase/<court>/<case_number>). */}
+            {/* Data-lake court case by IRI tail (/courtcase/<court>/<case_number>). */}
             <Route path="/courtcase/*" element={<CourtCaseProfile />} />
             <Route path="/ask" element={<GuestChat />} />
             <Route path="/entity-response/:id" element={<EntityResponse />} />

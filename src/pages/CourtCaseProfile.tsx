@@ -6,7 +6,7 @@ import { AlertCircle, ArrowLeft } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { CourtCaseCard } from "@/components/CourtCaseCard";
-import { getCourtCaseFull } from "@/services/ngm-api";
+import { getCourtCaseFull } from "@/services/datalake-api";
 
 // The /courtcase/* splat tail is the courtcase IRI path component
 // `<court>/<case_number>` (e.g. `special/081-CR-0079`). CourtCaseCard wants the
@@ -27,7 +27,7 @@ export default function CourtCaseProfile() {
   const courtCaseId = parsed ? `${parsed.court}:${parsed.caseNumber}` : "";
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["ngm-courtcase", parsed?.court, parsed?.caseNumber],
+    queryKey: ["datalake-courtcase", parsed?.court, parsed?.caseNumber],
     queryFn: () => getCourtCaseFull(parsed!.court, parsed!.caseNumber),
     enabled: Boolean(parsed),
     retry: false,
@@ -58,7 +58,7 @@ export default function CourtCaseProfile() {
         inLanguage: "ne",
         isAccessibleForFree: true,
         ...(data.registration_date_ad ? { dateCreated: data.registration_date_ad } : {}),
-        publisher: { "@type": "Organization", name: "Jawafdehi NGM" },
+        publisher: { "@type": "Organization", name: "Jawafdehi" },
       })
     : null;
 
@@ -95,7 +95,7 @@ export default function CourtCaseProfile() {
             {/* Provenance. */}
             <div className="rounded-xl border bg-muted/30 p-4 text-xs text-muted-foreground">
               <p>
-                <strong>Source:</strong> Jawafdehi governance archive (NGM) — court
+                <strong>Source:</strong> Jawafdehi governance archive — court
                 listings, hearings, and orders harvested from Nepal&apos;s public court
                 records.
               </p>

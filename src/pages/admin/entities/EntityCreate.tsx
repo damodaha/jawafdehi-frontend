@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  createNesEntity,
+  createEntity,
   adminErrorMessage,
   type CreateEntityPayload,
 } from "@/services/admin-api";
@@ -10,8 +10,10 @@ import {
   PREFIX_RE,
   SLUG_RE,
   slugify,
-} from "@/lib/nes-jsonld";
-import { Button } from "@/components/ui/button";
+} from "@/lib/entity-jsonld";
+import FormPageShell from "@/components/admin/FormPageShell";
+import AdminFormActions from "@/components/admin/AdminFormActions";
+import { FieldError } from "@/components/admin/FormError";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,12 +25,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { ArrowLeft, Loader2 } from "lucide-react";
 
-// Create a NES entity using the backend "authoring shape": prefix + slug +
+// Create an entity using the backend "authoring shape": prefix + slug +
 // @type + bilingual name, plus optional free-form schema.org properties
 // (description, sameAs, …) entered as JSON and merged in verbatim.
-export default function NesEntityCreate() {
+export default function EntityCreate() {
   const navigate = useNavigate();
   const [prefix, setPrefix] = useState("");
   const [slug, setSlug] = useState("");
@@ -117,10 +118,10 @@ export default function NesEntityCreate() {
     };
 
     try {
-      const created = await createNesEntity(payload);
+      const created = await createEntity(payload);
       toast({ title: "Entity created", description: created["@id"] });
       // Route to the edit view of the new entity (ref = prefix/slug).
-      navigate(`/admin/nes/entities/edit/${prefix.trim()}/${slug.trim()}`);
+      navigate(`/admin/entities/edit/${prefix.trim()}/${slug.trim()}`);
     } catch (err) {
       setError(adminErrorMessage(err, "Failed to create entity"));
     } finally {
@@ -129,29 +130,18 @@ export default function NesEntityCreate() {
   };
 
   return (
-    <div className="max-w-2xl space-y-6">
-      <div>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="mb-2 -ml-2"
-          onClick={() => navigate("/admin/nes/entities")}
-        >
-          <ArrowLeft className="mr-1 h-4 w-4" /> Entities
-        </Button>
-        <h1 className="text-2xl font-bold tracking-tight">New NES Entity</h1>
-        <p className="text-sm text-muted-foreground">
+    <FormPageShell
+      title="New entity"
+      backLabel="Entities"
+      onBack={() => navigate("/admin/entities")}
+      error={error}
+      subtitle={
+        <>
           Identity (prefix + slug + type) and bilingual name. The{" "}
           <code>@id</code> IRI is built from prefix/slug.
-        </p>
-      </div>
-
-      {error && (
-        <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
-          {error}
-        </p>
-      )}
-
+        </>
+      }
+    >
       <form onSubmit={onSubmit} className="space-y-5">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1">
@@ -162,11 +152,11 @@ export default function NesEntityCreate() {
               onChange={(e) => setPrefix(e.target.value)}
               placeholder="person, organization, location/district…"
             />
-            {!prefixValid && (
-              <p className="text-xs text-red-600">
-                Lowercase letters/digits/_ segments joined by “/”.
-              </p>
-            )}
+            <FieldError
+              message={
+                !prefixValid && "Lowercase letters/digits/_ segments joined by “/”."
+              }
+            />
           </div>
           <div className="space-y-1">
             <Label htmlFor="slug">Slug</Label>
@@ -179,11 +169,9 @@ export default function NesEntityCreate() {
               }}
               placeholder="ram-bahadur"
             />
-            {!slugValid && (
-              <p className="text-xs text-red-600">
-                Lowercase, alphanumeric, hyphen-separated.
-              </p>
-            )}
+            <FieldError
+              message={!slugValid && "Lowercase, alphanumeric, hyphen-separated."}
+            />
           </div>
         </div>
 
@@ -223,11 +211,12 @@ export default function NesEntityCreate() {
             />
           </div>
         </div>
-        {!nameValid && (
-          <p className="-mt-3 text-xs text-red-600">
-            At least one of English / Nepali name is required.
-          </p>
-        )}
+        <FieldError
+          message={
+            !nameValid && "At least one of English / Nepali name is required."
+          }
+          className="-mt-3"
+        />
 
         <div className="space-y-1">
           <Label htmlFor="extra">Extra properties (JSON, optional)</Label>
@@ -239,7 +228,7 @@ export default function NesEntityCreate() {
             className="font-mono text-xs"
             placeholder={'{\n  "description": {"en": "…"},\n  "sameAs": ["https://…"]\n}'}
           />
-          {extraError && <p className="text-xs text-red-600">{extraError}</p>}
+          <FieldError message={extraError} />
         </div>
 
         <div className="space-y-1">
@@ -252,20 +241,13 @@ export default function NesEntityCreate() {
           />
         </div>
 
-        <div className="flex gap-2">
-          <Button type="submit" disabled={!canSubmit}>
-            {submitting && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
-            Create entity
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate("/admin/nes/entities")}
-          >
-            Cancel
-          </Button>
-        </div>
+        <AdminFormActions
+          saving={submitting}
+          canSave={canSubmit}
+          submitLabel="Create entity"
+          onCancel={() => navigate("/admin/entities")}
+        />
       </form>
-    </div>
+    </FormPageShell>
   );
 }

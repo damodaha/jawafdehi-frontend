@@ -36,7 +36,7 @@ type SearchFiltersProps = {
   onTypeChange: (type?: ArchiveSearchType) => void;
   onToggle: (name: SidebarFilterName, value: string) => void;
   onClear: () => void;
-  // Hide the record-type radios on single-type browse pages (NGM Materials /
+  // Hide the record-type radios on single-type browse pages (Materials /
   // Court-cases) where the type is pinned by the route, not user-selectable.
   hideTypeSelector?: boolean;
 };
